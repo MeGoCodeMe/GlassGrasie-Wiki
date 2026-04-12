@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syncopate:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0D0C0B; color: #E8E2D8; font-family: 'Cormorant Garamond', Georgia, serif; }
+
+  .rule { width: 100%; height: 0.5px; background: linear-gradient(90deg, transparent, #4A3F30 30%, #8B7355 50%, #4A3F30 70%, transparent); }
+
+  /* ── HERO ── */
+  .hero { padding: 56px 40px 48px; display: flex; flex-direction: column; align-items: center; }
+  .eyebrow { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 40px; text-align: center; }
+  .hero-art { width: 100%; max-width: 560px; margin: 0 auto 40px; }
+  .brand-name { font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: clamp(24px, 4vw, 38px); letter-spacing: 10px; color: #F0EAE0; text-align: center; margin-bottom: 6px; }
+  .brand-sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 17px; letter-spacing: 3px; color: #8B7355; text-align: center; margin-bottom: 10px; }
+  .line-tag { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; border: 0.5px solid #2A2218; padding: 5px 14px; text-transform: uppercase; display: inline-block; }
+
+  /* ── PAIR GRID ── */
+  .pairs-section { padding: 48px 40px; background: #0D0C0B; }
+  .pairs-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; }
+  .pairs-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; }
+  .pairs-note { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #4A3F30; }
+
+  .pairs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #1C1810; }
+  .pair-card { background: #0D0C0B; padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 14px; transition: background 0.25s; }
+  .pair-card:hover { background: #111009; }
+  .pair-art { width: 100%; aspect-ratio: 1; }
+  .pair-run { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #3A3020; text-transform: uppercase; }
+  .pair-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; font-weight: 300; color: #D4C9B8; line-height: 1.2; }
+  .pair-price { font-family: 'Syncopate', sans-serif; font-size: 9px; letter-spacing: 1px; color: #8B7355; }
+  .pair-avail { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; display: inline-block; }
+  .d-avail { background: #3D5C3A; }
+  .d-low { background: #8B7355; }
+  .d-sold { background: #2A2218; border: 0.5px solid #4A3F30; }
+  .t-avail { color: #4A7A45; }
+  .t-low { color: #8B7355; }
+  .t-sold { color: #3A3020; }
+
+  /* ── MATERIAL STORY ── */
+  .material { padding: 52px 40px; background: #100F0D; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .mat-left {}
+  .mat-eyebrow { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 20px; }
+  .mat-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(20px, 3vw, 28px); line-height: 1.45; color: #D4C9B8; margin-bottom: 20px; }
+  .mat-quote em { color: #8B7355; }
+  .mat-body { font-family: 'Cormorant Garamond', serif; font-size: 15px; line-height: 1.85; color: #5A5044; }
+
+  .mat-right { display: flex; flex-direction: column; gap: 1px; background: #2A2218; }
+  .spec-row { background: #100F0D; padding: 14px 18px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .spec-k { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #4A3F30; text-transform: uppercase; flex-shrink: 0; }
+  .spec-v { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #D4C9B8; text-align: right; font-style: italic; }
+
+  /* ── PRICING BLOCK ── */
+  .pricing { padding: 48px 40px; background: #0D0C0B; }
+  .pricing-header { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; margin-bottom: 28px; }
+  .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1C1810; }
+  .price-tile { background: #0D0C0B; padding: 28px 24px; }
+  .price-tier { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; text-transform: uppercase; margin-bottom: 12px; }
+  .price-amount { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 40px; color: #E8E2D8; line-height: 1; margin-bottom: 4px; }
+  .price-amount span { font-size: 18px; color: #8B7355; vertical-align: top; margin-top: 8px; display: inline-block; }
+  .price-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #4A3F30; margin-top: 10px; line-height: 1.6; }
+  .price-margin { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #3D5C3A; margin-top: 14px; }
+
+  /* ── SYSTEM BRIDGE ── */
+  .bridge { padding: 40px 40px; background: #100F0D; display: flex; align-items: center; gap: 32px; }
+  .bridge-text { flex: 1; }
+  .bridge-eyebrow { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 12px; }
+  .bridge-headline { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(18px, 2.5vw, 24px); color: #D4C9B8; line-height: 1.4; }
+  .bridge-headline em { color: #8B7355; }
+  .bridge-art { flex-shrink: 0; width: 120px; }
+
+  /* ── FOOTER ── */
+  .footer { padding: 28px 40px; background: #0D0C0B; display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #1C1810; }
+  .footer-brand { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #3A3020; text-transform: uppercase; }
+  .footer-line { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 12px; color: #3A3020; }
+
+  @media (max-width: 640px) {
+    .pairs-grid { grid-template-columns: 1fr 1fr; }
+    .material { grid-template-columns: 1fr; padding: 40px 24px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .hero { padding: 40px 24px 36px; }
+    .pairs-section { padding: 36px 24px; }
+    .pricing { padding: 36px 24px; }
+    .bridge { flex-direction: column; padding: 32px 24px; }
+    .footer { padding: 20px 24px; flex-direction: column; gap: 10px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">Glass⏧Grasie® — Fragment · Wearable Series</div>
+
+  <div class="hero-art">
+    <svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <defs>
+        <radialGradient id="gA" cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stop-color="#C4955A" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="gB" cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stop-color="#4A8A6A" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- LEFT EARRING — Forest Floor run -->
+      <g transform="translate(100,20)">
+        <ellipse cx="80" cy="100" rx="68" ry="55" fill="url(#gA)"/>
+        <path d="M80,0 Q95,-12 108,0 Q118,10 112,22" fill="none" stroke="#4A3F30" stroke-width="1"/>
+        <circle cx="80" cy="2" r="2" fill="#2A2218"/>
+        <polygon points="80,22 120,50 120,110 80,138 40,110 40,50" fill="none" stroke="#2A2218" stroke-width="0.5"/>
+        <polygon points="80,22 40,50 60,72" fill="#1A3A2E" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,22 60,72 80,64" fill="#1F4A3A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,22 80,64 100,72" fill="#2C4A1A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,22 100,72 120,50" fill="#1E3A10" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="40,50 60,72 48,100" fill="#3A2C10" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="40,50 48,100 40,110" fill="#4A3818" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="60,72 80,64 80,96 64,100" fill="#2A3C1A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,64 100,72 96,100 80,96" fill="#1C3828" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="120,50 112,100 100,72" fill="#3C2A0C" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="120,50 120,110 112,100" fill="#4A3615" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="48,100 64,100 60,124 40,110" fill="#1A2C3A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="64,100 80,96 80,124 60,124" fill="#102A3C" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,96 96,100 100,124 80,124" fill="#1A3040" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="96,100 112,100 120,110 100,124" fill="#122A38" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="60,124 80,124 80,138 52,132" fill="#0E2030" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,124 100,124 108,132 80,138" fill="#0A1C2A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <line x1="80" y1="22" x2="80" y2="64" stroke="#8B7355" stroke-width="0.4" opacity="0.7"/>
+        <line x1="80" y1="96" x2="80" y2="138" stroke="#8B7355" stroke-width="0.4" opacity="0.5"/>
+        <text x="80" y="155" text-anchor="middle" font-family="monospace" font-size="6" letter-spacing="2" fill="#3A3020">RUN 001</text>
+      </g>
+
+      <!-- RIGHT EARRING — Maritime Rust run -->
+      <g transform="translate(300,20)">
+        <ellipse cx="80" cy="100" rx="68" ry="55" fill="url(#gB)"/>
+        <path d="M80,0 Q95,-12 108,0 Q118,10 112,22" fill="none" stroke="#4A3F30" stroke-width="1"/>
+        <circle cx="80" cy="2" r="2" fill="#2A2218"/>
+        <polygon points="80,22 120,50 120,110 80,138 40,110 40,50" fill="none" stroke="#2A2218" stroke-width="0.5"/>
+        <polygon points="80,22 40,50 60,72" fill="#0C2A40" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,22 60,72 80,64" fill="#0A1E30" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,22 80,64 100,72" fill="#142A4A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,22 100,72 120,50" fill="#1C3A5A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="40,50 60,72 48,100" fill="#C4602A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="40,50 48,100 40,110" fill="#B85020" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="60,72 80,64 80,96 64,100" fill="#8B3A18" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,64 100,72 96,100 80,96" fill="#C4702A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="120,50 112,100 100,72" fill="#0E2030" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="120,50 120,110 112,100" fill="#142A4A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="48,100 64,100 60,124 40,110" fill="#A84820" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="64,100 80,96 80,124 60,124" fill="#0C2A40" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,96 96,100 100,124 80,124" fill="#1C3A5A" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="96,100 112,100 120,110 100,124" fill="#0A1830" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="60,124 80,124 80,138 52,132" fill="#081420" stroke="#0D0C0B" stroke-width="1.2"/>
+        <polygon points="80,124 100,124 108,132 80,138" fill="#0C2030" stroke="#0D0C0B" stroke-width="1.2"/>
+        <line x1="80" y1="22" x2="80" y2="64" stroke="#4A7AAA" stroke-width="0.4" opacity="0.7"/>
+        <line x1="80" y1="96" x2="80" y2="138" stroke="#C47840" stroke-width="0.4" opacity="0.5"/>
+        <text x="80" y="155" text-anchor="middle" font-family="monospace" font-size="6" letter-spacing="2" fill="#3A3020">RUN 002</text>
+      </g>
+
+      <text x="280" y="80" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="11" fill="#2A2218" letter-spacing="1">dezelfde vorm</text>
+      <text x="280" y="96" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="11" fill="#4A3F30" letter-spacing="1">ander glas</text>
+      <line x1="268" y1="104" x2="292" y2="104" stroke="#2A2218" stroke-width="0.5"/>
+      <text x="280" y="118" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="10" fill="#2A2218" letter-spacing="0.5">nooit hetzelfde</text>
+      <text x="280" y="200" text-anchor="middle" font-family="monospace" font-size="6" letter-spacing="2" fill="#2A2218">float 3–4 mm · actual scale approx.</text>
+    </svg>
+  </div>
+
+  <div class="brand-name">FRAGMENT</div>
+  <div class="brand-sub">Wearable · by Glass⏧Grasie®</div>
+  <div class="line-tag">Geometrische oorbellen — limited per run</div>
+</div>
+
+<div class="rule"></div>
+
+<!-- PAIR GRID -->
+<div class="pairs-section">
+  <div class="pairs-header">
+    <span class="pairs-title">Huidige runs</span>
+    <span class="pairs-note">Van Dijken Glas — full-colour bedrukt restglas</span>
+  </div>
+
+  <div class="pairs-grid">
+
+    <!-- Forest Floor -->
+    <div class="pair-card">
+      <div class="pair-art">
+        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="160" height="160" fill="#0A1208"/>
+          <polygon points="80,10 140,50 140,110 80,150 20,110 20,50" fill="none" stroke="#1C1810" stroke-width="0.5"/>
+          <polygon points="80,10 20,50 50,72" fill="#1A3A2E" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 50,72 80,60" fill="#1F4A3A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 80,60 110,72" fill="#2C4A1A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 110,72 140,50" fill="#1E3A10" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="20,50 50,72 38,100" fill="#3A2C10" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="20,50 38,100 20,110" fill="#4A3818" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="50,72 80,60 80,92 62,100" fill="#2A3C1A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,60 110,72 98,100 80,92" fill="#1C3828" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="140,50 122,100 110,72" fill="#3C2A0C" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="140,50 140,110 122,100" fill="#4A3615" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="38,100 62,100 56,128 20,110" fill="#1A2C3A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="62,100 80,92 80,128 56,128" fill="#102A3C" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,92 98,100 104,128 80,128" fill="#1A3040" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="98,100 122,100 140,110 104,128" fill="#122A38" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="56,128 80,128 80,150 44,140" fill="#0E2030" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,128 104,128 116,140 80,150" fill="#0A1C2A" stroke="#0D0C0B" stroke-width="1"/>
+          <line x1="80" y1="10" x2="80" y2="60" stroke="#8B7355" stroke-width="0.4" opacity="0.6"/>
+          <line x1="80" y1="92" x2="80" y2="150" stroke="#8B7355" stroke-width="0.4" opacity="0.4"/>
+        </svg>
+      </div>
+      <div class="pair-run">Run 001 · 2024</div>
+      <div class="pair-name">Forest Floor</div>
+      <div class="pair-price">€ 75 / set</div>
+      <div class="pair-avail"><span class="dot d-low"></span><span class="t-low">2 sets resterend</span></div>
+    </div>
+
+    <!-- Maritime Rust -->
+    <div class="pair-card">
+      <div class="pair-art">
+        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="160" height="160" fill="#070D12"/>
+          <polygon points="80,10 140,50 140,110 80,150 20,110 20,50" fill="none" stroke="#1C1810" stroke-width="0.5"/>
+          <polygon points="80,10 20,50 50,72" fill="#0C2A40" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 50,72 80,60" fill="#0A1E30" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 80,60 110,72" fill="#142A4A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 110,72 140,50" fill="#1C3A5A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="20,50 50,72 38,100" fill="#C4602A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="20,50 38,100 20,110" fill="#B85020" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="50,72 80,60 80,92 62,100" fill="#8B3A18" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,60 110,72 98,100 80,92" fill="#C4702A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="140,50 122,100 110,72" fill="#0E2030" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="140,50 140,110 122,100" fill="#142A4A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="38,100 62,100 56,128 20,110" fill="#A84820" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="62,100 80,92 80,128 56,128" fill="#0C2A40" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,92 98,100 104,128 80,128" fill="#1C3A5A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="98,100 122,100 140,110 104,128" fill="#0A1830" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="56,128 80,128 80,150 44,140" fill="#081420" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,128 104,128 116,140 80,150" fill="#0C2030" stroke="#0D0C0B" stroke-width="1"/>
+          <line x1="80" y1="10" x2="80" y2="60" stroke="#4A7AAA" stroke-width="0.4" opacity="0.7"/>
+          <line x1="80" y1="92" x2="80" y2="150" stroke="#C47840" stroke-width="0.4" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="pair-run">Run 002 · 2024</div>
+      <div class="pair-name">Maritime Rust</div>
+      <div class="pair-price">€ 75 / set</div>
+      <div class="pair-avail"><span class="dot d-avail"></span><span class="t-avail">5 sets beschikbaar</span></div>
+    </div>
+
+    <!-- Chalk & Ash -->
+    <div class="pair-card">
+      <div class="pair-art">
+        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="160" height="160" fill="#0E0D0C"/>
+          <polygon points="80,10 140,50 140,110 80,150 20,110 20,50" fill="none" stroke="#1C1810" stroke-width="0.5"/>
+          <polygon points="80,10 20,50 50,72" fill="#2A2820" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 50,72 80,60" fill="#1E1C16" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 80,60 110,72" fill="#3A3828" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 110,72 140,50" fill="#4A4838" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="20,50 50,72 38,100" fill="#5A5848" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="20,50 38,100 20,110" fill="#4A4838" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="50,72 80,60 80,92 62,100" fill="#6A6858" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,60 110,72 98,100 80,92" fill="#5A5848" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="140,50 122,100 110,72" fill="#3A3828" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="140,50 140,110 122,100" fill="#2A2820" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="38,100 62,100 56,128 20,110" fill="#3A3828" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="62,100 80,92 80,128 56,128" fill="#4A4838" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,92 98,100 104,128 80,128" fill="#3A3828" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="98,100 122,100 140,110 104,128" fill="#2A2820" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="56,128 80,128 80,150 44,140" fill="#1E1C16" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,128 104,128 116,140 80,150" fill="#2A2820" stroke="#0D0C0B" stroke-width="1"/>
+          <line x1="80" y1="10" x2="80" y2="60" stroke="#8A8878" stroke-width="0.4" opacity="0.6"/>
+          <rect width="160" height="160" fill="#070605" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="pair-run">Run 003 · 2025</div>
+      <div class="pair-name">Chalk &amp; Ash</div>
+      <div class="pair-price">€ 65 / set</div>
+      <div class="pair-avail"><span class="dot d-sold" style="background:#2A2218;border:0.5px solid #4A3F30;"></span><span class="t-sold">Pre-registratie</span></div>
+    </div>
+
+    <!-- Run 004 -->
+    <div class="pair-card">
+      <div class="pair-art">
+        <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="160" height="160" fill="#080808"/>
+          <polygon points="80,10 140,50 140,110 80,150 20,110 20,50" fill="none" stroke="#1C1810" stroke-width="0.5"/>
+          <polygon points="80,10 20,50 50,72" fill="#2A1810" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 50,72 80,60" fill="#3A2018" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 80,60 110,72" fill="#4A3020" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,10 110,72 140,50" fill="#3A2818" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="20,50 50,72 38,100" fill="#1A3040" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="20,50 38,100 20,110" fill="#142438" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="50,72 80,60 80,92 62,100" fill="#3A2818" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,60 110,72 98,100 80,92" fill="#4A3828" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="140,50 122,100 110,72" fill="#1C3040" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="140,50 140,110 122,100" fill="#142438" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="38,100 62,100 56,128 20,110" fill="#2A1C10" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="62,100 80,92 80,128 56,128" fill="#3A2818" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,92 98,100 104,128 80,128" fill="#1A2C3A" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="98,100 122,100 140,110 104,128" fill="#122030" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="56,128 80,128 80,150 44,140" fill="#0E1820" stroke="#0D0C0B" stroke-width="1"/>
+          <polygon points="80,128 104,128 116,140 80,150" fill="#1A2810" stroke="#0D0C0B" stroke-width="1"/>
+          <rect width="160" height="160" fill="#050403" opacity="0.72"/>
+          <text x="80" y="76" text-anchor="middle" font-family="monospace" font-size="7" letter-spacing="2" fill="#3A3020">RUN 004</text>
+          <text x="80" y="90" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="11" fill="#2A2218">nader te bepalen</text>
+        </svg>
+      </div>
+      <div class="pair-run">Run 004 · TBD</div>
+      <div class="pair-name">Onbenoemd</div>
+      <div class="pair-price">€ 55 – 95</div>
+      <div class="pair-avail"><span class="dot d-sold" style="background:#1C1810;border:0.5px solid #2A2218;"></span><span class="t-sold">Motief onbekend</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- MATERIAL STORY -->
+<div class="material">
+  <div class="mat-left">
+    <div class="mat-eyebrow">Het materiaal</div>
+    <div class="mat-quote">
+      Float glas is geen edelstenen-imitatie.<br>Het is <em>zijn eigen categorie.</em>
+    </div>
+    <div class="mat-body">
+      3 tot 4 millimeter. Licht breekt er anders in dan in kristal — diffuser, warmer, minder schreeuwend. De gefacetteerde geometrie versterkt dat: elke facet vangt het licht op een andere hoek. Geen twee draagsters zien hetzelfde stuk. En geen twee runs produceren hetzelfde kleurveld.
+    </div>
+  </div>
+
+  <div class="mat-right">
+    <div class="spec-row"><span class="spec-k">Materiaal</span><span class="spec-v">Float glas Van Dijken Glas</span></div>
+    <div class="spec-row"><span class="spec-k">Dikte</span><span class="spec-v">3 – 4 mm</span></div>
+    <div class="spec-row"><span class="spec-k">Bedrukking</span><span class="spec-v">Full-colour, per run uniek</span></div>
+    <div class="spec-row"><span class="spec-k">Bevestiging</span><span class="spec-v">Goud-vermeil oorhaak</span></div>
+    <div class="spec-row"><span class="spec-k">Geometrie</span><span class="spec-v">Gefacetteerde zeshoek, vast</span></div>
+    <div class="spec-row"><span class="spec-k">Oplage</span><span class="spec-v">Max. 12 sets per run</span></div>
+    <div class="spec-row"><span class="spec-k">Reproductie</span><span class="spec-v">Principieel onmogelijk</span></div>
+    <div class="spec-row"><span class="spec-k">Verpakking</span><span class="spec-v">Genummerd, gesigneerd</span></div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- PRICING -->
+<div class="pricing">
+  <div class="pricing-header">Prijsopbouw</div>
+  <div class="pricing-grid">
+    <div class="price-tile">
+      <div class="price-tier">Introductie — Run 003</div>
+      <div class="price-amount"><span>€</span>65</div>
+      <div class="price-desc">Chalk &amp; Ash — pre-registratie prijs. Laagste entry point van de lijn. Beperkt tot 8 sets.</div>
+      <div class="price-margin">Marge ~85%</div>
+    </div>
+    <div class="price-tile">
+      <div class="price-tier">Standaard — actieve runs</div>
+      <div class="price-amount"><span>€</span>75</div>
+      <div class="price-desc">Forest Floor &amp; Maritime Rust. Prijs stijgt naar €95 naarmate sets opraken — schaarste is gebouwd in het model.</div>
+      <div class="price-margin">Marge ~85%</div>
+    </div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- SYSTEM BRIDGE -->
+<div class="bridge">
+  <div class="bridge-text">
+    <div class="bridge-eyebrow">Fragment als systeem</div>
+    <div class="bridge-headline">
+      Dezelfde run draagt je aan je oor<br>
+      én hangt aan je plafond.<br>
+      <em>Dat is het verhaal dat verkoopt.</em>
+    </div>
+  </div>
+
+  <div class="bridge-art">
+    <svg viewBox="0 0 120 180" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <rect x="58" y="0" width="4" height="20" fill="#2A2218" rx="1"/>
+      <polygon points="60,20 84,34 84,66 60,80 36,66 36,34" fill="none" stroke="#2A2218" stroke-width="0.5"/>
+      <polygon points="60,20 36,34 48,43" fill="#1A3A2E" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="60,20 48,43 60,40" fill="#1F4A3A" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="60,20 60,40 72,43" fill="#2C4A1A" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="60,20 72,43 84,34" fill="#1E3A10" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="36,34 48,43 44,58" fill="#3A2C10" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="60,40 72,43 68,58 60,56" fill="#2A3C1A" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="48,43 60,40 60,56 52,58" fill="#1C3828" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="84,34 76,58 72,43" fill="#3C2A0C" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="44,58 52,58 48,70 36,66" fill="#1A2C3A" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="52,58 60,56 60,70 48,70" fill="#102A3C" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="60,56 68,58 72,70 60,70" fill="#1A3040" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="68,58 76,58 84,66 72,70" fill="#122A38" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="48,70 60,70 60,80 42,76" fill="#0E2030" stroke="#0D0C0B" stroke-width="0.8"/>
+      <polygon points="60,70 72,70 78,76 60,80" fill="#0A1C2A" stroke="#0D0C0B" stroke-width="0.8"/>
+      <line x1="60" y1="88" x2="60" y2="100" stroke="#2A2218" stroke-width="0.5" stroke-dasharray="2 3"/>
+      <text x="60" y="97" text-anchor="middle" font-family="monospace" font-size="5" letter-spacing="1" fill="#2A2218">run 001</text>
+      <g transform="translate(36, 108)">
+        <path d="M24,0 Q30,-4 36,0 Q40,4 38,8" fill="none" stroke="#3A3020" stroke-width="0.8"/>
+        <polygon points="24,8 44,20 44,48 24,60 4,48 4,20" fill="none" stroke="#1C1810" stroke-width="0.4"/>
+        <polygon points="24,8 4,20 14,28" fill="#1A3A2E" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="24,8 14,28 24,26" fill="#1F4A3A" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="24,8 24,26 34,28" fill="#2C4A1A" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="24,8 34,28 44,20" fill="#1E3A10" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="4,20 14,28 10,40" fill="#3A2C10" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="14,28 24,26 24,38 18,40" fill="#2A3C1A" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="24,26 34,28 30,40 24,38" fill="#1C3828" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="44,20 36,40 34,28" fill="#3C2A0C" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="10,40 18,40 16,52 4,48" fill="#1A2C3A" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="18,40 24,38 24,52 16,52" fill="#102A3C" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="24,38 30,40 32,52 24,52" fill="#1A3040" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="30,40 36,40 44,48 32,52" fill="#122A38" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="16,52 24,52 24,60 14,56" fill="#0E2030" stroke="#0D0C0B" stroke-width="0.7"/>
+        <polygon points="24,52 32,52 36,56 24,60" fill="#0A1C2A" stroke="#0D0C0B" stroke-width="0.7"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span class="footer-brand">Glass⏧Grasie® — Rotterdam</span>
+  <span class="footer-line">fragment · float · forever</span>
+</div>
+
+</body>
+</html>
