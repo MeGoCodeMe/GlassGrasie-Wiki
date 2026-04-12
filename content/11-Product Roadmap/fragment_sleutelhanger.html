@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syncopate:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0D0C0B; color: #E8E2D8; font-family: 'Cormorant Garamond', Georgia, serif; }
+  .rule { width: 100%; height: 0.5px; background: linear-gradient(90deg, transparent, #4A3F30 30%, #8B7355 50%, #4A3F30 70%, transparent); }
+
+  .hero { padding: 56px 40px 48px; display: flex; flex-direction: column; align-items: center; }
+  .eyebrow { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 44px; text-align: center; }
+  .hero-art { width: 100%; max-width: 580px; margin: 0 auto 44px; }
+  .brand-name { font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: clamp(24px,4vw,38px); letter-spacing: 10px; color: #F0EAE0; text-align: center; margin-bottom: 6px; }
+  .brand-sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 17px; letter-spacing: 3px; color: #8B7355; text-align: center; margin-bottom: 10px; }
+  .line-tag { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; border: 0.5px solid #2A2218; padding: 5px 14px; text-transform: uppercase; display: inline-block; }
+
+  .entry-note { padding: 28px 40px; background: #100F0D; display: flex; align-items: center; gap: 32px; }
+  .entry-bar { width: 2px; height: 52px; background: #2A2218; flex-shrink: 0; }
+  .entry-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; color: #6A6050; line-height: 1.7; }
+  .entry-text em { color: #D4C9B8; }
+
+  .forms-section { padding: 48px 40px; }
+  .forms-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; }
+  .forms-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; }
+  .forms-note { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #4A3F30; }
+  .forms-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #1C1810; }
+  .form-card { background: #0D0C0B; padding: 22px 16px 26px; display: flex; flex-direction: column; gap: 12px; transition: background 0.25s; }
+  .form-card:hover { background: #111009; }
+  .form-art { width: 100%; aspect-ratio: 3/4; }
+  .form-id { font-family: 'Syncopate', sans-serif; font-size: 6px; letter-spacing: 2px; color: #3A3020; text-transform: uppercase; }
+  .form-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; font-weight: 300; color: #D4C9B8; line-height: 1.2; }
+  .form-ref { font-family: 'Cormorant Garamond', serif; font-size: 12px; color: #5A5044; line-height: 1.7; }
+  .form-price { font-family: 'Syncopate', sans-serif; font-size: 9px; letter-spacing: 1px; color: #8B7355; }
+  .form-avail { font-family: 'Syncopate', sans-serif; font-size: 6px; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; display: inline-block; }
+
+  .strategy { padding: 52px 40px; background: #100F0D; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .strat-eyebrow { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 20px; }
+  .strat-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(19px,3vw,26px); line-height: 1.45; color: #D4C9B8; margin-bottom: 20px; }
+  .strat-quote em { color: #8B7355; }
+  .strat-body { font-family: 'Cormorant Garamond', serif; font-size: 15px; line-height: 1.85; color: #5A5044; }
+  .spec-col { display: flex; flex-direction: column; gap: 1px; background: #2A2218; }
+  .spec-row { background: #100F0D; padding: 13px 18px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .spec-k { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #4A3F30; text-transform: uppercase; flex-shrink: 0; }
+  .spec-v { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #D4C9B8; text-align: right; font-style: italic; }
+
+  .funnel { padding: 48px 40px; background: #0D0C0B; }
+  .funnel-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; margin-bottom: 28px; }
+  .funnel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1C1810; }
+  .funnel-tile { background: #0D0C0B; padding: 26px 22px; }
+  .funnel-tier { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; text-transform: uppercase; margin-bottom: 12px; }
+  .funnel-amount { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 38px; color: #E8E2D8; line-height: 1; margin-bottom: 4px; }
+  .funnel-amount span { font-size: 17px; color: #8B7355; vertical-align: top; margin-top: 7px; display: inline-block; }
+  .funnel-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #4A3F30; margin-top: 10px; line-height: 1.6; }
+  .funnel-margin { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #3D5C3A; margin-top: 12px; }
+
+  .system { padding: 48px 40px; background: #0A0908; }
+  .sys-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; margin-bottom: 28px; }
+  .sys-row { display: grid; grid-template-columns: repeat(6,1fr); gap: 1px; background: #1C1810; }
+  .sys-tile { background: #0A0908; padding: 16px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .sys-product { font-family: 'Syncopate', sans-serif; font-size: 6px; letter-spacing: 2px; color: #4A3F30; text-transform: uppercase; }
+  .sys-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #D4C9B8; }
+  .sys-mat { font-family: 'Cormorant Garamond', serif; font-size: 10px; color: #4A4038; }
+  .sys-price { font-family: 'Syncopate', sans-serif; font-size: 6px; letter-spacing: 1px; color: #6A5A40; margin-top: 3px; }
+  .sys-new { border-left: 1px solid #8B7355; padding-left: 11px; }
+  .sys-entry { background: #0C0B0A; }
+
+  .footer { padding: 28px 40px; background: #0D0C0B; display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #1C1810; }
+  .footer-brand { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #3A3020; text-transform: uppercase; }
+  .footer-line { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 12px; color: #3A3020; }
+
+  @media (max-width: 640px) {
+    .forms-grid { grid-template-columns: repeat(2,1fr); }
+    .strategy { grid-template-columns: 1fr; padding: 40px 24px; }
+    .funnel-grid { grid-template-columns: 1fr; }
+    .sys-row { grid-template-columns: repeat(2,1fr); }
+    .hero, .forms-section, .funnel, .system { padding-left: 24px; padding-right: 24px; }
+    .entry-note { padding: 24px; }
+    .footer { padding: 20px 24px; flex-direction: column; gap: 10px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">Glass⏧Grasie® — Fragment · Sleutelhanger</div>
+
+  <div class="hero-art">
+    <svg viewBox="0 0 580 220" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <defs>
+        <radialGradient id="gK1" cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stop-color="#C8D8D0" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="gK2" cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stop-color="#D0C8B8" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="gK3" cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stop-color="#C8D0D8" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="gK4" cx="50%" cy="40%" r="55%">
+          <stop offset="0%" stop-color="#C4B8A8" stop-opacity="0.09"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- KEY 1 — Hexagon -->
+      <g transform="translate(28, 20)">
+        <ellipse cx="62" cy="105" rx="52" ry="80" fill="url(#gK1)"/>
+        <!-- split ring top -->
+        <path d="M55,0 Q62,-8 69,0 Q75,7 71,14" fill="none" stroke="#3A3020" stroke-width="1.2"/>
+        <circle cx="62" cy="1" r="2.5" fill="#2A2218"/>
+        <!-- connector bar -->
+        <rect x="59" y="12" width="6" height="14" rx="1" fill="#2A2218"/>
+        <!-- hexagon glass 6mm -->
+        <polygon points="62,26 100,48 100,92 62,114 24,92 24,48" fill="#0A1410" stroke="#1A2820" stroke-width="0.5"/>
+        <!-- helder float panels — clear but tinted by depth -->
+        <polygon points="62,26 24,48 43,70" fill="#0E1C18" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="62,26 43,70 62,64" fill="#121E1A" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="62,26 62,64 81,70" fill="#0E1A16" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="62,26 81,70 100,48" fill="#0A1812" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="24,48 43,70 32,88" fill="#0C1C1A" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="24,48 32,88 24,92" fill="#0E2020" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="43,70 62,64 62,84 48,88" fill="#101E1C" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="62,64 81,70 76,88 62,84" fill="#0C1A18" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="100,48 92,88 81,70" fill="#0A1814" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="100,48 100,92 92,88" fill="#0E1C18" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="32,88 48,88 44,104 24,92" fill="#0C1820" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="48,88 62,84 62,104 44,104" fill="#0A141C" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="62,84 76,88 80,104 62,104" fill="#0E1820" stroke="#0D0C0B" stroke-width="1"/>
+        <polygon points="76,88 92,88 100,92 80,104" fill="#0C1418" stroke="#0D0C0B" stroke-width="1"/>
+        <!-- edge highlights — the 6mm depth -->
+        <line x1="62" y1="26" x2="62" y2="64" stroke="#2A4A3A" stroke-width="0.5" opacity="0.6"/>
+        <line x1="62" y1="84" x2="62" y2="114" stroke="#2A4A3A" stroke-width="0.5" opacity="0.4"/>
+        <line x1="24" y1="48" x2="43" y2="70" stroke="#1C3830" stroke-width="0.4" opacity="0.5"/>
+        <line x1="100" y1="48" x2="81" y2="70" stroke="#1C3830" stroke-width="0.4" opacity="0.5"/>
+        <text x="62" y="130" text-anchor="middle" font-family="'Syncopate', monospace" font-size="5" letter-spacing="2" fill="#2A3020">HEXAGON</text>
+      </g>
+
+      <!-- KEY 2 — Arch (narrow) -->
+      <g transform="translate(163, 20)">
+        <ellipse cx="62" cy="105" rx="50" ry="78" fill="url(#gK2)"/>
+        <!-- ring -->
+        <path d="M55,0 Q62,-8 69,0 Q75,7 71,14" fill="none" stroke="#3A3020" stroke-width="1.2"/>
+        <circle cx="62" cy="1" r="2.5" fill="#2A2218"/>
+        <rect x="59" y="12" width="6" height="14" rx="1" fill="#2A2218"/>
+        <!-- narrow arch form — architectural -->
+        <path d="M30,114 L30,60 Q30,26 62,26 Q94,26 94,60 L94,114 Z" fill="#0A1014" stroke="#182028" stroke-width="0.5"/>
+        <!-- void -->
+        <path d="M44,114 L44,63 Q44,40 62,40 Q80,40 80,63 L80,114 Z" fill="#060809"/>
+        <!-- depth rings on arch body -->
+        <path d="M30,114 L30,60 Q30,26 62,26 Q94,26 94,60 L94,114 Z" fill="none" stroke="#1C2830" stroke-width="0.4"/>
+        <path d="M33,114 L33,61 Q33,29 62,29 Q91,29 91,61 L91,114 Z" fill="none" stroke="#141E28" stroke-width="0.3" opacity="0.5"/>
+        <!-- refraction arcs -->
+        <path d="M30,80 Q62,52 94,80" fill="none" stroke="#182838" stroke-width="0.4" opacity="0.6"/>
+        <path d="M30,96 Q62,70 94,96" fill="none" stroke="#142030" stroke-width="0.3" opacity="0.4"/>
+        <!-- keystone -->
+        <path d="M55,26 Q62,20 69,26" fill="#1A2430" stroke="#243040" stroke-width="0.4"/>
+        <text x="62" y="130" text-anchor="middle" font-family="'Syncopate', monospace" font-size="5" letter-spacing="2" fill="#2A2218">ARCH</text>
+      </g>
+
+      <!-- KEY 3 — Square chamfered -->
+      <g transform="translate(298, 20)">
+        <ellipse cx="62" cy="105" rx="52" ry="78" fill="url(#gK3)"/>
+        <path d="M55,0 Q62,-8 69,0 Q75,7 71,14" fill="none" stroke="#3A3020" stroke-width="1.2"/>
+        <circle cx="62" cy="1" r="2.5" fill="#2A2218"/>
+        <rect x="59" y="12" width="6" height="14" rx="1" fill="#2A2218"/>
+        <!-- chamfered square — same form as manchetknopen -->
+        <path d="M34,34 L90,34 L100,44 L100,100 L90,110 L34,110 L24,100 L24,44 Z" fill="#0C1014" stroke="#1C2028" stroke-width="0.5"/>
+        <!-- grid refraction — helder -->
+        <line x1="24" y1="62" x2="100" y2="62" stroke="#131C28" stroke-width="0.4" opacity="0.7"/>
+        <line x1="24" y1="82" x2="100" y2="82" stroke="#131C28" stroke-width="0.4" opacity="0.5"/>
+        <line x1="48" y1="34" x2="48" y2="110" stroke="#131C28" stroke-width="0.4" opacity="0.7"/>
+        <line x1="72" y1="34" x2="72" y2="110" stroke="#131C28" stroke-width="0.4" opacity="0.5"/>
+        <!-- light diagonals -->
+        <line x1="24" y1="55" x2="62" y2="34" stroke="#2A3A50" stroke-width="0.4" opacity="0.4"/>
+        <line x1="55" y1="110" x2="100" y2="78" stroke="#1C3048" stroke-width="0.3" opacity="0.3"/>
+        <!-- chamfer highlight -->
+        <path d="M34,34 L90,34 L100,44" fill="none" stroke="#2A3848" stroke-width="0.8" opacity="0.7"/>
+        <text x="62" y="130" text-anchor="middle" font-family="'Syncopate', monospace" font-size="5" letter-spacing="2" fill="#2A2218">SQUARE</text>
+      </g>
+
+      <!-- KEY 4 — Drop/teardrop -->
+      <g transform="translate(433, 20)">
+        <ellipse cx="62" cy="105" rx="50" ry="78" fill="url(#gK4)"/>
+        <path d="M55,0 Q62,-8 69,0 Q75,7 71,14" fill="none" stroke="#3A3020" stroke-width="1.2"/>
+        <circle cx="62" cy="1" r="2.5" fill="#2A2218"/>
+        <rect x="59" y="12" width="6" height="14" rx="1" fill="#2A2218"/>
+        <!-- teardrop — premium organic form -->
+        <path d="M62,26 Q96,50 96,80 Q96,114 62,114 Q28,114 28,80 Q28,50 62,26 Z" fill="#0C1018" stroke="#1A2030" stroke-width="0.5"/>
+        <!-- internal facet lines — teardrop panels -->
+        <path d="M62,26 Q90,54 88,80" fill="none" stroke="#182030" stroke-width="0.4" opacity="0.6"/>
+        <path d="M62,26 Q34,54 36,80" fill="none" stroke="#182030" stroke-width="0.4" opacity="0.6"/>
+        <path d="M28,72 Q62,56 96,72" fill="none" stroke="#142030" stroke-width="0.4" opacity="0.5"/>
+        <path d="M30,88 Q62,74 94,88" fill="none" stroke="#101C28" stroke-width="0.3" opacity="0.4"/>
+        <!-- centre axis light -->
+        <line x1="62" y1="26" x2="62" y2="114" stroke="#2A3A48" stroke-width="0.4" opacity="0.5"/>
+        <!-- glass edge highlight -->
+        <path d="M62,26 Q80,38 88,56" fill="none" stroke="#2A3A50" stroke-width="0.5" opacity="0.5"/>
+        <text x="62" y="130" text-anchor="middle" font-family="'Syncopate', monospace" font-size="5" letter-spacing="2" fill="#2A2218">TEARDROP</text>
+      </g>
+
+      <!-- bottom label -->
+      <text x="290" y="205" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#1C1810">HELDER FLOAT 6MM · GOUD-VERMEIL SPLITRING · CNC WATERJET</text>
+    </svg>
+  </div>
+
+  <div class="brand-name">FRAGMENT</div>
+  <div class="brand-sub">Sleutelhanger · by Glass⏧Grasie®</div>
+  <div class="line-tag">Helder float 6mm · vier vormen · premium entry</div>
+</div>
+
+<div class="rule"></div>
+
+<!-- ENTRY NOTE -->
+<div class="entry-note">
+  <div class="entry-bar"></div>
+  <div class="entry-text">
+    De sleutelhanger is het <em>laagste prijspunt van het Fragment-systeem</em> — maar niet het minste product. 6mm float is dikker dan alle andere stukken in de lijn. Het gewicht in de hand is het eerste argument. Het tweede: <em>iedereen heeft sleutels.</em>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- FORMS GRID -->
+<div class="forms-section">
+  <div class="forms-header">
+    <span class="forms-title">Vier vormen</span>
+    <span class="forms-note">Helder float 6mm · permanent · open oplage</span>
+  </div>
+
+  <div class="forms-grid">
+
+    <!-- Hexagon -->
+    <div class="form-card">
+      <div class="form-art">
+        <svg viewBox="0 0 140 190" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="140" height="190" fill="#070A08"/>
+          <path d="M64,0 Q70,-6 76,0 Q81,5 78,10" fill="none" stroke="#3A3020" stroke-width="1"/>
+          <circle cx="70" cy="1" r="2" fill="#2A2218"/>
+          <rect x="67" y="9" width="5" height="12" rx="1" fill="#2A2218"/>
+          <polygon points="70,21 108,43 108,87 70,109 32,87 32,43" fill="#0A1410" stroke="#1A2820" stroke-width="0.5"/>
+          <polygon points="70,21 32,43 51,65" fill="#0E1C18" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="70,21 51,65 70,59" fill="#121E1A" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="70,21 70,59 89,65" fill="#0E1A16" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="70,21 89,65 108,43" fill="#0A1812" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="32,43 51,65 40,83" fill="#0C1C1A" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="32,43 40,83 32,87" fill="#0E2020" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="51,65 70,59 70,79 56,83" fill="#101E1C" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="70,59 89,65 84,83 70,79" fill="#0C1A18" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="108,43 100,83 89,65" fill="#0A1814" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="108,43 108,87 100,83" fill="#0E1C18" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="40,83 56,83 52,99 32,87" fill="#0C1820" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="56,83 70,79 70,99 52,99" fill="#0A141C" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="70,79 84,83 88,99 70,99" fill="#0E1820" stroke="#0D0C0B" stroke-width="0.8"/>
+          <polygon points="84,83 100,83 108,87 88,99" fill="#0C1418" stroke="#0D0C0B" stroke-width="0.8"/>
+          <line x1="70" y1="21" x2="70" y2="59" stroke="#2A4A3A" stroke-width="0.4" opacity="0.6"/>
+          <line x1="70" y1="79" x2="70" y2="109" stroke="#2A4A3A" stroke-width="0.4" opacity="0.4"/>
+          <text x="70" y="130" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#2A2A18">HEXAGON</text>
+          <text x="70" y="148" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="12" fill="#3A3828">€ 35</text>
+        </svg>
+      </div>
+      <div class="form-id">Form 01 · Permanent</div>
+      <div class="form-name">Hexagon</div>
+      <div class="form-ref">Zes vlakken, elk met eigen lichtinval. De meest geometrische vorm in de lijn.</div>
+      <div class="form-price">€ 35 / stuk</div>
+      <div class="form-avail"><span class="dot" style="background:#3D5C3A;"></span><span style="color:#4A7A45;font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:1px;">Permanent</span></div>
+    </div>
+
+    <!-- Arch -->
+    <div class="form-card">
+      <div class="form-art">
+        <svg viewBox="0 0 140 190" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="140" height="190" fill="#06080A"/>
+          <path d="M64,0 Q70,-6 76,0 Q81,5 78,10" fill="none" stroke="#3A3020" stroke-width="1"/>
+          <circle cx="70" cy="1" r="2" fill="#2A2218"/>
+          <rect x="67" y="9" width="5" height="12" rx="1" fill="#2A2218"/>
+          <path d="M38,120 L38,64 Q38,22 70,22 Q102,22 102,64 L102,120 Z" fill="#0A1014" stroke="#182028" stroke-width="0.5"/>
+          <path d="M52,120 L52,66 Q52,36 70,36 Q88,36 88,66 L88,120 Z" fill="#060809"/>
+          <path d="M38,120 L38,64 Q38,22 70,22 Q102,22 102,64 L102,120 Z" fill="none" stroke="#1C2830" stroke-width="0.4"/>
+          <path d="M38,78 Q70,48 102,78" fill="none" stroke="#182838" stroke-width="0.4" opacity="0.6"/>
+          <path d="M38,96 Q70,68 102,96" fill="none" stroke="#142030" stroke-width="0.3" opacity="0.4"/>
+          <path d="M38,110 Q70,84 102,110" fill="none" stroke="#101828" stroke-width="0.3" opacity="0.3"/>
+          <path d="M62,22 Q70,16 78,22" fill="#1A2430" stroke="#243040" stroke-width="0.4"/>
+          <text x="70" y="140" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#2A2218">ARCH</text>
+          <text x="70" y="158" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="12" fill="#3A3828">€ 35</text>
+        </svg>
+      </div>
+      <div class="form-id">Form 02 · Permanent</div>
+      <div class="form-name">Arch</div>
+      <div class="form-ref">Smal en hoog. Architectuurverwant aan de broche-lijn. Licht door de opening.</div>
+      <div class="form-price">€ 35 / stuk</div>
+      <div class="form-avail"><span class="dot" style="background:#3D5C3A;"></span><span style="color:#4A7A45;font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:1px;">Permanent</span></div>
+    </div>
+
+    <!-- Square -->
+    <div class="form-card">
+      <div class="form-art">
+        <svg viewBox="0 0 140 190" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="140" height="190" fill="#070809"/>
+          <path d="M64,0 Q70,-6 76,0 Q81,5 78,10" fill="none" stroke="#3A3020" stroke-width="1"/>
+          <circle cx="70" cy="1" r="2" fill="#2A2218"/>
+          <rect x="67" y="9" width="5" height="12" rx="1" fill="#2A2218"/>
+          <path d="M28,30 L112,30 L122,40 L122,106 L112,116 L28,116 L18,106 L18,40 Z" fill="#0C1014" stroke="#1C2028" stroke-width="0.5"/>
+          <line x1="18" y1="62" x2="122" y2="62" stroke="#131C28" stroke-width="0.4" opacity="0.7"/>
+          <line x1="18" y1="84" x2="122" y2="84" stroke="#131C28" stroke-width="0.4" opacity="0.5"/>
+          <line x1="46" y1="30" x2="46" y2="116" stroke="#131C28" stroke-width="0.4" opacity="0.7"/>
+          <line x1="70" y1="30" x2="70" y2="116" stroke="#131C28" stroke-width="0.4" opacity="0.5"/>
+          <line x1="94" y1="30" x2="94" y2="116" stroke="#131C28" stroke-width="0.4" opacity="0.5"/>
+          <line x1="18" y1="52" x2="60" y2="30" stroke="#2A3A50" stroke-width="0.4" opacity="0.4"/>
+          <line x1="55" y1="116" x2="122" y2="76" stroke="#1C3048" stroke-width="0.3" opacity="0.3"/>
+          <path d="M28,30 L112,30 L122,40" fill="none" stroke="#2A3848" stroke-width="0.8" opacity="0.7"/>
+          <text x="70" y="136" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#2A2218">SQUARE</text>
+          <text x="70" y="154" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="12" fill="#3A3828">€ 25 – 30</text>
+        </svg>
+      </div>
+      <div class="form-id">Form 03 · Entry</div>
+      <div class="form-name">Square</div>
+      <div class="form-ref">Gedeelde geometrie met de manchetknopen. Het instappunt — herkenbaarheid als verkoopargument.</div>
+      <div class="form-price">€ 25 / stuk</div>
+      <div class="form-avail"><span class="dot" style="background:#3D5C3A;"></span><span style="color:#4A7A45;font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:1px;">Entry · laagste prijs</span></div>
+    </div>
+
+    <!-- Teardrop -->
+    <div class="form-card">
+      <div class="form-art">
+        <svg viewBox="0 0 140 190" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="140" height="190" fill="#070708"/>
+          <path d="M64,0 Q70,-6 76,0 Q81,5 78,10" fill="none" stroke="#3A3020" stroke-width="1"/>
+          <circle cx="70" cy="1" r="2" fill="#2A2218"/>
+          <rect x="67" y="9" width="5" height="12" rx="1" fill="#2A2218"/>
+          <path d="M70,22 Q104,46 104,78 Q104,118 70,118 Q36,118 36,78 Q36,46 70,22 Z" fill="#0C1018" stroke="#1A2030" stroke-width="0.5"/>
+          <path d="M70,22 Q98,50 96,78" fill="none" stroke="#182030" stroke-width="0.4" opacity="0.6"/>
+          <path d="M70,22 Q42,50 44,78" fill="none" stroke="#182030" stroke-width="0.4" opacity="0.6"/>
+          <path d="M36,68 Q70,52 104,68" fill="none" stroke="#142030" stroke-width="0.4" opacity="0.5"/>
+          <path d="M37,88 Q70,74 103,88" fill="none" stroke="#101C28" stroke-width="0.3" opacity="0.4"/>
+          <path d="M40,104 Q70,92 100,104" fill="none" stroke="#0E1820" stroke-width="0.3" opacity="0.3"/>
+          <line x1="70" y1="22" x2="70" y2="118" stroke="#2A3A48" stroke-width="0.4" opacity="0.5"/>
+          <path d="M70,22 Q86,34 94,52" fill="none" stroke="#2A3A50" stroke-width="0.5" opacity="0.5"/>
+          <text x="70" y="138" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#2A2218">TEARDROP</text>
+          <text x="70" y="156" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="12" fill="#3A3828">€ 45</text>
+        </svg>
+      </div>
+      <div class="form-id">Form 04 · Premium</div>
+      <div class="form-name">Teardrop</div>
+      <div class="form-ref">Organische vorm, maximale glazen massa. Zwaarste stuk in de sleutelhangerlijn — het gewicht is het argument.</div>
+      <div class="form-price">€ 45 / stuk</div>
+      <div class="form-avail"><span class="dot" style="background:#8B7355;"></span><span style="color:#8B7355;font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:1px;">Premium · beperkt</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- STRATEGY + SPECS -->
+<div class="strategy">
+  <div>
+    <div class="strat-eyebrow">De strategie</div>
+    <div class="strat-quote">
+      €25 is geen concessie.<br>
+      Het is een <em>instappunt<br>naar een systeem.</em>
+    </div>
+    <div class="strat-body">
+      De sleutelhanger is het enige Fragment-product dat spontaan gekocht wordt — niet overwogen, niet gecureerd. Het gewicht van 6mm float doet het werk: wie het oppakt begrijpt onmiddellijk dat dit geen bijproduct is. Het is glaswerk met massa. En de klant die vandaag een sleutelhanger koopt, koopt morgen een tie bar of manchetknopen. Dat is de functie van dit prijspunt — niet volumeverkoop, maar instroom.
+    </div>
+  </div>
+
+  <div class="spec-col">
+    <div class="spec-row"><span class="spec-k">Materiaal</span><span class="spec-v">Helder float, 6mm</span></div>
+    <div class="spec-row"><span class="spec-k">Dikte</span><span class="spec-v">Zwaarste in de lijn</span></div>
+    <div class="spec-row"><span class="spec-k">Vormen</span><span class="spec-v">4 — Hex, Arch, Square, Drop</span></div>
+    <div class="spec-row"><span class="spec-k">Bevestiging</span><span class="spec-v">Goud-vermeil splitring</span></div>
+    <div class="spec-row"><span class="spec-k">Snijding</span><span class="spec-v">CNC waterjet</span></div>
+    <div class="spec-row"><span class="spec-k">Afwerking</span><span class="spec-v">Gepolijste glasrand</span></div>
+    <div class="spec-row"><span class="spec-k">Oplage</span><span class="spec-v">Open — permanent</span></div>
+    <div class="spec-row"><span class="spec-k">Marge</span><span class="spec-v">~86% direct</span></div>
+    <div class="spec-row"><span class="spec-k">Functie</span><span class="spec-v">Instroom naar systeem</span></div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- FUNNEL / PRICING -->
+<div class="funnel">
+  <div class="funnel-title">Prijsarchitectuur — entry naar systeem</div>
+  <div class="funnel-grid">
+    <div class="funnel-tile">
+      <div class="funnel-tier">Entry · Square</div>
+      <div class="funnel-amount"><span>€</span>25</div>
+      <div class="funnel-desc">Laagste drempel van het volledige Fragment-systeem. Impulsaankoop op event of checkout.</div>
+      <div class="funnel-margin">Marge ~86%</div>
+    </div>
+    <div class="funnel-tile">
+      <div class="funnel-tier">Mid · Hex & Arch</div>
+      <div class="funnel-amount"><span>€</span>35</div>
+      <div class="funnel-desc">Geometrische vormen met architectuurverwijzing. Sterkste volumedragers van de vier.</div>
+      <div class="funnel-margin">Marge ~86%</div>
+    </div>
+    <div class="funnel-tile">
+      <div class="funnel-tier">Top · Teardrop</div>
+      <div class="funnel-amount"><span>€</span>45</div>
+      <div class="funnel-desc">Maximale glasmassa, organische vorm. Het zwaarste stuk — gewicht als luxeargument.</div>
+      <div class="funnel-margin">Marge ~86%</div>
+    </div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- COMPLETE SYSTEM — 6 producten -->
+<div class="system">
+  <div class="sys-title">Fragment — volledig systeem</div>
+  <div class="sys-row">
+    <div class="sys-tile sys-entry sys-new">
+      <div class="sys-product">Sleutelhanger — nieuw</div>
+      <div class="sys-name">Entry · 6mm</div>
+      <div class="sys-mat">Helder float · 4 vormen</div>
+      <div class="sys-price">€ 25–45 · ~86%</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Pendant</div>
+      <div class="sys-name">Geometrische hanger</div>
+      <div class="sys-mat">Bedrukt · 3–4mm</div>
+      <div class="sys-price">€ 55–95 · limited run</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Oorbellen</div>
+      <div class="sys-name">Wearable</div>
+      <div class="sys-mat">Bedrukt · 3–4mm</div>
+      <div class="sys-price">€ 55–95 / set</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Broche</div>
+      <div class="sys-name">Architecture</div>
+      <div class="sys-mat">Helder · 5–6mm</div>
+      <div class="sys-price">€ 65–130</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Tie Bar</div>
+      <div class="sys-name">Gecoat / bedrukt</div>
+      <div class="sys-mat">Float 4mm</div>
+      <div class="sys-price">€ 85–145</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Manchetknopen</div>
+      <div class="sys-name">Helder / bedrukt</div>
+      <div class="sys-mat">Float 5mm · set van 2</div>
+      <div class="sys-price">€ 95–165 / set</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span class="footer-brand">Glass⏧Grasie® — Rotterdam</span>
+  <span class="footer-line">fragment · float · forever</span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syncopate:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0D0C0B; color: #E8E2D8; font-family: 'Cormorant Garamond', Georgia, serif; }
+  .rule { width: 100%; height: 0.5px; background: linear-gradient(90deg, transparent, #4A3F30 30%, #8B7355 50%, #4A3F30 70%, transparent); }
+
+  .hero { padding: 56px 40px 48px; display: flex; flex-direction: column; align-items: center; }
+  .eyebrow { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 44px; text-align: center; }
+  .hero-art { width: 100%; max-width: 600px; margin: 0 auto 44px; }
+  .brand-name { font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: clamp(24px,4vw,38px); letter-spacing: 10px; color: #F0EAE0; text-align: center; margin-bottom: 6px; }
+  .brand-sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 17px; letter-spacing: 3px; color: #8B7355; text-align: center; margin-bottom: 10px; }
+  .line-tag { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; border: 0.5px solid #2A2218; padding: 5px 14px; text-transform: uppercase; display: inline-block; }
+
+  .position-note { padding: 28px 40px; background: #100F0D; display: flex; align-items: center; gap: 32px; }
+  .pos-bar { width: 2px; height: 52px; background: #2A2218; flex-shrink: 0; }
+  .pos-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; color: #6A6050; line-height: 1.7; }
+  .pos-text em { color: #D4C9B8; }
+
+  .variants-section { padding: 48px 40px; background: #0D0C0B; }
+  .variants-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; }
+  .variants-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; }
+  .variants-note { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #4A3F30; }
+  .variants-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1C1810; }
+  .var-card { background: #0D0C0B; padding: 26px 20px 30px; display: flex; flex-direction: column; gap: 14px; transition: background 0.25s; }
+  .var-card:hover { background: #111009; }
+  .var-art { width: 100%; aspect-ratio: 3/2; }
+  .var-id { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #3A3020; text-transform: uppercase; }
+  .var-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; font-weight: 300; color: #D4C9B8; line-height: 1.2; }
+  .var-desc { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: #5A5044; line-height: 1.75; }
+  .var-price { font-family: 'Syncopate', sans-serif; font-size: 9px; letter-spacing: 1px; color: #8B7355; }
+  .var-avail { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; display: inline-block; }
+
+  .material { padding: 52px 40px; background: #100F0D; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .mat-eyebrow { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 20px; }
+  .mat-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(19px,3vw,27px); line-height: 1.45; color: #D4C9B8; margin-bottom: 20px; }
+  .mat-quote em { color: #8B7355; }
+  .mat-body { font-family: 'Cormorant Garamond', serif; font-size: 15px; line-height: 1.85; color: #5A5044; }
+  .spec-col { display: flex; flex-direction: column; gap: 1px; background: #2A2218; }
+  .spec-row { background: #100F0D; padding: 13px 18px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .spec-k { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #4A3F30; text-transform: uppercase; flex-shrink: 0; }
+  .spec-v { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #D4C9B8; text-align: right; font-style: italic; }
+
+  .pricing { padding: 48px 40px; background: #0D0C0B; }
+  .pricing-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; margin-bottom: 28px; }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1C1810; }
+  .price-tile { background: #0D0C0B; padding: 26px 22px; }
+  .price-tier { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; text-transform: uppercase; margin-bottom: 12px; }
+  .price-amount { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 38px; color: #E8E2D8; line-height: 1; margin-bottom: 4px; }
+  .price-amount span { font-size: 17px; color: #8B7355; vertical-align: top; margin-top: 7px; display: inline-block; }
+  .price-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #4A3F30; margin-top: 10px; line-height: 1.6; }
+  .price-margin { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #3D5C3A; margin-top: 12px; }
+
+  .system { padding: 48px 40px; background: #0A0908; }
+  .sys-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; margin-bottom: 28px; }
+  .sys-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #1C1810; }
+  .sys-tile { background: #0A0908; padding: 18px 14px; display: flex; flex-direction: column; gap: 7px; }
+  .sys-product { font-family: 'Syncopate', sans-serif; font-size: 6px; letter-spacing: 2px; color: #4A3F30; text-transform: uppercase; }
+  .sys-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 14px; color: #D4C9B8; }
+  .sys-mat { font-family: 'Cormorant Garamond', serif; font-size: 11px; color: #4A4038; }
+  .sys-price { font-family: 'Syncopate', sans-serif; font-size: 6px; letter-spacing: 1px; color: #6A5A40; margin-top: 3px; }
+  .sys-new { border-left: 1px solid #8B7355; padding-left: 13px; }
+
+  .footer { padding: 28px 40px; background: #0D0C0B; display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #1C1810; }
+  .footer-brand { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #3A3020; text-transform: uppercase; }
+  .footer-line { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 12px; color: #3A3020; }
+
+  @media (max-width: 640px) {
+    .variants-grid { grid-template-columns: 1fr; }
+    .material { grid-template-columns: 1fr; padding: 40px 24px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .sys-row { grid-template-columns: repeat(2,1fr); }
+    .hero, .variants-section, .pricing, .system { padding-left: 24px; padding-right: 24px; }
+    .position-note { padding: 24px; }
+    .footer { padding: 20px 24px; flex-direction: column; gap: 10px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">Glass⏧Grasie® — Fragment · Tie Bar</div>
+
+  <div class="hero-art">
+    <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <defs>
+        <radialGradient id="gT1" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#C8D0D8" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="gT2" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#C4955A" stop-opacity="0.09"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="gT3" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#9AB0C0" stop-opacity="0.08"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- ambient pools -->
+      <ellipse cx="100" cy="90" rx="80" ry="50" fill="url(#gT1)"/>
+      <ellipse cx="300" cy="90" rx="80" ry="50" fill="url(#gT2)"/>
+      <ellipse cx="500" cy="90" rx="80" ry="50" fill="url(#gT3)"/>
+
+      <!-- TIE BAR 1 — Helder float, gecoat zwart -->
+      <g transform="translate(20, 55)">
+        <!-- bar body — long horizontal rectangle, 4mm thick -->
+        <rect x="0" y="20" width="160" height="22" rx="1" fill="#111418" stroke="#1C2428" stroke-width="0.5"/>
+        <!-- coating surface — matte black -->
+        <rect x="1" y="21" width="158" height="20" rx="0.5" fill="#0C1014"/>
+        <!-- glass edge top — the 4mm float visible -->
+        <rect x="0" y="20" width="160" height="3" rx="0.5" fill="#1A2028" stroke="#243040" stroke-width="0.3"/>
+        <!-- clip mechanism left -->
+        <rect x="0" y="14" width="18" height="8" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        <rect x="0" y="40" width="18" height="6" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+        <!-- clip mechanism right -->
+        <rect x="142" y="14" width="18" height="8" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        <rect x="142" y="40" width="18" height="6" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+        <!-- subtle coat sheen line -->
+        <line x1="18" y1="24" x2="142" y2="24" stroke="#1E2830" stroke-width="0.4" opacity="0.6"/>
+        <line x1="18" y1="27" x2="142" y2="27" stroke="#162028" stroke-width="0.3" opacity="0.4"/>
+        <text x="80" y="68" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#2A2218">GECOAT · MATTE BLACK</text>
+      </g>
+
+      <!-- TIE BAR 2 — Bedrukt restglas Forest Floor -->
+      <g transform="translate(220, 55)">
+        <rect x="0" y="20" width="160" height="22" rx="1" fill="#0A1208" stroke="#1A2818" stroke-width="0.5"/>
+        <!-- forest floor print across bar -->
+        <rect x="1" y="21" width="50" height="20" fill="#1A3A2E"/>
+        <rect x="51" y="21" width="40" height="20" fill="#2C4A1A"/>
+        <rect x="91" y="21" width="35" height="20" fill="#1C3828"/>
+        <rect x="126" y="21" width="33" height="20" fill="#1E3A10"/>
+        <!-- diagonal panel cuts across print -->
+        <line x1="0" y1="21" x2="160" y2="41" stroke="#0D0C0B" stroke-width="1.2"/>
+        <line x1="40" y1="21" x2="40" y2="41" stroke="#0D0C0B" stroke-width="0.8"/>
+        <line x1="85" y1="21" x2="85" y2="41" stroke="#0D0C0B" stroke-width="0.8"/>
+        <line x1="120" y1="21" x2="120" y2="41" stroke="#0D0C0B" stroke-width="0.8"/>
+        <!-- glass edge -->
+        <rect x="0" y="20" width="160" height="3" rx="0.5" fill="#1A2818" stroke="#243830" stroke-width="0.3"/>
+        <!-- edge highlight run colour -->
+        <line x1="0" y1="21" x2="160" y2="21" stroke="#8B7355" stroke-width="0.4" opacity="0.5"/>
+        <!-- clips -->
+        <rect x="0" y="14" width="18" height="8" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        <rect x="0" y="40" width="18" height="6" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+        <rect x="142" y="14" width="18" height="8" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        <rect x="142" y="40" width="18" height="6" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+        <text x="80" y="68" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#3A2818">BEDRUKT · RUN 001</text>
+      </g>
+
+      <!-- TIE BAR 3 — Gecoat kleur (deep navy) -->
+      <g transform="translate(420, 55)">
+        <rect x="0" y="20" width="160" height="22" rx="1" fill="#0A0E14" stroke="#161C28" stroke-width="0.5"/>
+        <!-- navy coat -->
+        <rect x="1" y="21" width="158" height="20" rx="0.5" fill="#0C1220"/>
+        <!-- coat sheen — slightly lighter band -->
+        <line x1="18" y1="23" x2="142" y2="23" stroke="#1A2A40" stroke-width="0.5" opacity="0.7"/>
+        <line x1="18" y1="26" x2="142" y2="26" stroke="#142030" stroke-width="0.3" opacity="0.5"/>
+        <line x1="18" y1="35" x2="100" y2="38" stroke="#0E1828" stroke-width="0.3" opacity="0.4"/>
+        <!-- glass edge top in navy -->
+        <rect x="0" y="20" width="160" height="3" rx="0.5" fill="#1A2438" stroke="#243048" stroke-width="0.3"/>
+        <!-- clips -->
+        <rect x="0" y="14" width="18" height="8" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        <rect x="0" y="40" width="18" height="6" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+        <rect x="142" y="14" width="18" height="8" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        <rect x="142" y="40" width="18" height="6" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+        <text x="80" y="68" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#2A3040">GECOAT · DEEP NAVY</text>
+      </g>
+
+      <!-- scale note -->
+      <text x="300" y="160" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#1C1810">±55MM LENGTE · 4MM FLOAT · GOUD-VERMEIL CLIP</text>
+    </svg>
+  </div>
+
+  <div class="brand-name">FRAGMENT</div>
+  <div class="brand-sub">Tie Bar · by Glass⏧Grasie®</div>
+  <div class="line-tag">Gecoat helder float of bedrukt restglas · ±55mm</div>
+</div>
+
+<div class="rule"></div>
+
+<!-- POSITION NOTE -->
+<div class="position-note">
+  <div class="pos-bar"></div>
+  <div class="pos-text">
+    De tie bar is het enige sieraad dat <em>op ooghoogte zit</em> in een zakelijk gesprek. Wat de tegenpartij ziet is niet het materiaal — het is de glasrand. <em>Vier millimeter float aan de bovenzijde van de bar: dat is het verkoopmoment.</em>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- VARIANTS -->
+<div class="variants-section">
+  <div class="variants-header">
+    <span class="variants-title">Drie varianten</span>
+    <span class="variants-note">Helder float 4mm · goud-vermeil clip</span>
+  </div>
+
+  <div class="variants-grid">
+
+    <!-- Gecoat Matte -->
+    <div class="var-card">
+      <div class="var-art">
+        <svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="240" height="160" fill="#08090A"/>
+          <g transform="translate(20, 55)">
+            <rect x="0" y="0" width="200" height="28" rx="1" fill="#111418" stroke="#1C2428" stroke-width="0.5"/>
+            <rect x="1" y="1" width="198" height="26" rx="0.5" fill="#0C1014"/>
+            <rect x="0" y="0" width="200" height="4" rx="0.5" fill="#1A2028" stroke="#243040" stroke-width="0.3"/>
+            <line x1="22" y1="4" x2="178" y2="4" stroke="#202830" stroke-width="0.5" opacity="0.7"/>
+            <line x1="22" y1="8" x2="178" y2="8" stroke="#182030" stroke-width="0.3" opacity="0.5"/>
+            <line x1="22" y1="18" x2="140" y2="22" stroke="#101820" stroke-width="0.3" opacity="0.4"/>
+            <rect x="0" y="-6" width="22" height="10" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+            <rect x="0" y="26" width="22" height="8" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+            <rect x="178" y="-6" width="22" height="10" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+            <rect x="178" y="26" width="22" height="8" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+          </g>
+          <text x="120" y="120" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#2A2218">MATTE BLACK COAT</text>
+        </svg>
+      </div>
+      <div class="var-id">Variant 01 · Permanent</div>
+      <div class="var-name">Matte Coat</div>
+      <div class="var-desc">Helder float, PVD-coating zwart mat. De glasrand aan bovenzijde blijft onbehandeld — zichtbaar contrast tussen coating en puur glas.</div>
+      <div class="var-price">€ 85 / stuk</div>
+      <div class="var-avail"><span class="dot" style="background:#3D5C3A;"></span><span style="color:#4A7A45;font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:1px;">Permanent</span></div>
+    </div>
+
+    <!-- Gecoat Kleur -->
+    <div class="var-card">
+      <div class="var-art">
+        <svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="240" height="160" fill="#07080C"/>
+          <g transform="translate(20, 55)">
+            <!-- navy -->
+            <rect x="0" y="0" width="200" height="28" rx="1" fill="#0A0E18" stroke="#141828" stroke-width="0.5"/>
+            <rect x="1" y="1" width="198" height="26" rx="0.5" fill="#0C1220"/>
+            <rect x="0" y="0" width="200" height="4" rx="0.5" fill="#1A2438" stroke="#243050" stroke-width="0.3"/>
+            <line x1="22" y1="4" x2="178" y2="4" stroke="#1C2C44" stroke-width="0.5" opacity="0.7"/>
+            <line x1="22" y1="9" x2="178" y2="9" stroke="#142038" stroke-width="0.3" opacity="0.5"/>
+            <line x1="22" y1="20" x2="120" y2="24" stroke="#0E1828" stroke-width="0.3" opacity="0.4"/>
+            <rect x="0" y="-6" width="22" height="10" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+            <rect x="0" y="26" width="22" height="8" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+            <rect x="178" y="-6" width="22" height="10" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+            <rect x="178" y="26" width="22" height="8" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+          </g>
+          <text x="120" y="120" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#1C2840">DEEP NAVY COAT</text>
+          <!-- colour swatches -->
+          <rect x="78" y="128" width="14" height="8" rx="1" fill="#0C1220" stroke="#1A2438" stroke-width="0.5"/>
+          <rect x="96" y="128" width="14" height="8" rx="1" fill="#1A2C10" stroke="#2A4020" stroke-width="0.5"/>
+          <rect x="114" y="128" width="14" height="8" rx="1" fill="#3A1810" stroke="#4A2818" stroke-width="0.5"/>
+          <rect x="132" y="128" width="14" height="8" rx="1" fill="#2A1A30" stroke="#3A2840" stroke-width="0.5"/>
+        </svg>
+      </div>
+      <div class="var-id">Variant 02 · Kleurkeuze</div>
+      <div class="var-name">Colour Coat</div>
+      <div class="var-desc">PVD-coating in vier kleuren: Navy, Forest, Terracotta, Aubergine. Klant kiest bij bestelling. Glasrand blijft zichtbaar contrast.</div>
+      <div class="var-price">€ 105 / stuk</div>
+      <div class="var-avail"><span class="dot" style="background:#3D5C3A;"></span><span style="color:#4A7A45;font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:1px;">Permanent · 4 kleuren</span></div>
+    </div>
+
+    <!-- Bedrukt Run -->
+    <div class="var-card">
+      <div class="var-art">
+        <svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="240" height="160" fill="#070A08"/>
+          <g transform="translate(20, 55)">
+            <rect x="0" y="0" width="200" height="28" rx="1" fill="#0A1208" stroke="#1A2818" stroke-width="0.5"/>
+            <!-- forest floor print across full bar -->
+            <rect x="1" y="1" width="58" height="26" fill="#1A3A2E"/>
+            <rect x="59" y="1" width="48" height="26" fill="#2C4A1A"/>
+            <rect x="107" y="1" width="44" height="26" fill="#1C3828"/>
+            <rect x="151" y="1" width="48" height="26" fill="#1E3A10"/>
+            <!-- diagonal facet lines -->
+            <line x1="0" y1="0" x2="200" y2="28" stroke="#0D0C0B" stroke-width="1.5"/>
+            <line x1="50" y1="0" x2="50" y2="28" stroke="#0D0C0B" stroke-width="1"/>
+            <line x1="100" y1="0" x2="100" y2="28" stroke="#0D0C0B" stroke-width="1"/>
+            <line x1="150" y1="0" x2="150" y2="28" stroke="#0D0C0B" stroke-width="1"/>
+            <!-- top glass edge -->
+            <rect x="0" y="0" width="200" height="4" rx="0.5" fill="#1A2818" stroke="#243830" stroke-width="0.3"/>
+            <line x1="0" y1="0" x2="200" y2="0" stroke="#8B7355" stroke-width="0.4" opacity="0.5"/>
+            <!-- clips -->
+            <rect x="0" y="-6" width="22" height="10" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+            <rect x="0" y="26" width="22" height="8" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+            <rect x="178" y="-6" width="22" height="10" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+            <rect x="178" y="26" width="22" height="8" rx="1" fill="#222018" stroke="#322E18" stroke-width="0.5"/>
+          </g>
+          <text x="120" y="118" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#3A2818">RESTGLAS · RUN 001</text>
+          <text x="120" y="130" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="1" fill="#2A2010">FOREST FLOOR</text>
+        </svg>
+      </div>
+      <div class="var-id">Variant 03 · Run-gebonden</div>
+      <div class="var-name">Printed Bar</div>
+      <div class="var-desc">Bedrukt restglas Van Dijken. Hetzelfde motief als de actieve pendant- en oorbellenrun — de tie bar als derde stuk van een setgeheel.</div>
+      <div class="var-price">€ 145 / stuk</div>
+      <div class="var-avail"><span class="dot" style="background:#8B7355;"></span><span style="color:#8B7355;font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:1px;">Beperkt per run</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- MATERIAL + SPECS -->
+<div class="material">
+  <div>
+    <div class="mat-eyebrow">Het argument</div>
+    <div class="mat-quote">
+      Metaal houdt licht tegen.<br>
+      <em>Glas laat het door.</em><br>
+      Dat ziet men in een vergadering.
+    </div>
+    <div class="mat-body">
+      De tie bar zit op borsthoogte. Het is het eerste punt van visueel contact in een staand gesprek. Float glas op 4mm heeft een eigenschap die geen metaal heeft: de bovenzijde — de glasrand — is zichtbaar als een aparte laag. Niet als een oppervlakte maar als een sectie. Coating voegt kleur toe zonder het glas te verbergen. Bedrukt restglas draagt hetzelfde verhaal als de manchetknopen en oorbellen: eén run, nooit herhaald.
+    </div>
+  </div>
+
+  <div class="spec-col">
+    <div class="spec-row"><span class="spec-k">Materiaal</span><span class="spec-v">Helder float, 4mm</span></div>
+    <div class="spec-row"><span class="spec-k">Lengte</span><span class="spec-v">±55mm</span></div>
+    <div class="spec-row"><span class="spec-k">Coating A</span><span class="spec-v">PVD matte zwart</span></div>
+    <div class="spec-row"><span class="spec-k">Coating B</span><span class="spec-v">PVD kleur — 4 opties</span></div>
+    <div class="spec-row"><span class="spec-k">Variant C</span><span class="spec-v">Bedrukt restglas</span></div>
+    <div class="spec-row"><span class="spec-k">Clip</span><span class="spec-v">Goud-vermeil, veerclip</span></div>
+    <div class="spec-row"><span class="spec-k">Glasrand</span><span class="spec-v">Onbehandeld, gepolijst</span></div>
+    <div class="spec-row"><span class="spec-k">Marge</span><span class="spec-v">~79% direct</span></div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- PRICING -->
+<div class="pricing">
+  <div class="pricing-title">Prijsarchitectuur</div>
+  <div class="pricing-grid">
+    <div class="price-tile">
+      <div class="price-tier">Entry · Matte coat</div>
+      <div class="price-amount"><span>€</span>85</div>
+      <div class="price-desc">Zwart mat. Permanent. Draagt onder elk pak — het veiligste instappunt van de lijn.</div>
+      <div class="price-margin">Marge ~79%</div>
+    </div>
+    <div class="price-tile">
+      <div class="price-tier">Mid · Colour coat</div>
+      <div class="price-amount"><span>€</span>105</div>
+      <div class="price-desc">Vier PVD-kleuren. Permanente oplage. Statement zonder schaarste.</div>
+      <div class="price-margin">Marge ~79%</div>
+    </div>
+    <div class="price-tile">
+      <div class="price-tier">Top · Printed run</div>
+      <div class="price-amount"><span>€</span>145</div>
+      <div class="price-desc">Restglas motief. Matching met actieve manchetknopen- en oorbellenrun. Derde stuk van een volledig set.</div>
+      <div class="price-margin">Marge ~79%</div>
+    </div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- FULL SYSTEM — alle 5 producten -->
+<div class="system">
+  <div class="sys-title">Fragment — volledig systeem</div>
+  <div class="sys-row">
+    <div class="sys-tile">
+      <div class="sys-product">Pendant</div>
+      <div class="sys-name">Geometrische hanger</div>
+      <div class="sys-mat">Bedrukt · 3–4mm</div>
+      <div class="sys-price">€ 55–95 · limited run</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Oorbellen</div>
+      <div class="sys-name">Wearable serie</div>
+      <div class="sys-mat">Bedrukt · 3–4mm</div>
+      <div class="sys-price">€ 55–95 / set · limited</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Broche</div>
+      <div class="sys-name">Architecture</div>
+      <div class="sys-mat">Helder float · 5–6mm</div>
+      <div class="sys-price">€ 65–130 · open</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Manchetknopen</div>
+      <div class="sys-name">Helder of bedrukt</div>
+      <div class="sys-mat">Float 5mm · set van 2</div>
+      <div class="sys-price">€ 95–165 / set</div>
+    </div>
+    <div class="sys-tile sys-new">
+      <div class="sys-product">Tie Bar — nieuw</div>
+      <div class="sys-name">Gecoat of bedrukt</div>
+      <div class="sys-mat">Float 4mm · ±55mm</div>
+      <div class="sys-price">€ 85–145 · ~79%</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span class="footer-brand">Glass⏧Grasie® — Rotterdam</span>
+  <span class="footer-line">fragment · float · forever</span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syncopate:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0D0C0B; color: #E8E2D8; font-family: 'Cormorant Garamond', Georgia, serif; }
+  .rule { width: 100%; height: 0.5px; background: linear-gradient(90deg, transparent, #4A3F30 30%, #8B7355 50%, #4A3F30 70%, transparent); }
+
+  /* HERO */
+  .hero { padding: 56px 40px 48px; display: flex; flex-direction: column; align-items: center; }
+  .eyebrow { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 44px; text-align: center; }
+  .hero-art { width: 100%; max-width: 580px; margin: 0 auto 44px; }
+  .brand-name { font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: clamp(24px,4vw,38px); letter-spacing: 10px; color: #F0EAE0; text-align: center; margin-bottom: 6px; }
+  .brand-sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: 17px; letter-spacing: 3px; color: #8B7355; text-align: center; margin-bottom: 10px; }
+  .line-tag { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; border: 0.5px solid #2A2218; padding: 5px 14px; text-transform: uppercase; display: inline-block; }
+
+  /* SETS GRID */
+  .sets-section { padding: 48px 40px; background: #0D0C0B; }
+  .sets-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; }
+  .sets-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; }
+  .sets-note { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #4A3F30; }
+  .sets-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #1C1810; }
+  .set-card { background: #0D0C0B; padding: 28px 22px 32px; display: flex; flex-direction: column; gap: 16px; transition: background 0.25s; }
+  .set-card:hover { background: #111009; }
+  .set-art { width: 100%; aspect-ratio: 4/3; }
+  .set-variant { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #3A3020; text-transform: uppercase; }
+  .set-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; font-weight: 300; color: #D4C9B8; line-height: 1.2; }
+  .set-desc { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #5A5044; line-height: 1.75; }
+  .set-price { font-family: 'Syncopate', sans-serif; font-size: 10px; letter-spacing: 1px; color: #8B7355; }
+  .set-avail { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; display: inline-block; }
+
+  /* CRAFT NOTE */
+  .craft { padding: 28px 40px; background: #100F0D; display: flex; align-items: center; gap: 32px; }
+  .craft-bar { width: 2px; height: 52px; background: #2A2218; flex-shrink: 0; }
+  .craft-text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; color: #6A6050; line-height: 1.7; }
+  .craft-text em { color: #D4C9B8; }
+
+  /* SPECS + ARGUMENT */
+  .material { padding: 52px 40px; background: #100F0D; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .mat-eyebrow { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #4A3F30; text-transform: uppercase; margin-bottom: 20px; }
+  .mat-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(19px,3vw,27px); line-height: 1.45; color: #D4C9B8; margin-bottom: 20px; }
+  .mat-quote em { color: #8B7355; }
+  .mat-body { font-family: 'Cormorant Garamond', serif; font-size: 15px; line-height: 1.85; color: #5A5044; }
+  .spec-col { display: flex; flex-direction: column; gap: 1px; background: #2A2218; }
+  .spec-row { background: #100F0D; padding: 14px 18px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .spec-k { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #4A3F30; text-transform: uppercase; flex-shrink: 0; }
+  .spec-v { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #D4C9B8; text-align: right; font-style: italic; }
+
+  /* PRICING */
+  .pricing { padding: 48px 40px; background: #0D0C0B; }
+  .pricing-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; margin-bottom: 28px; }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1C1810; }
+  .price-tile { background: #0D0C0B; padding: 26px 22px; }
+  .price-tier { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; text-transform: uppercase; margin-bottom: 12px; }
+  .price-amount { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 38px; color: #E8E2D8; line-height: 1; margin-bottom: 4px; }
+  .price-amount span { font-size: 17px; color: #8B7355; vertical-align: top; margin-top: 7px; display: inline-block; }
+  .price-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: #4A3F30; margin-top: 10px; line-height: 1.6; }
+  .price-margin { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 2px; color: #3D5C3A; margin-top: 12px; }
+
+  /* FULL SYSTEM */
+  .system { padding: 48px 40px; background: #0A0908; }
+  .sys-title { font-family: 'Syncopate', sans-serif; font-size: 8px; letter-spacing: 4px; color: #8B7355; text-transform: uppercase; margin-bottom: 28px; }
+  .sys-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #1C1810; }
+  .sys-tile { background: #0A0908; padding: 20px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .sys-product { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 3px; color: #4A3F30; text-transform: uppercase; }
+  .sys-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; color: #D4C9B8; }
+  .sys-mat { font-family: 'Cormorant Garamond', serif; font-size: 12px; color: #4A4038; }
+  .sys-price { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 1px; color: #6A5A40; margin-top: 4px; }
+  .sys-new { border-left: 1px solid #8B7355; padding-left: 15px; }
+
+  /* FOOTER */
+  .footer { padding: 28px 40px; background: #0D0C0B; display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #1C1810; }
+  .footer-brand { font-family: 'Syncopate', sans-serif; font-size: 7px; letter-spacing: 4px; color: #3A3020; text-transform: uppercase; }
+  .footer-line { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 12px; color: #3A3020; }
+
+  @media (max-width: 640px) {
+    .sets-grid { grid-template-columns: 1fr; }
+    .material { grid-template-columns: 1fr; padding: 40px 24px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .sys-row { grid-template-columns: repeat(2,1fr); }
+    .hero, .sets-section, .pricing, .system { padding-left: 24px; padding-right: 24px; }
+    .craft { padding: 24px; }
+    .footer { padding: 20px 24px; flex-direction: column; gap: 10px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">Glass⏧Grasie® — Fragment · Manchetknopen</div>
+
+  <div class="hero-art">
+    <svg viewBox="0 0 580 200" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <defs>
+        <radialGradient id="gM1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#C8D0D8" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="gM2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#C4955A" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="#0D0C0B" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- LEFT SET — helder float pair -->
+      <g transform="translate(40, 20)">
+        <ellipse cx="105" cy="90" rx="90" ry="65" fill="url(#gM1)"/>
+
+        <!-- cufflink LEFT — helder float, square face -->
+        <g transform="translate(20, 30)">
+          <!-- glass face — square with chamfered corners -->
+          <path d="M8,0 L62,0 L70,8 L70,62 L62,70 L8,70 L0,62 L0,8 Z" fill="#0A1420" stroke="#1C2A3A" stroke-width="0.5"/>
+          <!-- grid refraction on clear glass -->
+          <line x1="0" y1="23" x2="70" y2="23" stroke="#132030" stroke-width="0.4" opacity="0.6"/>
+          <line x1="0" y1="46" x2="70" y2="46" stroke="#132030" stroke-width="0.4" opacity="0.5"/>
+          <line x1="23" y1="0" x2="23" y2="70" stroke="#132030" stroke-width="0.4" opacity="0.6"/>
+          <line x1="46" y1="0" x2="46" y2="70" stroke="#132030" stroke-width="0.4" opacity="0.5"/>
+          <!-- light diagonal refraction -->
+          <line x1="0" y1="30" x2="40" y2="0" stroke="#2A4A6A" stroke-width="0.4" opacity="0.4"/>
+          <line x1="30" y1="70" x2="70" y2="40" stroke="#1C3A5A" stroke-width="0.3" opacity="0.3"/>
+          <!-- glass edge highlight — the 5mm side -->
+          <path d="M8,0 L62,0 L70,8" fill="none" stroke="#2A3A4A" stroke-width="0.8" opacity="0.7"/>
+          <!-- T-bar post suggestion -->
+          <rect x="28" y="70" width="14" height="6" rx="1" fill="#3A3020" stroke="#4A4030" stroke-width="0.5"/>
+          <rect x="18" y="74" width="34" height="4" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        </g>
+
+        <!-- cufflink RIGHT — helder float, square face (duplicate) -->
+        <g transform="translate(110, 30)">
+          <path d="M8,0 L62,0 L70,8 L70,62 L62,70 L8,70 L0,62 L0,8 Z" fill="#091220" stroke="#1C2A3A" stroke-width="0.5"/>
+          <line x1="0" y1="23" x2="70" y2="23" stroke="#132030" stroke-width="0.4" opacity="0.5"/>
+          <line x1="0" y1="46" x2="70" y2="46" stroke="#132030" stroke-width="0.4" opacity="0.4"/>
+          <line x1="23" y1="0" x2="23" y2="70" stroke="#132030" stroke-width="0.4" opacity="0.5"/>
+          <line x1="46" y1="0" x2="46" y2="70" stroke="#132030" stroke-width="0.4" opacity="0.4"/>
+          <line x1="10" y1="20" x2="50" y2="0" stroke="#1C3A5A" stroke-width="0.3" opacity="0.35"/>
+          <line x1="20" y1="70" x2="70" y2="35" stroke="#2A4A6A" stroke-width="0.3" opacity="0.3"/>
+          <path d="M8,0 L62,0 L70,8" fill="none" stroke="#2A3A4A" stroke-width="0.8" opacity="0.6"/>
+          <rect x="28" y="70" width="14" height="6" rx="1" fill="#3A3020" stroke="#4A4030" stroke-width="0.5"/>
+          <rect x="18" y="74" width="34" height="4" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        </g>
+
+        <text x="105" y="130" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#2A2218">HELDER FLOAT · SET VAN 2</text>
+      </g>
+
+      <!-- center divider -->
+      <line x1="290" y1="20" x2="290" y2="180" stroke="#1C1810" stroke-width="0.5"/>
+      <text x="290" y="104" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-style="italic" font-size="10" fill="#2A2218" transform="rotate(-90, 290, 104)">twee materialen · één naam</text>
+
+      <!-- RIGHT SET — bedrukt restglas pair -->
+      <g transform="translate(330, 20)">
+        <ellipse cx="105" cy="90" rx="90" ry="65" fill="url(#gM2)"/>
+
+        <!-- cufflink LEFT — Forest Floor print -->
+        <g transform="translate(20, 30)">
+          <path d="M8,0 L62,0 L70,8 L70,62 L62,70 L8,70 L0,62 L0,8 Z" fill="#0A1208" stroke="#1A2818" stroke-width="0.5"/>
+          <!-- restglas motif panels inside chamfered square -->
+          <polygon points="8,0 35,0 0,35 0,8" fill="#1A3A2E"/>
+          <polygon points="35,0 62,0 70,8 70,30 30,0" fill="#2C4A1A"/>
+          <polygon points="0,35 30,0 0,0" fill="#1F4A3A" opacity="0.7"/>
+          <polygon points="70,30 70,62 62,70 40,45" fill="#1E3A10"/>
+          <polygon points="0,35 0,62 8,70 35,45" fill="#3A2C10"/>
+          <polygon points="8,70 35,70 0,35 0,62" fill="#4A3818" opacity="0.8"/>
+          <polygon points="35,70 62,70 70,62 40,45 35,45" fill="#1A2C3A"/>
+          <polygon points="35,0 70,30 40,45 35,45 0,35 30,0" fill="#1C3828"/>
+          <!-- edge highlight -->
+          <path d="M8,0 L62,0 L70,8" fill="none" stroke="#8B7355" stroke-width="0.6" opacity="0.5"/>
+          <rect x="28" y="70" width="14" height="6" rx="1" fill="#3A3020" stroke="#4A4030" stroke-width="0.5"/>
+          <rect x="18" y="74" width="34" height="4" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        </g>
+
+        <!-- cufflink RIGHT — Maritime Rust print -->
+        <g transform="translate(110, 30)">
+          <path d="M8,0 L62,0 L70,8 L70,62 L62,70 L8,70 L0,62 L0,8 Z" fill="#070D12" stroke="#1A2028" stroke-width="0.5"/>
+          <polygon points="8,0 35,0 0,35 0,8" fill="#0C2A40"/>
+          <polygon points="35,0 62,0 70,8 70,30 30,0" fill="#142A4A"/>
+          <polygon points="0,35 30,0 0,0" fill="#0A1E30" opacity="0.7"/>
+          <polygon points="70,30 70,62 62,70 40,45" fill="#C4602A"/>
+          <polygon points="0,35 0,62 8,70 35,45" fill="#B85020"/>
+          <polygon points="8,70 35,70 0,35 0,62" fill="#A84820" opacity="0.8"/>
+          <polygon points="35,70 62,70 70,62 40,45 35,45" fill="#0A1830"/>
+          <polygon points="35,0 70,30 40,45 35,45 0,35 30,0" fill="#1C3A5A"/>
+          <path d="M8,0 L62,0 L70,8" fill="none" stroke="#8B7355" stroke-width="0.6" opacity="0.5"/>
+          <rect x="28" y="70" width="14" height="6" rx="1" fill="#3A3020" stroke="#4A4030" stroke-width="0.5"/>
+          <rect x="18" y="74" width="34" height="4" rx="1" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+        </g>
+
+        <text x="105" y="130" text-anchor="middle" font-family="'Syncopate', monospace" font-size="6" letter-spacing="2" fill="#3A3020">BEDRUKT RESTGLAS · RUN-GEBONDEN</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="brand-name">FRAGMENT</div>
+  <div class="brand-sub">Manchetknopen · by Glass⏧Grasie®</div>
+  <div class="line-tag">Helder float of bedrukt restglas · set van 2</div>
+</div>
+
+<div class="rule"></div>
+
+<!-- CRAFT NOTE -->
+<div class="craft">
+  <div class="craft-bar"></div>
+  <div class="craft-text">
+    Manchetknopen zijn het enige sieraad dat <em>uitsluitend door mannen</em> wordt gedragen — en de categorie met de meest conservatieve materiaalkeuze ter wereld. Goud, zilver, parelmoer. <em>Float glas is iets dat niemand heeft gezien.</em>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- SETS GRID -->
+<div class="sets-section">
+  <div class="sets-header">
+    <span class="sets-title">Twee varianten</span>
+    <span class="sets-note">Set van 2 · goud-vermeil T-bar · gesigneerd</span>
+  </div>
+
+  <div class="sets-grid">
+
+    <!-- Helder Float -->
+    <div class="set-card">
+      <div class="set-art">
+        <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="320" height="240" fill="#070C10"/>
+          <!-- LEFT cufflink large -->
+          <g transform="translate(30, 35)">
+            <path d="M10,0 L100,0 L110,10 L110,100 L100,110 L10,110 L0,100 L0,10 Z" fill="#0A1420" stroke="#1C2A3A" stroke-width="0.5"/>
+            <line x1="0" y1="36" x2="110" y2="36" stroke="#132030" stroke-width="0.5" opacity="0.7"/>
+            <line x1="0" y1="73" x2="110" y2="73" stroke="#132030" stroke-width="0.5" opacity="0.6"/>
+            <line x1="36" y1="0" x2="36" y2="110" stroke="#132030" stroke-width="0.5" opacity="0.7"/>
+            <line x1="73" y1="0" x2="73" y2="110" stroke="#132030" stroke-width="0.5" opacity="0.6"/>
+            <line x1="0" y1="50" x2="60" y2="0" stroke="#2A4A6A" stroke-width="0.5" opacity="0.35"/>
+            <line x1="50" y1="110" x2="110" y2="60" stroke="#1C3A5A" stroke-width="0.4" opacity="0.3"/>
+            <line x1="0" y1="80" x2="30" y2="110" stroke="#162838" stroke-width="0.3" opacity="0.25"/>
+            <path d="M10,0 L100,0 L110,10" fill="none" stroke="#2A3A4A" stroke-width="1" opacity="0.8"/>
+            <path d="M0,10 L0,100 L10,110" fill="none" stroke="#162028" stroke-width="0.5" opacity="0.4"/>
+            <!-- thickness side edge visible -->
+            <rect x="0" y="0" width="110" height="110" fill="none" stroke="#1A2838" stroke-width="0.3"/>
+            <!-- T-bar -->
+            <rect x="42" y="110" width="26" height="10" rx="2" fill="#3A3020" stroke="#4A4030" stroke-width="0.5"/>
+            <rect x="28" y="118" width="54" height="7" rx="2" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+          </g>
+          <!-- RIGHT cufflink -->
+          <g transform="translate(180, 35)">
+            <path d="M10,0 L100,0 L110,10 L110,100 L100,110 L10,110 L0,100 L0,10 Z" fill="#091220" stroke="#1C2A3A" stroke-width="0.5"/>
+            <line x1="0" y1="36" x2="110" y2="36" stroke="#132030" stroke-width="0.5" opacity="0.6"/>
+            <line x1="0" y1="73" x2="110" y2="73" stroke="#132030" stroke-width="0.5" opacity="0.5"/>
+            <line x1="36" y1="0" x2="36" y2="110" stroke="#132030" stroke-width="0.5" opacity="0.6"/>
+            <line x1="73" y1="0" x2="73" y2="110" stroke="#132030" stroke-width="0.5" opacity="0.5"/>
+            <line x1="15" y1="0" x2="70" y2="0" stroke="#2A3A4A" stroke-width="0.8"/>
+            <line x1="20" y1="110" x2="110" y2="55" stroke="#1C3A5A" stroke-width="0.4" opacity="0.3"/>
+            <path d="M10,0 L100,0 L110,10" fill="none" stroke="#2A3A4A" stroke-width="1" opacity="0.7"/>
+            <rect x="42" y="110" width="26" height="10" rx="2" fill="#3A3020" stroke="#4A4030" stroke-width="0.5"/>
+            <rect x="28" y="118" width="54" height="7" rx="2" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+          </g>
+          <text x="160" y="210" text-anchor="middle" font-family="'Syncopate', monospace" font-size="7" letter-spacing="3" fill="#2A2218">HELDER FLOAT · 5MM · SET VAN 2</text>
+        </svg>
+      </div>
+      <div class="set-variant">Variant A · Permanent</div>
+      <div class="set-name">Clear Architecture</div>
+      <div class="set-desc">Helder float, 5mm. Geen motief — de glasrand, de refractie en de geometrie van de vlakken zijn het enige ornament. Tijdloos, seizoensloos, open oplage.</div>
+      <div class="set-price">€ 95 / set</div>
+      <div class="set-avail"><span class="dot" style="background:#3D5C3A;"></span><span style="color:#4A7A45;font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:1px;">Permanent beschikbaar</span></div>
+    </div>
+
+    <!-- Bedrukt Restglas -->
+    <div class="set-card">
+      <div class="set-art">
+        <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="320" height="240" fill="#070A08"/>
+          <!-- LEFT — Forest Floor -->
+          <g transform="translate(30, 35)">
+            <path d="M10,0 L100,0 L110,10 L110,100 L100,110 L10,110 L0,100 L0,10 Z" fill="#0A1208" stroke="#1A2818" stroke-width="0.5"/>
+            <polygon points="10,0 55,0 0,55 0,10" fill="#1A3A2E"/>
+            <polygon points="55,0 100,0 110,10 110,50 55,0" fill="#2C4A1A"/>
+            <polygon points="0,55 55,0 10,0 0,10" fill="#1F4A3A" opacity="0.8"/>
+            <polygon points="110,50 110,100 100,110 65,70" fill="#1E3A10"/>
+            <polygon points="0,55 0,100 10,110 55,65" fill="#3A2C10"/>
+            <polygon points="10,110 55,110 55,65 0,100" fill="#4A3818"/>
+            <polygon points="55,110 100,110 110,100 65,70 55,65" fill="#1A2C3A"/>
+            <polygon points="55,0 110,50 65,70 55,65 0,55 55,0" fill="#1C3828"/>
+            <path d="M10,0 L100,0 L110,10" fill="none" stroke="#8B7355" stroke-width="0.8" opacity="0.6"/>
+            <rect x="42" y="110" width="26" height="10" rx="2" fill="#3A3020" stroke="#4A4030" stroke-width="0.5"/>
+            <rect x="28" y="118" width="54" height="7" rx="2" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+          </g>
+          <!-- RIGHT — Maritime Rust -->
+          <g transform="translate(180, 35)">
+            <path d="M10,0 L100,0 L110,10 L110,100 L100,110 L10,110 L0,100 L0,10 Z" fill="#070D12" stroke="#1A2028" stroke-width="0.5"/>
+            <polygon points="10,0 55,0 0,55 0,10" fill="#0C2A40"/>
+            <polygon points="55,0 100,0 110,10 110,50 55,0" fill="#1C3A5A"/>
+            <polygon points="0,55 55,0 10,0 0,10" fill="#0A1E30" opacity="0.8"/>
+            <polygon points="110,50 110,100 100,110 65,70" fill="#C4602A"/>
+            <polygon points="0,55 0,100 10,110 55,65" fill="#B85020"/>
+            <polygon points="10,110 55,110 55,65 0,100" fill="#A84820"/>
+            <polygon points="55,110 100,110 110,100 65,70 55,65" fill="#0A1830"/>
+            <polygon points="55,0 110,50 65,70 55,65 0,55 55,0" fill="#142A4A"/>
+            <path d="M10,0 L100,0 L110,10" fill="none" stroke="#C47840" stroke-width="0.6" opacity="0.5"/>
+            <rect x="42" y="110" width="26" height="10" rx="2" fill="#3A3020" stroke="#4A4030" stroke-width="0.5"/>
+            <rect x="28" y="118" width="54" height="7" rx="2" fill="#2A2418" stroke="#3A3020" stroke-width="0.5"/>
+          </g>
+          <text x="160" y="210" text-anchor="middle" font-family="'Syncopate', monospace" font-size="7" letter-spacing="3" fill="#3A2818">RESTGLAS PRINT · RUN-GEBONDEN</text>
+        </svg>
+      </div>
+      <div class="set-variant">Variant B · Run-gebonden</div>
+      <div class="set-name">Printed Pair</div>
+      <div class="set-desc">Bedrukt restglas uit actieve run. De twee stukken in een set hoeven niet identiek te zijn — ze komen uit dezelfde run, niet dezelfde snede. Dat is het verhaal.</div>
+      <div class="set-price">€ 165 / set</div>
+      <div class="set-avail"><span class="dot" style="background:#8B7355;"></span><span style="color:#8B7355;font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:1px;">Beperkt per run</span></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- MATERIAL + SPECS -->
+<div class="material">
+  <div>
+    <div class="mat-eyebrow">Het argument voor manchetknopen</div>
+    <div class="mat-quote">
+      Goud reflecteert.<br>
+      Zilver reflecteert.<br>
+      <em>Float glas breekt het licht.</em>
+    </div>
+    <div class="mat-body">
+      De man die manchetknopen draagt, draagt ze bewust. Het is een statement-categorie — niet dagelijks gebruik maar een gerichte keuze. Float glas op 5mm heeft de massadichtheid van een metalen knoop, maar gedraagt zich volledig anders in licht. De glasrand die zichtbaar is vanuit de manchet is het meest overtuigende verkoopmoment: die kant heeft niemand eerder gezien.
+    </div>
+  </div>
+
+  <div class="spec-col">
+    <div class="spec-row"><span class="spec-k">Materiaal A</span><span class="spec-v">Helder float, 5mm</span></div>
+    <div class="spec-row"><span class="spec-k">Materiaal B</span><span class="spec-v">Bedrukt restglas, 3–4mm</span></div>
+    <div class="spec-row"><span class="spec-k">Vorm</span><span class="spec-v">Vierkant, gechamferd</span></div>
+    <div class="spec-row"><span class="spec-k">Bevestiging</span><span class="spec-v">Goud-vermeil T-bar</span></div>
+    <div class="spec-row"><span class="spec-k">Snijding</span><span class="spec-v">CNC waterjet</span></div>
+    <div class="spec-row"><span class="spec-k">Afwerking</span><span class="spec-v">Gepolijste glasrand</span></div>
+    <div class="spec-row"><span class="spec-k">Verpakking</span><span class="spec-v">Set van 2, genummerd</span></div>
+    <div class="spec-row"><span class="spec-k">Marge</span><span class="spec-v">~82% direct</span></div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- PRICING -->
+<div class="pricing">
+  <div class="pricing-title">Prijsarchitectuur</div>
+  <div class="pricing-grid">
+    <div class="price-tile">
+      <div class="price-tier">Entry · Helder float</div>
+      <div class="price-amount"><span>€</span>95</div>
+      <div class="price-desc">Clear Architecture. Permanent. Geen run-afhankelijkheid — altijd leverbaar.</div>
+      <div class="price-margin">Marge ~82%</div>
+    </div>
+    <div class="price-tile">
+      <div class="price-tier">Premium · Bedrukt</div>
+      <div class="price-amount"><span>€</span>135</div>
+      <div class="price-desc">Printed Pair, actieve run. Motiefcombinatie per set uniek.</div>
+      <div class="price-margin">Marge ~82%</div>
+    </div>
+    <div class="price-tile">
+      <div class="price-tier">Top · Laatste sets</div>
+      <div class="price-amount"><span>€</span>165</div>
+      <div class="price-desc">Laatste 2 sets van een run. Schaarste automatisch in het model gebouwd.</div>
+      <div class="price-margin">Marge ~82%</div>
+    </div>
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<!-- FULL SYSTEM -->
+<div class="system">
+  <div class="sys-title">Fragment — volledig systeem</div>
+  <div class="sys-row">
+    <div class="sys-tile">
+      <div class="sys-product">Pendant</div>
+      <div class="sys-name">Geometrische hanger</div>
+      <div class="sys-mat">Bedrukt restglas · 3–4mm</div>
+      <div class="sys-price">€ 55 – 95 · limited run</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Oorbellen</div>
+      <div class="sys-name">Wearable serie</div>
+      <div class="sys-mat">Bedrukt restglas · 3–4mm</div>
+      <div class="sys-price">€ 55 – 95 / set · limited run</div>
+    </div>
+    <div class="sys-tile">
+      <div class="sys-product">Broche</div>
+      <div class="sys-name">Architecture series</div>
+      <div class="sys-mat">Helder float · 5–6mm</div>
+      <div class="sys-price">€ 65 – 130 · open oplage</div>
+    </div>
+    <div class="sys-tile sys-new">
+      <div class="sys-product">Manchetknopen — nieuw</div>
+      <div class="sys-name">Helder of bedrukt</div>
+      <div class="sys-mat">Float 5mm of restglas 3–4mm</div>
+      <div class="sys-price">€ 95 – 165 / set · ~82%</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span class="footer-brand">Glass⏧Grasie® — Rotterdam</span>
+  <span class="footer-line">fragment · float · forever</span>
+</div>
+
+</body>
+</html>

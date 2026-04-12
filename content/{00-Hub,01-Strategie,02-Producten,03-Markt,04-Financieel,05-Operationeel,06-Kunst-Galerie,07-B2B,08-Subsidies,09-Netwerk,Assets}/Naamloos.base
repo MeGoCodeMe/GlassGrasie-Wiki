@@ -1,0 +1,13 @@
+views:
+  - type: list
+    name: Tabel
+    groupBy:
+      property: file.folder
+      direction: ASC
+    order:
+      - file.name
+    sort:
+      - property: file.folder
+        direction: ASC
+    indentProperties: false
+    markers: bullet

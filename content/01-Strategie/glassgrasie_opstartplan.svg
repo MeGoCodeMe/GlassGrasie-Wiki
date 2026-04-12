@@ -1,0 +1,191 @@
+<svg width="100%" viewBox="0 0 680 780" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Glass Grasie opstartplan — vier fases</title>
+  <desc>Roadmap van nul naar eerste omzet in vier fases: fundament, proof of concept, eerste verkoop, schaalstart</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      text { font-family: Arial, sans-serif; fill: #111; }
+      .t  { font-size: 14px; }
+      .ts { font-size: 12px; fill: #555; }
+      .th { font-size: 14px; font-weight: 500; }
+
+      /* c-teal */
+      .c-teal rect  { fill: #E1F5EE; stroke: #0F6E56; }
+      .c-teal .th   { fill: #085041; }
+      .c-teal .ts   { fill: #0F6E56; }
+
+      /* c-purple */
+      .c-purple rect { fill: #EEEDFE; stroke: #534AB7; }
+      .c-purple .th  { fill: #3C3489; }
+      .c-purple .ts  { fill: #534AB7; }
+
+      /* c-coral */
+      .c-coral rect { fill: #FAECE7; stroke: #993C1D; }
+      .c-coral .th  { fill: #712B13; }
+      .c-coral .ts  { fill: #993C1D; }
+
+      /* c-amber */
+      .c-amber rect { fill: #FAEEDA; stroke: #854F0B; }
+      .c-amber .th  { fill: #633806; }
+      .c-amber .ts  { fill: #854F0B; }
+
+      /* c-gray */
+      .c-gray rect { fill: #F1EFE8; stroke: #5F5E5A; }
+      .c-gray .th  { fill: #2C2C2A; }
+      .c-gray .ts  { fill: #5F5E5A; }
+
+      .node { cursor: pointer; }
+      .node:hover rect { opacity: 0.82; }
+
+      .arr { stroke: #888780; fill: none; stroke-width: 1.5; }
+
+      @media (prefers-color-scheme: dark) {
+        text { fill: #c2c0b6; }
+        .ts  { fill: #9c9a92; }
+
+        .c-teal rect   { fill: #04342C; stroke: #5DCAA5; }
+        .c-teal .th    { fill: #9FE1CB; }
+        .c-teal .ts    { fill: #5DCAA5; }
+
+        .c-purple rect { fill: #26215C; stroke: #AFA9EC; }
+        .c-purple .th  { fill: #CECBF6; }
+        .c-purple .ts  { fill: #AFA9EC; }
+
+        .c-coral rect  { fill: #4A1B0C; stroke: #F0997B; }
+        .c-coral .th   { fill: #F5C4B3; }
+        .c-coral .ts   { fill: #F0997B; }
+
+        .c-amber rect  { fill: #412402; stroke: #EF9F27; }
+        .c-amber .th   { fill: #FAC775; }
+        .c-amber .ts   { fill: #EF9F27; }
+
+        .c-gray rect   { fill: #2C2C2A; stroke: #B4B2A9; }
+        .c-gray .th    { fill: #D3D1C7; }
+        .c-gray .ts    { fill: #B4B2A9; }
+
+        .arr { stroke: #888780; }
+      }
+    </style>
+  </defs>
+
+  <!-- Phase labels left column -->
+  <text class="ts" x="56" y="92"  text-anchor="middle" font-weight="500">Fase 1</text>
+  <text class="ts" x="56" y="106" text-anchor="middle">Week 1–2</text>
+  <text class="ts" x="56" y="258" text-anchor="middle" font-weight="500">Fase 2</text>
+  <text class="ts" x="56" y="272" text-anchor="middle">Week 3–6</text>
+  <text class="ts" x="56" y="468" text-anchor="middle" font-weight="500">Fase 3</text>
+  <text class="ts" x="56" y="482" text-anchor="middle">Week 7–10</text>
+  <text class="ts" x="56" y="658" text-anchor="middle" font-weight="500">Fase 4</text>
+  <text class="ts" x="56" y="672" text-anchor="middle">Week 11–16</text>
+
+  <!-- Connector lines -->
+  <line x1="56" y1="140" x2="56" y2="246" class="arr" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="56" y1="330" x2="56" y2="456" class="arr" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="56" y1="530" x2="56" y2="646" class="arr" stroke-width="0.5" marker-end="url(#arrow)"/>
+
+  <!-- FASE 1 header -->
+  <g class="c-teal">
+    <rect x="84" y="60" width="572" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="370" y="86" text-anchor="middle" dominant-baseline="central">Fundament — KvK, materiaalafspraak, gereedschap</text>
+  </g>
+
+  <!-- Fase 1 cards -->
+  <g class="node c-gray" onclick="alert('KvK registratie: Eenmanszaak, €85,15, Blaak 40 Rotterdam')">
+    <rect x="84" y="116" width="178" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="173" y="136" text-anchor="middle" dominant-baseline="central">KvK registratie</text>
+    <text class="ts" x="173" y="154" text-anchor="middle" dominant-baseline="central">Eenmanszaak, €0 kosten</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Van Dijken afspraak: exclusiviteit restmateriaal schriftelijk vastleggen')">
+    <rect x="274" y="116" width="178" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="363" y="136" text-anchor="middle" dominant-baseline="central">Van Dijken afspraak</text>
+    <text class="ts" x="363" y="154" text-anchor="middle" dominant-baseline="central">Exclusiviteit restmateriaal</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Minimale tooling: glassnijder, beschermingsmiddelen, schuurmiddelen')">
+    <rect x="464" y="116" width="192" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="560" y="136" text-anchor="middle" dominant-baseline="central">Minimale tooling</text>
+    <text class="ts" x="560" y="154" text-anchor="middle" dominant-baseline="central">Glassnijder, bescherming</text>
+  </g>
+
+  <!-- FASE 2 header -->
+  <g class="c-purple">
+    <rect x="84" y="224" width="572" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="370" y="250" text-anchor="middle" dominant-baseline="central">Proof of concept — eerste producten, foto's, prijzen</text>
+  </g>
+
+  <!-- Fase 2 cards row 1 -->
+  <g class="node c-gray" onclick="alert('Eerste 10 objecten: snijden, schuren, framen')">
+    <rect x="84" y="280" width="178" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="173" y="300" text-anchor="middle" dominant-baseline="central">Eerste 10 objecten</text>
+    <text class="ts" x="173" y="318" text-anchor="middle" dominant-baseline="central">Snijden, schuren, framen</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Productfotografie: naturel licht, clean achtergrond, kaarslicht voor glasrand')">
+    <rect x="274" y="280" width="178" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="363" y="300" text-anchor="middle" dominant-baseline="central">Productfotografie</text>
+    <text class="ts" x="363" y="318" text-anchor="middle" dominant-baseline="central">Naturel licht, clean achtergrond</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Prijsstrategie: positionering vs. markt, value-based pricing')">
+    <rect x="464" y="280" width="192" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="560" y="300" text-anchor="middle" dominant-baseline="central">Prijsstrategie vaststellen</text>
+    <text class="ts" x="560" y="318" text-anchor="middle" dominant-baseline="central">Positionering vs markt</text>
+  </g>
+
+  <!-- Fase 2 cards row 2 -->
+  <g class="node c-gray" onclick="alert('Online aanwezigheid: Instagram + gratis webshop (Bigcartel/Gumroad)')">
+    <rect x="84" y="348" width="272" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="220" y="368" text-anchor="middle" dominant-baseline="central">Minimale online aanwezigheid</text>
+    <text class="ts" x="220" y="386" text-anchor="middle" dominant-baseline="central">Instagram + gratis webshop</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Brand story: Van Dijken + Rotterdam + circulair — 150 woorden artistiek statement')">
+    <rect x="368" y="348" width="288" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="512" y="368" text-anchor="middle" dominant-baseline="central">Brand story formuleren</text>
+    <text class="ts" x="512" y="386" text-anchor="middle" dominant-baseline="central">Van Dijken + Rotterdam + circulair</text>
+  </g>
+
+  <!-- FASE 3 header -->
+  <g class="c-coral">
+    <rect x="84" y="424" width="572" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="370" y="450" text-anchor="middle" dominant-baseline="central">Eerste omzet — B2C verkoop en B2B prospecting</text>
+  </g>
+
+  <!-- Fase 3 cards -->
+  <g class="node c-gray" onclick="alert('5 architecten: Superuse Studios, RAU Architects, MVRDV, Studio Modijefsky, Paul de Ruiter')">
+    <rect x="84" y="480" width="232" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="200" y="500" text-anchor="middle" dominant-baseline="central">5 architecten benaderen</text>
+    <text class="ts" x="200" y="518" text-anchor="middle" dominant-baseline="central">Superuse, RAU, MVRDV</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Pop-up markt: Markthal Rotterdam, Fenix Food Factory, designmarkten')">
+    <rect x="328" y="480" width="200" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="428" y="500" text-anchor="middle" dominant-baseline="central">Pop-up / markt</text>
+    <text class="ts" x="428" y="518" text-anchor="middle" dominant-baseline="central">Rotterdam designmarkt</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Subsidie: MIA/Vamil check bij WAZER aanschaf, WBSO aanvraag')">
+    <rect x="540" y="480" width="116" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="598" y="500" text-anchor="middle" dominant-baseline="central">Subsidie</text>
+    <text class="ts" x="598" y="518" text-anchor="middle" dominant-baseline="central">MIA/Vamil check</text>
+  </g>
+
+  <!-- FASE 4 header -->
+  <g class="c-amber">
+    <rect x="84" y="614" width="572" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="370" y="640" text-anchor="middle" dominant-baseline="central">Schaalstart — collectie, kanalen, B2B contract</text>
+  </g>
+
+  <!-- Fase 4 cards -->
+  <g class="node c-gray" onclick="alert('Dutch Design Week Eindhoven: oktober, 350.000 bezoekers, aanmelden via ddw.nl')">
+    <rect x="84" y="670" width="178" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="173" y="690" text-anchor="middle" dominant-baseline="central">Dutch Design Week</text>
+    <text class="ts" x="173" y="708" text-anchor="middle" dominant-baseline="central">Eindhoven, oktober</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Madaster registratie: materialenpaspoort voor BREEAM-NL certificeringspunten')">
+    <rect x="274" y="670" width="178" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="363" y="690" text-anchor="middle" dominant-baseline="central">Madaster registratie</text>
+    <text class="ts" x="363" y="708" text-anchor="middle" dominant-baseline="central">B2B bouw credentials</text>
+  </g>
+  <g class="node c-gray" onclick="alert('Eerste B2B contract: wandpaneel of bartop voor architect of interieurontwerper')">
+    <rect x="464" y="670" width="192" height="56" rx="8" stroke-width="0.5"/>
+    <text class="th" x="560" y="690" text-anchor="middle" dominant-baseline="central">Eerste B2B contract</text>
+    <text class="ts" x="560" y="708" text-anchor="middle" dominant-baseline="central">Architecten, hospitality</text>
+  </g>
+</svg>
