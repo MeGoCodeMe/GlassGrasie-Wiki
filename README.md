@@ -17,3 +17,4 @@ Built with Cloudflare Workers + GitHub integration.
 ---
 
 **Last updated:** $(date)
+# GlassGrasie-Wiki
