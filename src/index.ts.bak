@@ -1,0 +1,292 @@
+import { Router } from 'itty-router';
+
+const router = Router();
+
+interface WikiEnv {
+  GITHUB_OWNER: string;
+  GITHUB_REPO: string;
+  GITHUB_BRANCH: string;
+  MASTER_PASSCODE: string;
+  WIKI_TITLE: string;
+  WIKI_DESCRIPTION: string;
+  WIKI_KV: KVNamespace;
+}
+
+const NOTES = ["Art-Rotterdam.md","B2B-Kanalen.md","B2C-Kanalen.md","BREEAM-NL.md","BlueCity-Rotterdam.md","Businessplan-Overzicht.md","Certificaat-van-Herkomst.md","Concurrentieanalyse.md","Dutch-Design-Week.md","Executive-Summary.md","Financieel-Plan.md","Galerie-Strategie.md","GlassGrasie-Mindmap.md","Glass⏧Grasie Hub.md","KvK-Registratie.md","MAGNA-Glaskeramik.md","MIA-Vamil.md","MVRDV.md","Madaster.md","Marktanalyse.md","Missie-en-Positionering.md","Mondriaan-Fonds.md","Omzetprognose.md","Product-B2B-Architectuur.md","Product-Kunstobjecten.md","Product-Sieraden.md","Product-Woonaccessoires.md","RAU-Architects.md","Restmateriaal-Overeenkomst.md","Subsidies-Overzicht.md","Superuse-Studios.md","Van-Dijken-Glas.md","WAZER-Desktop.md","WBSO.md","Weekplan-16-Weken.md","fragment_broche_architectuur.md","fragment_earrings_brand_extension.md","fragment_manchetknopen.md","fragment_sleutelhanger.md","fragment_tie_bar.md","glassgrasie_b2b_architectuur.md"];
+
+const DOCUMENTS = ["fragment_brand_deck.pptx","fragment_broche_architectuur.html","fragment_earrings_brand_extension.html","fragment_manchetknopen.html","fragment_sleutelhanger.html","fragment_tie_bar.html","Manchetknopen set.md"];
+
+const ADMINS = ['699b16eb9b3bea50ebb1a94f7a314472'];
+const USERS: Record<string, string> = {
+  'gertjan@glassgrasie.com': 'xdefNbWnJsmchi0y'
+};
+
+const STYLES = {
+  dark: { bg: '#0a0a0a', textPrimary: '#eeeeee', textSecondary: '#aaaaaa', textTertiary: '#cccccc', gold: '#c9a87c', goldHover: '#b8965c', cardBg: 'rgba(10,10,10,0.7)', inputBg: '#333333' },
+  light: { bg: '#f5f5f5', textPrimary: '#1a1a1a', textSecondary: '#666666', textTertiary: '#999999', gold: '#b8965c', goldHover: '#9d7e4a', cardBg: '#ffffff', inputBg: '#f0f0f0' }
+};
+
+const STYLE = {
+  fontFamily: "'Cormorant Garamond', Georgia, serif",
+  ...STYLES.dark
+};
+
+function parseMarkdown(md: string): string {
+  let html = md
+    .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.*?)__/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/_(.*?)_/g, '<em>$1</em>')
+    .replace(/\`\`\`[\s\S]*?\`\`\`/g, (match) => '<pre><code>' + match.replace(/\`\`\`/g, '') + '</code></pre>')
+    .replace(/\`(.*?)\`/g, '<code>$1</code>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="/wiki?note=$2">$1</a>')
+    .replace(/\n\n+/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  return '<p>' + html + '</p>';
+}
+
+function extractBacklinks(md: string): string[] {
+  const regex = /\[(.*?)\]\((.*?)\)/g;
+  const links: string[] = [];
+  let match;
+  while ((match = regex.exec(md)) !== null) {
+    const fileName = match[2].replace('.md', '');
+    if (NOTES.find(n => n.toLowerCase().includes(fileName.toLowerCase()))) {
+      links.push(match[2]);
+    }
+  }
+  return links;
+}
+
+async function getNoteMeta(filename: string, env: WikiEnv): Promise<{ lastModified: string } | null> {
+  const url = 'https://api.github.com/repos/' + env.GITHUB_OWNER + '/' + env.GITHUB_REPO + '/commits?path=notes/' + encodeURIComponent(filename) + '&per_page=1';
+  try {
+    const res = await fetch(url);
+    if (res.ok) {
+      const data: any[] = await res.json();
+      if (data.length > 0) {
+        const date = new Date(data[0].commit.committer.date);
+        return { lastModified: date.toLocaleDateString('nl-NL', { year: 'numeric', month: 'long', day: 'numeric' }) };
+      }
+    }
+    return null;
+  } catch (e) {
+    console.error('Meta fetch error: ' + e);
+    return null;
+  }
+}
+
+function generateInviteToken(): string {
+  return Array.from(crypto.getRandomValues(new Uint8Array(12))).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+router.get('/', () => {
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Glass⏧Grasie — Premium Float Glass Art & Design</title><style>@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap");*{margin:0;padding:0;box-sizing:border-box}body{background:' + STYLE.bg + ';font-family:' + STYLE.fontFamily + ';display:flex;justify-content:center;align-items:center;min-height:100vh;color:' + STYLE.textPrimary + ';padding:60px 20px}.landing{text-align:center;max-width:800px}.logo{font-size:64px;font-weight:300;letter-spacing:2px;margin-bottom:35px}.divider{width:320px;height:1px;background:linear-gradient(to right, transparent, ' + STYLE.gold + ', transparent);margin:0 auto 35px}.tagline{font-size:20px;font-style:italic;color:' + STYLE.gold + ';font-weight:300;letter-spacing:1px;margin-bottom:45px;line-height:1.6}.contact{font-size:13px;letter-spacing:1px;color:' + STYLE.textSecondary + ';margin-bottom:50px;line-height:2}.contact a{color:' + STYLE.textSecondary + ';text-decoration:none}.contact a:hover{color:' + STYLE.gold + '}.divider-2{width:200px;height:1px;background:linear-gradient(to right, transparent, #555, transparent);margin:0 auto 40px}.description{font-size:14px;font-style:italic;color:' + STYLE.textSecondary + '}.footer{margin-top:60px;padding-top:30px;border-top:1px solid rgba(212,175,55,0.1);font-size:12px;color:' + STYLE.textSecondary + '}.footer a{color:' + STYLE.gold + ';text-decoration:none}.footer a:hover{color:' + STYLE.textPrimary + '}</style></head><body><div class="landing"><div class="logo">Glass⏧Grasie</div><div class="divider"></div><div class="tagline">Premium Float Glass Art & Design</div><div class="contact"><a href="https://glassgrasie.com">glassgrasie.com</a> · <a href="mailto:alchemy@glassgrasie.com">alchemy@glassgrasie.com</a> · Rotterdam</div><div class="divider-2"></div><div class="description">Hier erkennen we dat Grasie gewoon Grasie is.</div><div class="footer"><a href="/login">Private Wiki</a></div></div></body></html>';
+  return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+});
+
+router.get('/login', () => {
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Glass⏧Grasie Wiki</title><style>@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap");*{margin:0;padding:0;box-sizing:border-box}body{background:' + STYLE.bg + ';font-family:' + STYLE.fontFamily + ';display:flex;justify-content:center;align-items:center;height:100vh;color:' + STYLE.textPrimary + '}.login{text-align:center;max-width:600px;padding:40px 20px}.logo{font-size:56px;font-weight:300;letter-spacing:2px;margin-bottom:30px}.divider{width:250px;height:1px;background:linear-gradient(to right, transparent, ' + STYLE.gold + ', transparent);margin:0 auto 30px}.tagline{font-size:18px;font-style:italic;color:' + STYLE.gold + ';font-weight:300;letter-spacing:1px;margin-bottom:40px}.form-group{margin-bottom:20px}input[type="email"],input[type="password"]{width:100%;max-width:400px;padding:14px 16px;border:1px solid rgba(201,168,124,0.2);background:' + STYLE.inputBg + ';color:' + STYLE.textPrimary + ';font-size:13px;letter-spacing:1px;border-radius:0;transition:all 0.3s;font-family:"Courier New", monospace;margin-bottom:12px}input[type="email"]:focus,input[type="password"]:focus{outline:none;border-color:' + STYLE.gold + ';background:rgba(51,51,51,0.8);box-shadow:0 0 15px rgba(201,168,124,0.15)}input::placeholder{color:' + STYLE.textSecondary + '}button{width:100%;max-width:400px;padding:14px 16px;background:transparent;color:' + STYLE.gold + ';border:1px solid ' + STYLE.gold + ';font-size:11px;font-weight:600;letter-spacing:3px;cursor:pointer;border-radius:0;transition:all 0.3s;text-transform:uppercase;font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif}button:hover{background:rgba(201,168,124,0.1);box-shadow:0 0 20px rgba(201,168,124,0.25)}.error{color:#ff6b6b;font-size:12px;margin-top:10px}.master-login{margin-top:30px;padding-top:30px;border-top:1px solid rgba(201,168,124,0.1)}.master-login p{font-size:12px;color:' + STYLE.textSecondary + '}</style></head><body><div class="login"><div class="logo">Glass⏧Grasie</div><div class="divider"></div><div class="tagline">Premium Float Glass Art & Design</div><div id="emailForm"><form method="POST" action="/auth"><div class="form-group"><input type="email" name="email" placeholder="Email" required autofocus></div><div class="form-group"><input type="password" name="password" placeholder="Password" required></div><button type="submit">Enter</button></form><div id="errorMsg" class="error"></div></div><div class="master-login"><p>Or use master passcode</p><form method="POST" action="/auth"><div class="form-group"><input type="password" name="passcode" placeholder="Passcode"></div><button type="submit">Enter</button></form></div></div><script>const params=new URLSearchParams(window.location.search);if(params.get("error")==="invalid"){document.getElementById("errorMsg").textContent="Invalid email or password"}</script></body></html>';
+  return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+});
+
+router.post('/auth', async (req: Request, env: WikiEnv) => {
+  const data = await req.formData();
+  const email = data.get('email')?.toString() || '';
+  const password = data.get('password')?.toString() || '';
+  const passcode = data.get('passcode')?.toString() || '';
+
+  let authenticated = false;
+  let userType = '';
+
+  if (passcode && passcode === env.MASTER_PASSCODE) {
+    authenticated = true;
+    userType = 'admin';
+  } else if (email && password && USERS[email] && USERS[email] === password) {
+    authenticated = true;
+    userType = 'user';
+  }
+
+  if (authenticated) {
+    const token = generateInviteToken();
+    const res = new Response('Redirecting...', { status: 302, headers: { 'Location': '/wiki?token=' + token } });
+    res.headers.set('Set-Cookie', 'token=' + token + '; Path=/; HttpOnly; Max-Age=2592000; SameSite=Strict');
+    res.headers.set('Set-Cookie', 'userType=' + userType + '; Path=/; Max-Age=2592000; SameSite=Strict');
+    res.headers.set('Set-Cookie', 'theme=dark; Path=/; Max-Age=31536000; SameSite=Strict');
+    await env.WIKI_KV.put('token:' + token, userType, { expirationTtl: 2592000 });
+    return res;
+  }
+
+  return new Response('Redirecting...', { status: 302, headers: { 'Location': '/login?error=invalid' } });
+});
+
+router.post('/admin/invite', async (req: Request, env: WikiEnv) => {
+  const token = new URL(req.url).searchParams.get('token');
+  const cookieToken = req.headers.get('Cookie')?.match(/token=([^;]+)/)?.[1];
+  const currentToken = token || cookieToken;
+  
+  const userType = await env.WIKI_KV.get('token:' + (currentToken || ''));
+  if (userType !== 'admin') {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const inviteToken = generateInviteToken();
+  await env.WIKI_KV.put('token:' + inviteToken, 'user', { expirationTtl: 2592000 });
+  
+  const inviteUrl = 'https://revamped.glassgrasie.com/wiki?token=' + inviteToken;
+  return new Response(JSON.stringify({ inviteUrl, token: inviteToken }), { headers: { 'Content-Type': 'application/json' } });
+});
+
+function isAuthed(req: Request): boolean {
+  const token = new URL(req.url).searchParams.get('token');
+  const cookieToken = req.headers.get('Cookie')?.match(/token=([^;]+)/)?.[1];
+  return !!(token || cookieToken);
+}
+
+async function fetchNoteFromGitHub(filename: string, env: WikiEnv): Promise<string | null> {
+  const url = 'https://raw.githubusercontent.com/' + env.GITHUB_OWNER + '/' + env.GITHUB_REPO + '/' + env.GITHUB_BRANCH + '/notes/' + encodeURIComponent(filename);
+  try {
+    const res = await fetch(url);
+    if (res.ok) return await res.text();
+    return null;
+  } catch (e) {
+    console.error('Fetch note error: ' + e);
+    return null;
+  }
+}
+
+async function fetchDocumentFromGitHub(filename: string, env: WikiEnv): Promise<ArrayBuffer | null> {
+  const url = 'https://raw.githubusercontent.com/' + env.GITHUB_OWNER + '/' + env.GITHUB_REPO + '/' + env.GITHUB_BRANCH + '/documents/' + encodeURIComponent(filename);
+  try {
+    const res = await fetch(url);
+    if (res.ok) return await res.arrayBuffer();
+    return null;
+  } catch (e) {
+    console.error('Fetch document error: ' + e);
+    return null;
+  }
+}
+
+function getMimeType(filename: string): string {
+  if (filename.endsWith('.pptx')) return 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+  if (filename.endsWith('.html')) return 'text/html; charset=utf-8';
+  if (filename.endsWith('.md')) return 'text/markdown; charset=utf-8';
+  return 'application/octet-stream';
+}
+
+router.get('/document', async (req: Request, env: WikiEnv) => {
+  if (!isAuthed(req)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const filename = new URL(req.url).searchParams.get('file');
+  if (!filename || !DOCUMENTS.includes(filename)) {
+    return new Response('Document not found', { status: 404 });
+  }
+
+  const data = await fetchDocumentFromGitHub(filename, env);
+  if (!data) {
+    return new Response('Document not found', { status: 404 });
+  }
+
+  return new Response(data, {
+    headers: {
+      'Content-Type': getMimeType(filename),
+      'Content-Disposition': 'inline; filename="' + filename + '"'
+    }
+  });
+});
+
+router.get('/wiki', async (req: Request, env: WikiEnv) => {
+  if (!isAuthed(req)) {
+    return new Response('Redirecting...', { status: 302, headers: { 'Location': '/login' } });
+  }
+
+  const token = new URL(req.url).searchParams.get('token');
+  if (token) {
+    const res = new Response('', { status: 302, headers: { 'Location': '/wiki' } });
+    const userType = await env.WIKI_KV.get('token:' + token) || 'user';
+    res.headers.set('Set-Cookie', 'token=' + token + '; Path=/; HttpOnly; Max-Age=2592000; SameSite=Strict');
+    res.headers.set('Set-Cookie', 'userType=' + userType + '; Path=/; Max-Age=2592000; SameSite=Strict');
+    res.headers.set('Set-Cookie', 'theme=dark; Path=/; Max-Age=31536000; SameSite=Strict');
+    return res;
+  }
+
+  const noteName = new URL(req.url).searchParams.get('note');
+  const searchQuery = new URL(req.url).searchParams.get('search')?.toLowerCase() || '';
+  const cookieToken = req.headers.get('Cookie')?.match(/token=([^;]+)/)?.[1];
+  const theme = req.headers.get('Cookie')?.match(/theme=([^;]+)/)?.[1] || 'dark';
+  const userType = await env.WIKI_KV.get('token:' + (cookieToken || '')) || 'user';
+  const CURRENT_STYLE = { ...STYLE, ...STYLES[theme as keyof typeof STYLES] };
+  
+  if (noteName) {
+    const content = await fetchNoteFromGitHub(noteName, env);
+    if (!content) {
+      return new Response('Note not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+    }
+
+    const meta = await getNoteMeta(noteName, env);
+    const backlinks = extractBacklinks(content);
+    const displayName = noteName.replace('.md', '').replace(/-/g, ' ');
+    const parsedHtml = parseMarkdown(content);
+
+    const backlinksHtml = backlinks.length > 0 ? '<div style="margin-top:40px;border-top:1px solid rgba(201,168,124,0.15);padding-top:20px"><h3>Backlinks</h3><ul style="list-style:none;padding:0">' + backlinks.map(link => '<li><a href="/wiki?note=' + encodeURIComponent(link) + '">' + link.replace('.md', '') + '</a></li>').join('') + '</ul></div>' : '';
+
+    const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + displayName + ' - ' + env.WIKI_TITLE + '</title><style>@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap");body{background:' + CURRENT_STYLE.bg + ';font-family:' + CURRENT_STYLE.fontFamily + ';margin:0;padding:40px 20px;color:' + CURRENT_STYLE.textPrimary + '}.container{max-width:900px;margin:0 auto}.header{margin-bottom:30px;display:flex;justify-content:space-between;align-items:flex-start}.back{color:' + CURRENT_STYLE.textSecondary + ';text-decoration:none;font-size:14px}.back:hover{color:' + CURRENT_STYLE.gold + '}h1{font-size:2em;margin:15px 0 5px 0;color:' + CURRENT_STYLE.textPrimary + ';border-bottom:2px solid ' + CURRENT_STYLE.gold + ';padding-bottom:10px;font-weight:400}.meta{color:' + CURRENT_STYLE.textSecondary + ';font-size:13px}.theme-toggle{background:transparent;border:1px solid ' + CURRENT_STYLE.gold + ';color:' + CURRENT_STYLE.gold + ';padding:8px 12px;cursor:pointer;font-size:12px;border-radius:0}.theme-toggle:hover{background:rgba(201,168,124,0.1)}.content{background:' + CURRENT_STYLE.cardBg + ';padding:30px;border:1px solid rgba(201,168,124,0.15);margin-top:20px}a{color:' + CURRENT_STYLE.gold + ';text-decoration:none}a:hover{color:' + CURRENT_STYLE.goldHover + '}</style><script>function toggleTheme(){const newTheme=document.cookie.includes("theme=light")?"dark":"light";document.cookie="theme="+newTheme+"; path=/; max-age=31536000";location.reload()}</script></head><body><div class="container"><div class="header"><a href="/wiki" class="back">&larr; Back</a><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div><h1>' + displayName + '</h1>' + (meta ? '<div class="meta">Last modified: ' + meta.lastModified + '</div>' : '') + '<div class="content">' + parsedHtml + backlinksHtml + '</div></div></body></html>';
+
+    return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+  }
+
+  let filteredNotes = NOTES;
+  if (searchQuery) {
+    filteredNotes = NOTES.filter(name => {
+      const fileName = name.toLowerCase();
+      return fileName.includes(searchQuery);
+    });
+  }
+
+  const noteLinks = filteredNotes.map(name => {
+    const displayName = name.replace('.md', '').replace(/-/g, ' ');
+    return '<li><a href="/wiki?note=' + encodeURIComponent(name) + '">' + displayName + '</a></li>';
+  }).join('');
+
+  const documentLinks = DOCUMENTS.map(name => {
+    return '<li><a href="/document?file=' + encodeURIComponent(name) + '" target="_blank">' + name + '</a></li>';
+  }).join('');
+
+  const adminLink = userType === 'admin' ? '<div class="admin-link"><a href="/admin?action=invite">+ Generate invite link</a></div>' : '';
+
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + env.WIKI_TITLE + '</title><style>@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap");body{background:' + CURRENT_STYLE.bg + ';font-family:' + CURRENT_STYLE.fontFamily + ';margin:0;padding:40px 20px;color:' + CURRENT_STYLE.textPrimary + '}.container{max-width:900px;margin:0 auto}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}h1{color:' + CURRENT_STYLE.textPrimary + ';margin:0;font-weight:400}p{color:' + CURRENT_STYLE.textSecondary + '}.theme-toggle{background:transparent;border:1px solid ' + CURRENT_STYLE.gold + ';color:' + CURRENT_STYLE.gold + ';padding:8px 12px;cursor:pointer;font-size:14px;border-radius:0}.theme-toggle:hover{background:rgba(201,168,124,0.1)}.search-box{margin:20px 0;display:flex;gap:8px}.search-box input{flex:1;padding:10px;border:1px solid rgba(201,168,124,0.2);background:' + CURRENT_STYLE.inputBg + ';color:' + CURRENT_STYLE.textPrimary + ';border-radius:0;font-size:14px}.search-box input::placeholder{color:' + CURRENT_STYLE.textSecondary + '}.search-box button{padding:10px 20px;background:' + CURRENT_STYLE.gold + ';color:' + CURRENT_STYLE.bg + ';border:none;cursor:pointer;font-weight:600;letter-spacing:1px}.search-box button:hover{background:' + CURRENT_STYLE.goldHover + '}.admin-link{margin:20px 0}.admin-link a{color:' + CURRENT_STYLE.gold + ';font-size:12px;text-decoration:none}.admin-link a:hover{color:' + CURRENT_STYLE.goldHover + '}h2{color:' + CURRENT_STYLE.textPrimary + ';margin:20px 0 10px 0;font-weight:400}ul{list-style:none;padding:0;margin:20px 0}li{margin:8px 0}a{color:' + CURRENT_STYLE.gold + ';text-decoration:none}a:hover{color:' + CURRENT_STYLE.goldHover + '}.no-results{color:' + CURRENT_STYLE.textSecondary + '}</style><script>function toggleTheme(){const newTheme=document.cookie.includes("theme=light")?"dark":"light";document.cookie="theme="+newTheme+"; path=/; max-age=31536000";location.reload()}</script></head><body><div class="container"><div class="header"><h1>' + env.WIKI_TITLE + '</h1><button class="theme-toggle" onclick="toggleTheme()">🌙</button></div><p>' + env.WIKI_DESCRIPTION + '</p><div class="search-box"><form method="GET" style="display:flex;gap:8px;width:100%"><input type="text" name="search" placeholder="Search notes by title or content..." value="' + searchQuery + '" autofocus><button type="submit">Search</button>' + (searchQuery ? '<a href="/wiki" style="padding:10px 20px;color:' + CURRENT_STYLE.textSecondary + ';text-decoration:none">Clear</a>' : '') + '</form></div><h2>Notes (' + filteredNotes.length + ')</h2>' + (filteredNotes.length > 0 ? '<ul>' + noteLinks + '</ul>' : '<div class="no-results">No notes found.</div>') + '<h2>Documents (' + DOCUMENTS.length + ')</h2><ul>' + documentLinks + '</ul>' + adminLink + '</div></body></html>';
+
+  return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+});
+
+router.get('/admin', async (req: Request, env: WikiEnv) => {
+  if (!isAuthed(req)) {
+    return new Response('Redirecting...', { status: 302, headers: { 'Location': '/login' } });
+  }
+
+  const cookieToken = req.headers.get('Cookie')?.match(/token=([^;]+)/)?.[1];
+  const userType = await env.WIKI_KV.get('token:' + (cookieToken || '')) || 'user';
+  
+  if (userType !== 'admin') {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const action = new URL(req.url).searchParams.get('action');
+
+  if (action === 'invite') {
+    const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Generate Invite - ' + env.WIKI_TITLE + '</title><style>@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap");*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;font-family:' + STYLE.fontFamily + ';display:flex;justify-content:center;align-items:center;min-height:100vh;color:#eeeeee;padding:40px 20px}.container{text-align:center;max-width:600px}.logo{font-size:48px;font-weight:300;letter-spacing:2px;margin-bottom:20px}.divider{width:200px;height:1px;background:linear-gradient(to right, transparent, #c9a87c, transparent);margin:0 auto 25px}.tagline{font-size:16px;font-style:italic;color:#c9a87c;font-weight:300;letter-spacing:1px;margin-bottom:40px}.box{background:rgba(10,10,10,0.7);padding:40px;border:1px solid rgba(201,168,124,0.2);border-radius:0}.box p{color:#cccccc;font-size:14px;line-height:1.8;margin-bottom:30px}button{width:100%;padding:14px 16px;background:transparent;color:#c9a87c;border:1px solid #c9a87c;font-size:11px;font-weight:600;letter-spacing:3px;cursor:pointer;border-radius:0;transition:all 0.3s;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button:hover{background:rgba(201,168,124,0.1);box-shadow:0 0 20px rgba(201,168,124,0.25)}#inviteUrl{width:100%;padding:12px 14px;border:1px solid rgba(201,168,124,0.3);background:rgba(255,255,255,0.02);color:#c9a87c;font-family:"Courier New",monospace;font-size:12px;letter-spacing:0.5px;border-radius:0;margin:20px 0;text-align:center}.invite-section{margin-top:20px;display:none}.invite-section.show{display:block}.copy-btn{margin-top:10px;background:rgba(201,168,124,0.15)}.copy-btn:hover{background:rgba(201,168,124,0.25)}.back{display:block;color:#aaaaaa;text-decoration:none;font-size:12px;margin-bottom:30px;transition:color 0.3s}.back:hover{color:#c9a87c}</style></head><body><div class="container"><a href="/wiki" class="back">← Back to wiki</a><div class="logo">Glass⏧Grasie</div><div class="divider"></div><div class="tagline">Premium Float Glass Art & Design</div><div class="box"><p>Create a shareable invite link for others to access this wiki. The link is valid for 30 days.</p><button onclick="generateInvite()">Generate Invite</button><div id="inviteSection" class="invite-section"><input type="text" id="inviteUrl" readonly><button class="copy-btn" onclick="copyToClipboard()">Copy Link</button></div></div></div><script>async function generateInvite(){try{const response=await fetch("/admin/invite",{method:"POST"});const data=await response.json();document.getElementById("inviteUrl").value=data.inviteUrl;document.getElementById("inviteSection").classList.add("show")}catch(e){alert("Error generating invite: "+e.message)}}function copyToClipboard(){const url=document.getElementById("inviteUrl");url.select();document.execCommand("copy");alert("Invite link copied!")}</script></body></html>';
+
+    return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+  }
+
+  return new Response('Redirecting...', { status: 302, headers: { 'Location': '/wiki' } });
+});
+
+export default {
+  fetch: (req: Request, env: WikiEnv) => router.handle(req, env),
+};

@@ -1,0 +1,20 @@
+name = "glassgrasie-wiki"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+routes = [
+  { pattern = "revamped.glassgrasie.com/*", zone_name = "glassgrasie.com" }
+]
+
+[[kv_namespaces]]
+binding = "WIKI_KV"
+id = "3f542429ff91400da3aa15d4c17d65b4"
+
+[vars]
+GITHUB_OWNER = "MeGoCodeMe"
+GITHUB_REPO = "GlassGrasie-Wiki"
+GITHUB_BRANCH = "main"
+GITHUB_TOKEN = "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"
+MASTER_PASSCODE = "699b16eb9b3bea50ebb1a94f7a314472"
+WIKI_TITLE = "Glass⏧Grasie® Wiki"
+WIKI_DESCRIPTION = "Private knowledge base — Revamped"

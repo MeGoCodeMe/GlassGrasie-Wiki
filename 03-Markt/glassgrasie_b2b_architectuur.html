@@ -1,0 +1,214 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.intro{padding-bottom:1rem;margin-bottom:1rem;border-bottom:1px solid var(--color-border-tertiary)}
+.intro p{font-size:13px;color:var(--color-text-secondary);line-height:1.65}
+.intro strong{color:var(--color-text-primary);font-weight:500}
+.block{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--color-border-tertiary)}
+.block:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.block-header{display:flex;align-items:center;gap:10px;margin-bottom:.65rem;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.badge.a{background:#E1F5EE;color:#085041}
+.badge.b{background:#E6F1FB;color:#0C447C}
+.badge.c{background:#FAEEDA;color:#633806}
+.badge.d{background:#EEEDFE;color:#3C3489}
+@media(prefers-color-scheme:dark){
+  .badge.a{background:#04342C;color:#9FE1CB}
+  .badge.b{background:#042C53;color:#B5D4F4}
+  .badge.c{background:#412402;color:#FAC775}
+  .badge.d{background:#26215C;color:#CECBF6}
+}
+.block-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.price-tag{margin-left:auto;font-size:13px;color:var(--color-text-secondary);font-weight:500}
+.desc{font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:.65rem}
+.desc strong{color:var(--color-text-primary);font-weight:500}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+.card{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--color-border-secondary)}
+.card-name{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.card-price{font-size:12px;color:var(--color-text-secondary);margin-bottom:5px}
+.card-desc{font-size:12px;color:var(--color-text-tertiary);line-height:1.5}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;background:var(--color-background-tertiary);color:var(--color-text-secondary)}
+.clients{display:flex;flex-wrap:wrap;gap:6px;margin:.5rem 0}
+.client{font-size:12px;padding:3px 9px;border-radius:20px;border:1px solid var(--color-border-secondary);color:var(--color-text-secondary)}
+.note{padding:10px 14px;border-left:3px solid var(--color-border-success);background:var(--color-background-secondary);border-radius:0;margin:.7rem 0}
+.note p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.note strong{color:var(--color-text-primary);font-weight:500}
+.warn{padding:10px 14px;border-left:3px solid var(--color-border-warning);background:var(--color-background-secondary);border-radius:0;margin:.7rem 0}
+.warn p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.warn strong{color:var(--color-text-primary);font-weight:500}
+.price-table{width:100%;font-size:12px;border-collapse:collapse;margin:.5rem 0}
+.price-table th{text-align:left;color:var(--color-text-tertiary);font-weight:500;padding:4px 0;border-bottom:1px solid var(--color-border-tertiary)}
+.price-table td{padding:5px 0;color:var(--color-text-secondary);border-bottom:1px solid var(--color-border-tertiary)}
+.price-table td:last-child{text-align:right;font-weight:500;color:var(--color-text-primary)}
+.price-table tr:last-child td{border-bottom:none}
+</style>
+
+<div class="intro">
+  <p>Standaard glas kost <strong>€120–350/m²</strong> geplaatst. Glass⏧Grasie® zit op <strong>€350–800/m²</strong> — de premium voor circulaire herkomst, unieke esthetiek en documenteerbare materialenpaspoort. Dat is vergelijkbaar met premium steensoorten als basalt of leiandersteen. Het onderscheid: <strong>jij behoudt de optische kwaliteit, coating en print van het floatglas intact</strong>. MAGNA vermaalt zijn materiaal — jij niet. Dat is je sterkste differentiator in architectuurgesprekken.</p>
+</div>
+
+<!-- BLOK 1: WANDPANELEN -->
+<div class="block">
+  <div class="block-header">
+    <span class="badge a">Categorie 1</span>
+    <span class="block-title">Decoratieve wandpanelen</span>
+    <span class="price-tag">€350 – €650/m²</span>
+  </div>
+  <div class="desc">Het meest gevraagde product in projectinterieur. Jouw onderscheid: <strong>uniek bedrukt of gecoat restfloatglas</strong> dat nergens anders bestaat. Elk paneel is traceerbaar tot een specifieke Van Dijken productierun — dat is het materialenpaspoort dat BREEAM-NL-projecten zoeken.</div>
+  <div class="clients">
+    <span class="client">Horeca / restaurant</span>
+    <span class="client">Hotel lobbies</span>
+    <span class="client">Retail</span>
+    <span class="client">Kantoor ontvangst</span>
+    <span class="client">Woningbouw premium</span>
+  </div>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Hoe specificeer ik een Glass Grasie wandpaneel voor een architect of interieurontwerper? Welke technische informatie moet ik aanleveren en welke bevestigingsmethoden zijn standaard?')">
+      <div class="card-name">Gecoat floatglas paneel</div>
+      <div class="card-price">€350 – €480/m² (exclusief montage)</div>
+      <div class="card-desc">Kleur van Van Dijken coating — blauw, groen, brons, zilver. Homogeen vlak, reflecterend. Enige coating in NL met aantoonbare circulaire herkomst. 6–10mm. Puntbevestiging of U-profiel.</div>
+      <div class="tags"><span class="tag">Gecoat float</span><span class="tag">Projectinterieur</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe positioneer ik bedrukte restglas panelen van Van Dijken aan een architect als uniek designmateriaal? Welke argumenten werken het sterkst?')">
+      <div class="card-name">Bedrukt restglas paneel</div>
+      <div class="card-price">€480 – €650/m² (exclusief montage)</div>
+      <div class="card-desc">Van Dijken print-restmateriaal: elk paneel heeft uniek grafisch motief. Niet reproduceerbaar. Maximale differentiatie. Sterkst voor hospitality en retail die identiteitsmateriaal zoeken.</div>
+      <div class="tags"><span class="tag">Bedrukt restglas</span><span class="tag">Limited supply</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Wat zijn de technische vereisten voor gelaagd restglas als wandpaneel in een kantoor of hotel? Moet het gehard zijn en wat zijn de Nederlandse bouwregelgeving vereisten?')">
+      <div class="card-name">Gelaagd restglas paneel</div>
+      <div class="card-price">€420 – €580/m²</div>
+      <div class="card-desc">Twee floatglaslagen + PVB-folie. Veiligheidsglas equivalent. Bouwbesluit-compliant voor toepassingen waar veiligheidsglas verplicht is. Dikste glastype = meest architecturaal van uitstraling.</div>
+      <div class="tags"><span class="tag">Gelaagd float</span><span class="tag">Veiligheidsglas</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe registreer ik Glass Grasie glasproducten in Madaster voor een BREEAM-NL project? Wat zijn de stappen en welke informatie heb ik nodig van Van Dijken Glas?')">
+      <div class="card-name">BREEAM-NL / Madaster pakket</div>
+      <div class="card-price">+€25–50/m² toeslag</div>
+      <div class="card-desc">Materialenpaspoort + EPD-aanvraag + Madaster-registratie. Voor architecten die BREEAM-punten nodig hebben via circulair materiaalgebruik. Onderscheidt jou van elke andere glasleverancier in NL.</div>
+      <div class="tags"><span class="tag">BREEAM-NL</span><span class="tag">Madaster</span><span class="tag">EPD</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOK 2: BARTOPS & WERKBLADEN -->
+<div class="block">
+  <div class="block-header">
+    <span class="badge b">Categorie 2</span>
+    <span class="block-title">Bartops, receptiebalie &amp; werkbladen</span>
+    <span class="price-tag">€400 – €900/m²</span>
+  </div>
+  <div class="desc">Horizontale toepassingen vragen dikker glas (12–19mm) voor belastbaarheid. Vetrazzo (VS-benchmark) prijst vergelijkbare producten op <strong>$85–250/sqft = €900–2.700/m²</strong> geïnstalleerd. Jouw materiaal is anders maar de marktruimte is dezelfde. In Nederland bestaat dit segment praktisch niet als premiumproduct.</div>
+  <div class="clients">
+    <span class="client">Bar &amp; restaurant</span>
+    <span class="client">Hotel receptie</span>
+    <span class="client">Boutique retail</span>
+    <span class="client">Architectenbureau showroom</span>
+  </div>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Wat zijn de technische specificaties voor een glazen bartop van restfloatglas? Welke dikte, randafwerking en bevestiging is nodig voor een functionele bartop in een restaurant?')">
+      <div class="card-name">Bartop / toogblad</div>
+      <div class="card-price">€550 – €850/m² (exclusief montage)</div>
+      <div class="card-desc">15–19mm float, gepolijste kanten, afgeronde hoeken waterjet. Maximale plaat WAZER: ca. 30×30cm — grotere bartops bestaan dus uit meerdere panelen met voeg of naadloze montage. Kenmerkend: zichtbare groene glasrand aan de voorkant.</div>
+      <div class="tags"><span class="tag">Float 15–19mm</span><span class="tag">Horeca</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe maak ik een receptiebalie van restfloatglas voor een hotel of kantoor? Wat zijn de afmetingen, constructie en montage-eisen?')">
+      <div class="card-name">Receptiebalie paneel</div>
+      <div class="card-price">€480 – €750/m²</div>
+      <div class="card-desc">Frontpaneel en/of blad van float. Verticaal frontpaneel: 10–12mm, puntbevestiging. Blad: 15mm, gesteund op onderbouw. Print of coating op frontpaneel = sterk identiteitsstatement voor opdrachtgever.</div>
+      <div class="tags"><span class="tag">Float 10–15mm</span><span class="tag">Kantoor / hotel</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Wat zijn de limitaties van de WAZER voor grote glasplaten voor bartops? Hoe los je de maximale snijdimensies op voor grotere bartops?')">
+      <div class="card-name">Modulair blad (meerdere panelen)</div>
+      <div class="card-price">€400 – €680/m²</div>
+      <div class="card-desc">WAZER snijdt max. ca. 30×30cm per sessie — grotere oppervlakken zijn meerdere modules met designvoeg. Meerdere panelen naast elkaar = zichtbare structuur die een designkeuze is, geen beperking. Vergelijkbaar met mozaïek-esthetiek.</div>
+      <div class="tags"><span class="tag">Modulair</span><span class="tag">WAZER-dimensies</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe verkoop ik een circulaire bartop van restfloatglas aan een restauranteigenaar die een bewuste materiaalstory wil? Wat zijn de sterkste verkoopargumenten?')">
+      <div class="card-name">Verhaalgedreven hospitality</div>
+      <div class="card-price">Premium +20%</div>
+      <div class="card-desc">"Onze bartop is gemaakt van glas dat anders vernietigd zou worden" — dit is de positionering die Vetrazzo groot maakte. In NL is dit verhaal compleet onbezet. Certificaat van herkomst als onderdeel van het product, niet als bijlage.</div>
+      <div class="tags"><span class="tag">Storytelling</span><span class="tag">Hospitality</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOK 3: SCHEIDINGSWANDEN -->
+<div class="block">
+  <div class="block-header">
+    <span class="badge c">Categorie 3</span>
+    <span class="block-title">Decoratieve scheidingswanden</span>
+    <span class="price-tag">€420 – €720/m²</span>
+  </div>
+  <div class="desc">Standaard glazen scheidingswanden kosten <strong>€350–600/m² inclusief montage</strong>. Glass⏧Grasie® zit daarboven met de circulaire premium en unieke glastypen. <strong>Veiligheidseis:</strong> voor loopruimtes is gehard of gelaagd glas wettelijk verplicht (Bouwbesluit) — dit vereist dat Van Dijken het glas harst of lamineerst vóór levering aan jou.</div>
+  <div class="clients">
+    <span class="client">Kantoor flexwerkruimte</span>
+    <span class="client">Restaurant zones</span>
+    <span class="client">Winkels</span>
+    <span class="client">Co-working spaces</span>
+  </div>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Wat zijn de Bouwbesluit-eisen voor glazen scheidingswanden in Nederland? Wanneer is gehard of gelaagd glas verplicht en wat betekent dat voor Glass Grasie producten?')">
+      <div class="card-name">Decoratieve kantoortussenwand</div>
+      <div class="card-price">€420 – €580/m²</div>
+      <div class="card-desc">10mm gelaagd restfloatglas, aluminium of stalen profielen. Helder met zichtbare groene kant of gecoat voor kleuraccent. Kantoren die BREEAM werken zoeken actief circulaire materialen voor scheidingswanden.</div>
+      <div class="tags"><span class="tag">Gelaagd float</span><span class="tag">Kantoor</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe maak ik een opengewerkte glazen scheidingswand met een waterjet-gesneden patroon voor een restaurant? Wat zijn de constructie en veiligheidseisen?')">
+      <div class="card-name">Opengewerkt patroon wand</div>
+      <div class="card-price">€580 – €720/m²</div>
+      <div class="card-desc">Waterjet-gesneden patroon in het glasvlak — enkel mogelijk met waterjet, niet met lasersnijden op glas. Het negatieve patroon filtert licht en ruimte. Uniek aanbod dat geen andere glasleverancier in NL biedt.</div>
+      <div class="tags"><span class="tag">WAZER exclusief</span><span class="tag">Horeca / retail</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOK 4: VLOERPANELEN & TRAPPEN -->
+<div class="block">
+  <div class="block-header">
+    <span class="badge d">Categorie 4</span>
+    <span class="block-title">Vloerpanelen, treden &amp; gevelelementen</span>
+    <span class="price-tag">€600 – €1.200/m²</span>
+  </div>
+  <div class="desc">Het meest ambitieuze B2B-segment. Vereist <strong>gehard of gelaagd glas</strong> (wettelijk) en doorgaans samenwerking met een erkende glaszetter voor montage. Dit is het segment waar MAGNA Glaskeramik opereert met Bulgari en MVRDV als klanten. Haalbaar voor Glass⏧Grasie® vanaf jaar 2 na opbouw van projectreferenties.</div>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Wat zijn de technische eisen voor glazen vloerpanelen van restfloatglas? Welke dikte, hardsing en anti-slipafwerking is vereist?')">
+      <div class="card-name">Decoratief vloerpaneel</div>
+      <div class="card-price">€700 – €1.100/m²</div>
+      <div class="card-desc">Gelaagd gehard glas min. 2×8mm, anti-slip textuur verplicht. Print of coating is zichtbaar van onderaf bij achterlichting. MAGNA-stijl toepassing. Voor jou haalbaar als Van Dijken het glastype hardst.</div>
+      <div class="tags"><span class="tag">Gehard gelaagd</span><span class="tag">Jaar 2+</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe bereik ik architectenbureaus als MVRDV, Superuse Studios of RAU Architects in Nederland als nieuwe glasleverancier? Wat is de juiste aanpak voor eerste contact?')">
+      <div class="card-name">Gevelelement (façade)</div>
+      <div class="card-price">Op offerte, €800–1.200/m²</div>
+      <div class="card-desc">MAGNA's kernproduct. Voor Glass⏧Grasie® is dit jaar 3+ — vereist EPD, NMD-registratie en referentieprojecten. Begin nu al het gesprek met architecten als oriëntatie, niet als verkoop. MVRDV en Superuse Studios zijn jouw eerste doelgroep.</div>
+      <div class="tags"><span class="tag">Jaar 2–3</span><span class="tag">BREEAM</span><span class="tag">EPD vereist</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRIJSTABEL -->
+<div class="block">
+  <div class="block-header">
+    <span class="badge a">Referentie</span>
+    <span class="block-title">Marktpositionering in context</span>
+  </div>
+  <table class="price-table">
+    <tr><th>Product</th><th>Standaard markt</th><th>Glass⏧Grasie®</th></tr>
+    <tr><td>Wandpaneel glas</td><td>€120–350/m²</td><td>€350–650/m²</td></tr>
+    <tr><td>Scheidingswand</td><td>€350–600/m²</td><td>€420–720/m²</td></tr>
+    <tr><td>Bartop</td><td>€200–400/m²</td><td>€550–850/m²</td></tr>
+    <tr><td>Vloerpaneel</td><td>€350–600/m²</td><td>€700–1.100/m²</td></tr>
+    <tr><td>MAGNA benchmark</td><td>Sintered recycled glas</td><td>€700–1.400/m² (Duitsland)</td></tr>
+  </table>
+</div>
+
+<div class="note">
+  <p><strong>De slimste eerste B2B-stap:</strong> benader geen grote projecten als eerste. Zoek een <strong>interieurontwerper van een restaurant of hotelrenovatie</strong> die een bartop of wandpaneel zoekt voor één ruimte. Klein project, tastbaar resultaat, referentiefoto. Die foto opent vervolgens de deur naar architect-gesprekken. Superuse Studios in BlueCity Rotterdam is je meest voor de hand liggende eerste contact — ze werken letterlijk met circulaire restmaterialen, jij bent hun buur.</p>
+</div>
+
+<div class="warn">
+  <p><strong>Kritieke randvoorwaarde:</strong> voor structurele toepassingen (scheidingswanden in loopruimtes, vloerpanelen, trappen) is <strong>gehard of gelaagd glas wettelijk verplicht</strong> in het Bouwbesluit. Dat betekent dat Van Dijken het glas moet harden voordat jij het bewerkt — waterjet-snijden na het harden is ook mogelijk maar vereist andere instellingen. Bespreek dit direct met Van Dijken als onderdeel van de restmateriaalaafspraak.</p>
+</div>

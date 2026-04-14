@@ -1,0 +1,160 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.section{margin-bottom:1.4rem;padding-bottom:1.4rem;border-bottom:1px solid var(--color-border-tertiary)}
+.section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sec-header{display:flex;align-items:center;gap:10px;margin-bottom:.7rem}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.badge.now{background:var(--color-background-success);color:var(--color-text-success)}
+.badge.m4{background:var(--color-background-info);color:var(--color-text-info)}
+.badge.m6{background:var(--color-background-warning);color:var(--color-text-warning)}
+.badge.m12{background:#EEEDFE;color:#3C3489}
+.sec-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.body{font-size:13px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:.6rem}
+.body strong{color:var(--color-text-primary);font-weight:500}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.6rem}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+.card{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--color-border-secondary)}
+.card-name{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.card-sub{font-size:12px;color:var(--color-text-tertiary);line-height:1.5}
+.tag-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;background:var(--color-background-tertiary);color:var(--color-text-secondary)}
+.warn{padding:10px 14px;border-left:3px solid var(--color-border-danger);background:var(--color-background-secondary);margin:.6rem 0;border-radius:0}
+.warn p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.warn strong{color:var(--color-text-primary);font-weight:500}
+.tip{padding:10px 14px;border-left:3px solid var(--color-border-success);background:var(--color-background-secondary);margin:.6rem 0;border-radius:0}
+.tip p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.tip strong{color:var(--color-text-primary);font-weight:500}
+.price-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.price-label{font-size:12px;color:var(--color-text-secondary)}
+.price-val{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+</style>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge now">Realiteit eerst</span>
+    <span class="sec-title">Hoe Art Rotterdam écht werkt</span>
+  </div>
+  <div class="body">
+    <strong>Je kunt niet direct deelnemen aan Art Rotterdam als individuele kunstenaar.</strong> Art Rotterdam is een galeriebeurs — je bent er alleen via een deelnemende galerie die jouw werk vertegenwoordigt. De beurs telt 90+ Nederlandse en Belgische galeries, allemaal geselecteerd op kwaliteit. Zelf een stand huren als maker is niet mogelijk.
+  </div>
+  <div class="body">
+    Er zijn twee routes naar Art Rotterdam. De <strong>Hoofdsectie</strong> is via een galerie die je werk opneemt in hun booth. De <strong>Prospects sectie</strong> is via het Mondriaan Fonds — 92 startende kunstenaars, gecureerd, toegankelijk via de Artist Start subsidie (2 jaar na toekenning word je uitgenodigd). Art Rotterdam 2026 was 27–29 maart. De volgende editie is maart 2027.
+  </div>
+  <div class="warn">
+    <p><strong>Wat dit betekent voor jou:</strong> de route naar Art Rotterdam 2027 start nu — niet door een stand te boeken, maar door de juiste galeries en het Mondriaan Fonds te benaderen terwijl je werk opbouwt. De tijdlijn is 12–18 maanden.</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge now">Nu starten</span>
+    <span class="sec-title">Stap 1 — bouw het artistieke fundament</span>
+  </div>
+  <div class="body">
+    Galeries en het Mondriaan Fonds beoordelen kunstenaars op drie dingen: een herkenbare <strong>beeldtaal</strong>, een <strong>consistent oeuvre</strong> (meerdere werken in samenhang), en een <strong>artistiek statement</strong> dat de werken verbindt. Voor Glass⏧Grasie® ligt dit statement voor de hand — maar het moet geschreven worden en zichtbaar zijn.
+  </div>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Schrijf een artistiek statement voor Glass Grasie dat het werk verbindt aan circulaire economie, industrieel restfloatglas en Rotterdam. Max 150 woorden, voor gebruik bij galeriebenaderingen.')">
+      <div class="card-name">Artistiek statement schrijven</div>
+      <div class="card-sub">150 woorden max. Verbindt materiaal, proces, Rotterdam en circulariteit tot één coherente artistieke positie. Dit is het fundament van elke galeriebenadering.</div>
+      <div class="tag-row"><span class="tag">Nu</span><span class="tag">Tekst</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Wat zijn de vijf tot tien sterkste werken die Glass Grasie als eerste serie moet maken voor galeriebenaderingen? Denk aan samenhang als collectie, niet als losse objecten.')">
+      <div class="card-name">Eerste serie — 5 à 10 werken</div>
+      <div class="card-sub">Geen losstaande objecten maar een samenhangende serie met één thema. Galeries kopen concepten, niet stukken. De serie geeft het werk context en meerwaarde.</div>
+      <div class="tag-row"><span class="tag">Maand 3–4</span><span class="tag">Productie</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe maak ik een professionele portfolio voor een glaskunstenaar voor galeriebenaderingen? Wat moet erin staan en in welk formaat?')">
+      <div class="card-name">Portfolio / press kit</div>
+      <div class="card-sub">PDF van 8–12 pagina's: artistiek statement, 5–8 werken met afmetingen en prijs, bio, Van Dijken-verhaal, beschikbaarheid. Dit is je visitekaartje bij elke galeriebenadering.</div>
+      <div class="tag-row"><span class="tag">Maand 4</span><span class="tag">Document</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe documenteer ik glaskunstwerken van restfloatglas professioneel voor een portfolio? Camera-instellingen, achtergrond, lichtopbouw.')">
+      <div class="card-name">Professionele documentatie</div>
+      <div class="card-sub">Donkere achtergrond + zijlicht = groene floatglas-kanten. Witte achtergrond + bovenlicht = transparantie en vorm. Beide sets nodig voor portfolio én sociale media.</div>
+      <div class="tag-row"><span class="tag">Maand 3</span><span class="tag">Fotografie</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge m4">Maand 4–6</span>
+    <span class="sec-title">Stap 2 — galeries benaderen</span>
+  </div>
+  <div class="body">
+    Niet alle galeries zijn gelijkwaardig voor Glass⏧Grasie®. Je zoekt galeries die <strong>hedendaagse materiaalkunst</strong> vertegenwoordigen, affiniteit hebben met design of architectuur, en idealiter al deelnemen aan Art Rotterdam. Commissie is standaard 40–50% van verkoopprijs.
+  </div>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Welke Nederlandse galeries zijn het meest geschikt voor Glass Grasie glaskunst? Denk aan galeries die materiaalkunst, design-kunst of circulaire kunst vertegenwoordigen en deelnemen aan Art Rotterdam.')">
+      <div class="card-name">Doelgaleries NL — shortlist</div>
+      <div class="card-sub">Circa 8–10 galeries die passen bij materiaalkunst, circulair thema en premium positionering. Zowel Rotterdam als Amsterdam. Deelname aan Art Rotterdam is een pre.</div>
+      <div class="tag-row"><span class="tag">Research</span><span class="tag">B2B</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Schrijf een introductiebericht voor Glass Grasie aan een Nederlandse galerie die materiaalkunst vertegenwoordigt. Kort, direct, met link naar portfolio. Toon: zelfverzekerd, niet smekend.')">
+      <div class="card-name">Galerie-introductiebericht</div>
+      <div class="card-sub">Eerste contact: e-mail van 4–5 zinnen. Wie je bent, wat je maakt, waarom deze galerie past. Bijlage: portfolio PDF. Doel: afspraak in atelier of galerie.</div>
+      <div class="tag-row"><span class="tag">Outreach</span><span class="tag">Template</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Wat zijn goede alternatieve exposities en platforms voor Glass Grasie voordat een galerie het werk opneemt? Denk aan pop-up shows, kunstroutes, open ateliers in Rotterdam.')">
+      <div class="card-name">Tussenroute — eigen exposities</div>
+      <div class="card-sub">Open atelierdag, Rotterdam Art Week satellite (60+ venues), TENT Rotterdam, MAMA, kunstroutes. Zichtbaarheid opbouwen zonder galerie als tussenpersoon.</div>
+      <div class="tag-row"><span class="tag">Zichtbaarheid</span><span class="tag">Netwerk</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe gebruik ik Dutch Design Week in Eindhoven als springplank naar galeriebenaderingen voor Glass Grasie glaskunst? Wat zijn de stappen om mee te doen?')">
+      <div class="card-name">Dutch Design Week als lanceer</div>
+      <div class="card-sub">Oktober, Eindhoven, 350.000 bezoekers. Galeries, curatoren en pers lopen allemaal langs. Een sterke presentatie hier genereert galeriecontact — dit is het snelste pad naar Art Rotterdam 2027.</div>
+      <div class="tag-row"><span class="tag">Oktober</span><span class="tag">Catalysator</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge m6">Maand 6–8</span>
+    <span class="sec-title">Stap 3 — Mondriaan Fonds Artist Start</span>
+  </div>
+  <div class="body">
+    <strong>Dit is de directe route naar Art Rotterdam via Prospects.</strong> De Artist Start biedt financiële ondersteuning aan kunstenaars die 1–4 jaar professioneel actief zijn. Kun je het diploma van een relevante opleiding aantonen of aantonen dat je 1+ jaar professioneel actief bent in de beeldende kunst, dan kom je in aanmerking. Geen kunstacademie-diploma vereist — datum van eerste professionele presentatie telt.
+  </div>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Wat moet ik als Glass Grasie-kunstenaar schrijven in een aanvraag voor de Mondriaan Fonds Artist Start subsidie? Wat zijn de belangrijkste beoordelingscriteria en hoe presenteer ik het werk het sterkst?')">
+      <div class="card-name">Artist Start aanvraag</div>
+      <div class="card-sub">Altijd open. Beoordeling: artistieke kwaliteit, ontwikkelingspotentieel, cultureel ondernemerschap. Toekenning in 2026 = Prospects uitnodiging 2028. Bedrag en voorwaarden variëren per aanvraag.</div>
+      <div class="tag-row"><span class="tag">Mondriaan Fonds</span><span class="tag">Route naar Prospects</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Wat zijn alternatieve kunstfondsen en subsidies voor glaskunstenaars in Nederland naast het Mondriaan Fonds? Denk aan Stimuleringsfonds, Fonds Kwadraat, lokale fondsen Rotterdam.')">
+      <div class="card-name">Alternatieve fondsen</div>
+      <div class="card-sub">Stimuleringsfonds Creatieve Industrie (voor design-kant), Fonds Kwadraat (renteloze lening na Mondriaan Fonds), CBK Rotterdam, Prins Bernhard Cultuurfonds.</div>
+      <div class="tag-row"><span class="tag">Financiering</span><span class="tag">Parallel</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge m12">12–18 maanden</span>
+    <span class="sec-title">Stap 4 — Art Rotterdam 2027</span>
+  </div>
+  <div class="body">
+    Met een galeriepartner die deelneemt aan Art Rotterdam, of via Prospects na Artist Start toekenning, is de 27e editie (2027) realistisch. <strong>De deadline voor galerie-aanmelding Art Rotterdam 2026 was oktober 2025 — voor 2027 opent dat rond oktober 2026.</strong>
+  </div>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Hoe positioneer ik een Glass Grasie limited edition serie van 5 werken voor een galeriepresentatie bij Art Rotterdam? Wat zijn realistische prijzen voor glaskunstwerken op dit niveau?')">
+      <div class="card-name">Limited edition serie prijzen</div>
+      <div class="card-sub">Genummerde serie van 5 werken. Gesigneerd + certificaat van herkomst. Prijsrange Art Rotterdam: €800–5.000 per werk voor startende kunstenaars. Galerie neemt 40–50%.</div>
+      <div class="tag-row"><span class="tag">Prijsstrategie</span><span class="tag">Serie</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Welke alternatieve kunstbeurzen zijn er in Nederland voor startende kunstenaars met glaskunst naast Art Rotterdam? Denk aan PAN Amsterdam, Affordable Art Fair, Naarden.')">
+      <div class="card-name">Alternatieve kunstbeurzen NL</div>
+      <div class="card-sub">PAN Amsterdam (november), Affordable Art Fair Amsterdam, NAARDEN The Art Fair, Object Rotterdam. Lagere drempel, geen galerie nodig bij sommige. Goede testmarkt.</div>
+      <div class="tag-row"><span class="tag">2026–2027</span><span class="tag">Beurzen</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="tip">
+  <p><strong>De slimste eerste stap:</strong> Rotterdam Art Week 2027 (maart) heeft 60+ satellite venues naast Art Rotterdam zelf. Een eigen presentatie bij een van die venues — TENT, MAMA, een café, een architectenbureau — kost bijna niets en plaatst je werk direct in de context van de internationale bezoekersstroom van de beurs. Galeries die interessant werk zien bij satellite events benaderen kunstenaars actief. Dit is hoe veel Prospects-kunstenaars hun eerste galerie vonden.</p>
+</div>

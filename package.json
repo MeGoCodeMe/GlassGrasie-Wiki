@@ -1,0 +1,17 @@
+{
+  "name": "glassgrasie-wiki",
+  "version": "1.0.0",
+  "description": "Glass⏧Grasie® private wiki",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Build complete'",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "latest"
+  },
+  "dependencies": {
+    "itty-router": "^4.2.2"
+  }
+}

@@ -1,0 +1,162 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.intro{padding:0 0 1rem;border-bottom:1px solid var(--color-border-tertiary);margin-bottom:1rem}
+.intro p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.intro strong{color:var(--color-text-primary);font-weight:500}
+.section{margin-bottom:1.4rem}
+.sec-header{display:flex;align-items:center;gap:10px;margin-bottom:0.6rem}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.badge.easy{background:var(--color-background-success);color:var(--color-text-success)}
+.badge.med{background:var(--color-background-info);color:var(--color-text-info)}
+.badge.adv{background:var(--color-background-warning);color:var(--color-text-warning)}
+.sec-title{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.sec-price{margin-left:auto;font-size:13px;color:var(--color-text-secondary)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+.card{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--color-border-secondary)}
+.card-name{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.card-price{font-size:13px;color:var(--color-text-secondary);margin-bottom:6px}
+.card-desc{font-size:12px;color:var(--color-text-tertiary);line-height:1.5;margin-bottom:6px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;background:var(--color-background-tertiary);color:var(--color-text-secondary)}
+.tag.glass{background:#E1F5EE;color:#085041}
+.tag.method{background:#E6F1FB;color:#0C447C}
+@media(prefers-color-scheme:dark){.tag.glass{background:#04342C;color:#9FE1CB}.tag.method{background:#042C53;color:#B5D4F4}}
+.warn-box{margin-top:1rem;padding:12px 14px;border-left:3px solid var(--color-border-warning);background:var(--color-background-secondary);border-radius:0}
+.warn-box p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.warn-box strong{color:var(--color-text-primary);font-weight:500}
+.tip-box{margin-top:1rem;padding:12px 14px;border-left:3px solid var(--color-border-success);background:var(--color-background-secondary);border-radius:0}
+.tip-box p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.tip-box strong{color:var(--color-text-primary);font-weight:500}
+.sec-note{font-size:12px;color:var(--color-text-tertiary);margin-bottom:8px;line-height:1.5}
+</style>
+
+<div class="intro">
+  <p><strong>Technisch principe:</strong> de WAZER snijdt vlakke platen. Driedimensionale objecten bouw je door meerdere gesneden componenten samen te stellen met siliconen, koperen strips, stangen of U-profiel. Dit is jouw designtaal — niet geblazen, niet gegoten, maar <strong>geconstrueerd glas</strong>. Internationaal bestaat dit segment nauwelijks als merk. Floatglas van 6–12mm is zwaarder en structureel sterker dan gangbaar decoratieglas — dat geeft de objecten gewicht en prestige.</p>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge easy">Start maand 2</span>
+    <span class="sec-title">Kaarsenhouders &amp; waxinelichtjes</span>
+    <span class="sec-price">€65 – €220</span>
+  </div>
+  <p class="sec-note">Eenvoudigste 3D-constructie: vier snijkanten, siliconen voegen. Geen lijm zichtbaar bij helder glas. Kaarslicht activeert de kwaliteit van floatglas — perfecte productfoto.</p>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Hoe monteer ik een glazen kaarsenhouder van vier snijkanten restfloatglas? Welke voegmethode werkt het best en is veilig bij warmte?')">
+      <div class="card-name">Architecturale waxinehouder</div>
+      <div class="card-price">€65 – €95</div>
+      <div class="card-desc">Vier rechthoekige zijkanten + bodemplaat. 6mm helder float. Siliconen voegen transparant. Kaarslicht schijnt door het glas en toont de groene floatglaskleur aan de kanten — karakteristiek voor materiaal.</div>
+      <div class="tags"><span class="tag glass">Helder float 6mm</span><span class="tag method">4 componenten</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Kan ik kaarsenhouders maken van bedrukt restglas van Van Dijken? Hoe werkt dat met licht dat erdoorheen schijnt?')">
+      <div class="card-name">Print-fragment lantaarn</div>
+      <div class="card-price">€110 – €175</div>
+      <div class="card-desc">Zijkanten van bedrukt Van Dijken-glas. Kaarslicht schijnt door de print heen — motief projecteert als schaduw op de tafel. Elk stuk anders door uniekheid restmateriaal.</div>
+      <div class="tags"><span class="tag glass">Bedrukt restglas</span><span class="tag method">Licht als element</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe maak ik een set van drie kaarsenhouders in verschillende hoogtes van restfloatglas? Wat is een goede maatverhouding?')">
+      <div class="card-name">Triptiek set (3 hoogtes)</div>
+      <div class="card-price">€165 – €220 per set</div>
+      <div class="card-desc">Drie houders — hoog, middel, laag — in één bestelling vanuit één bestand. Sets verkopen beter dan losse objecten. Dezelfde maten, verschillende hoogtes. Sterk als cadeau en concept store product.</div>
+      <div class="tags"><span class="tag glass">Helder of gecoat</span><span class="tag method">Serieopmaak WAZER</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe maak ik een glazen waxinehouder met een opengewerkt patroon — dus met uitgesneden vormen in de wand — en hoe ziet het lichteffect eruit?')">
+      <div class="card-name">Opengewerkt patroon houder</div>
+      <div class="card-price">€95 – €145</div>
+      <div class="card-desc">Zijkant heeft waterjet-uitgesneden patroon — geometrie, flora, abstracte vormen. Kaarslicht schijnt door het negatieve patroon. Dit kan alleen met waterjet — lasersnijden beschadigt glas.</div>
+      <div class="tags"><span class="tag glass">Helder float 6–8mm</span><span class="tag method">Negatief patroon</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge easy">Maand 2</span>
+    <span class="sec-title">Boekensteun &amp; plankdecoratie</span>
+    <span class="sec-price">€85 – €280 per set</span>
+  </div>
+  <p class="sec-note">Platte objecten — geen constructie nodig. Directe output van de WAZER zonder nabewerking behalve kantafwerking. Hoge marges door simpele productie.</p>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Hoe maak ik glazen boekensteunnen van restfloatglas? Welke dikte en basismontage heeft dat nodig om stabiel te zijn?')">
+      <div class="card-name">Architecturale boekensteunnen</div>
+      <div class="card-price">€120 – €185 per paar</div>
+      <div class="card-desc">10–12mm dik float voor gewicht en stabiliteit. L-vormige voet van metaalprofiel of tweede glasstrook. Geometrische bovenvorm — oog of contour. Werkt als statement op werkplek of boekenplank.</div>
+      <div class="tags"><span class="tag glass">Float 10–12mm</span><span class="tag method">L-montage</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Welke decoratieve plankobjecten kan ik maken van een platte glasplaat zonder verdere constructie? Denk aan staande silhouetten.')">
+      <div class="card-name">Staand silhouet object</div>
+      <div class="card-price">€85 – €145</div>
+      <div class="card-desc">Vrijstaand glasvormpje op plankje — abstracte silhouet, stadsgezicht, boom, geometrie. Staat rechtop via kleine gleuf in houten of metalen voetje. Eenvoudigste product na sieraden.</div>
+      <div class="tags"><span class="tag glass">Helder of bedrukt</span><span class="tag method">Voetje extern</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge med">Maand 3</span>
+    <span class="sec-title">Dienblad &amp; onderzetter</span>
+    <span class="sec-price">€95 – €320</span>
+  </div>
+  <p class="sec-note">Functionele objecten met verhaal — dagelijks gebruik verhoogt herhaalcontact met het merk. Grotere platen bruikbaar, waardoor ook grotere Van Dijken restplaten ingezet worden.</p>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Hoe maak ik een glazen dienblad van restfloatglas met een rand? Wat is de maximale maat die de WAZER aankan en welk glastype is het meest geschikt?')">
+      <div class="card-name">Constructiedienblad met rand</div>
+      <div class="card-price">€145 – €245</div>
+      <div class="card-desc">Bodemplaat 30x40cm, vier lage randstroken van 3–4cm hoogte, siliconen voegen. 8mm float. Zware uitstraling, functioneel op bijzettafel of badkamer. Gecoat glas geeft kleur zonder verflaag.</div>
+      <div class="tags"><span class="tag glass">Float 8mm</span><span class="tag method">5 componenten</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe maak ik een set glazen onderzetters van restfloatglas met een uniek motief van bedrukt glas? Wat zijn goede maten en hoe voorkom je krassen op meubels?')">
+      <div class="card-name">Onderzetters set × 4</div>
+      <div class="card-price">€95 – €155 per set</div>
+      <div class="card-desc">10x10cm of 9x9cm vierkant, 6mm float. Viltjes onderkant. Vier stuks = één bestand, vier snijbeurten. Cadeau-format. Bedrukt glas: elk stuk heeft een ander fragment van hetzelfde motief — collectie-gevoel.</div>
+      <div class="tags"><span class="tag glass">Float 6mm of bedrukt</span><span class="tag method">Seriesnijden</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Kan ik een plat glasdienblad maken van één grote restplaat van Van Dijken met geëtste of gesneden tekst erop? Hoe werkt dat technisch?')">
+      <div class="card-name">Monoliet dienblad (één plaat)</div>
+      <div class="card-price">€175 – €320</div>
+      <div class="card-desc">Eén grote rechthoekige plaat 10mm, afgeronde hoeken waterjet, polijsted kanten. Minimalistisch en zwaar. Print of coating van Van Dijken maakt het tot een unieke tegel. Architectenmarkt: showroomtafel, ontvangstbalie.</div>
+      <div class="tags"><span class="tag glass">Float 10mm of bedrukt</span><span class="tag method">Enkelvoudig stuk</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe maak ik een glazen plateaustandaard — een verhoging voor het weergeven van objecten — van restfloatglas?')">
+      <div class="card-name">Plateau / display standaard</div>
+      <div class="card-price">€110 – €185</div>
+      <div class="card-desc">Verhoogde voet voor het exposeren van objecten op tafel of plank. Twee glazen platen in T- of H-profiel, metalen bevestiging. Galeriehouders, concept stores en thuisgebruik. Cross-sell met sieraden.</div>
+      <div class="tags"><span class="tag glass">Helder float 8–10mm</span><span class="tag method">T/H-constructie</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-header">
+    <span class="badge med">Maand 3–4</span>
+    <span class="sec-title">Wandobject &amp; paneel</span>
+    <span class="sec-price">€185 – €650</span>
+  </div>
+  <p class="sec-note">Grootste oppervlak, hoogste prijs per stuk, sterkste B2B-relevantie. Bedrukt Van Dijken-glas is hier het krachtigst — uniek motief als wanddecoratie.</p>
+  <div class="grid">
+    <div class="card" onclick="sendPrompt('Hoe maak ik een glazen wandobject van restfloatglas dat aan de muur hangt? Welke bevestigingsmethode is veilig en esthetisch voor glas aan de wand?')">
+      <div class="card-name">Wandpaneel (enkel)</div>
+      <div class="card-price">€185 – €350</div>
+      <div class="card-desc">30x40 of 40x60cm, 6mm float. Speciaal glazen wandbevestigingssysteem (punt- of railbevestiging). Helder glas: minimalistische schaduwen op de muur. Bedrukt: motief als kunstwerk. B2C en B2B geschikt.</div>
+      <div class="tags"><span class="tag glass">Float 6–8mm of bedrukt</span><span class="tag method">Puntbevestiging</span></div>
+    </div>
+    <div class="card" onclick="sendPrompt('Hoe maak ik een wandinstallatie van meerdere glasplaten van restfloatglas die samen een compositie vormen? Denk aan drie tot vijf panelen naast elkaar.')">
+      <div class="card-name">Wandcompositie (meerdelig)</div>
+      <div class="card-price">€380 – €650</div>
+      <div class="card-desc">Drie tot vijf panelen in één compositie, wisselende afmetingen of glastypen. Mix helder en gecoat. Elke plaat is een fragment van een groter geheel. Sterkste kunstpositionering. DDW-ready.</div>
+      <div class="tags"><span class="tag glass">Mix glastypen</span><span class="tag method">Multi-paneelcompositie</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="warn-box">
+  <p><strong>Wat technisch niet werkt:</strong> een klassieke vaas of schaal uit één stuk floatglas is niet mogelijk met de WAZER — je snijdt vlakken, geen curves. Een vaas bouwen kan wél via vijf of zes gesneden trapeziumvlakken die samen een prisma vormen, maar dat vereist precisie-montage en testen. Dit is een maand 4+ product, niet een startproduct.</p>
+</div>
+
+<div class="tip-box">
+  <p><strong>Het licht is het product.</strong> Floatglas heeft een unieke eigenschap: de kanten tonen een groene gloed bij doorslaand of zij-licht. Dit is het kenmerk van écht floatglas — en het is precies wat jouw objecten onderscheidt van massaproductie. Kaarsenhouders en wandpanelen activeren dit. Zorg dat je productfoto's dit vangen: donkere achtergrond, zij-lichtbron, lange sluitertijd.</p>
+</div>

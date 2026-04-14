@@ -1,0 +1,183 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.cat { padding: 1.2rem 0 0.4rem; border-top: 1px solid var(--color-border-tertiary); margin-top: 1rem; }
+.cat:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+.cat-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 0.75rem; }
+.cat-label { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.cat-label.week { background: var(--color-background-success); color: var(--color-text-success); }
+.cat-label.month2 { background: var(--color-background-info); color: var(--color-text-info); }
+.cat-label.month3 { background: var(--color-background-warning); color: var(--color-text-warning); }
+.cat-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.cat-range { font-size: 13px; color: var(--color-text-secondary); margin-left: auto; }
+.products { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media(max-width:520px){ .products { grid-template-columns: 1fr; } }
+.product { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 12px 14px; cursor: pointer; border: 1px solid var(--color-border-tertiary); transition: border-color 0.15s; }
+.product:hover { border-color: var(--color-border-secondary); }
+.prod-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.prod-price { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.prod-detail { font-size: 12px; color: var(--color-text-tertiary); line-height: 1.5; }
+.prod-material { display: inline-block; font-size: 11px; margin-top: 6px; padding: 2px 7px; border-radius: 20px; background: var(--color-background-tertiary); color: var(--color-text-secondary); }
+.margin-bar { margin-top: 8px; height: 4px; border-radius: 2px; background: var(--color-border-tertiary); overflow: hidden; }
+.margin-fill { height: 100%; border-radius: 2px; background: var(--color-text-success); }
+.margin-label { font-size: 11px; color: var(--color-text-tertiary); margin-top: 3px; }
+.tip-box { margin-top: 1.2rem; padding: 12px 14px; border-left: 3px solid var(--color-border-info); border-radius: 0; background: var(--color-background-secondary); }
+.tip-box p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.tip-box strong { color: var(--color-text-primary); font-weight: 500; }
+.section-note { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 10px; line-height: 1.5; }
+</style>
+
+<div class="cat">
+  <div class="cat-header">
+    <span class="cat-label week">Start week 3</span>
+    <span class="cat-title">Hangertjes &amp; pendants</span>
+    <span class="cat-range">€45 – €145</span>
+  </div>
+  <p class="section-note">Gebruik snijresten van 3–8 cm. Kleinste materiaalverspilling, hoogste marge per gram glas. Waterjets geeft scherpe randen zonder nabewerking bij float.</p>
+  <div class="products">
+    <div class="product" onclick="sendPrompt('Hoe maak ik een geometrisch glashangetje met de WAZER? Welke vormen werken het best in floatglas en hoe bevestig ik de ophangring?')">
+      <div class="prod-name">Geometrisch pendant</div>
+      <div class="prod-price">€45 – €75</div>
+      <div class="prod-detail">Hexagon, driehoek, cirkel — strakke vormen uit helder float 6mm. Ophangring van sterling zilver of verguld messing. Ideaal als instapproduct.</div>
+      <span class="prod-material">Helder float 4–6mm</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:85%"></div></div>
+      <div class="margin-label">Marge ~82% (materiaal nagenoeg gratis)</div>
+    </div>
+    <div class="product" onclick="sendPrompt('Hoe verwerk ik het bedrukte restglas van Van Dijken Glas tot sieraden? Welke afwerking is nodig aan de snijkanten?')">
+      <div class="prod-name">Print-fragment pendant</div>
+      <div class="prod-price">€75 – €145</div>
+      <div class="prod-detail">Uitgesneden fragment van afgekeurde print van Van Dijken. Elk stuk heeft een uniek grafisch motief. Nooit exact reproduceerbaar — built-in limited edition.</div>
+      <span class="prod-material">Bedrukt restglas</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:90%"></div></div>
+      <div class="margin-label">Marge ~88% — uniekheid rechtvaardigt premium</div>
+    </div>
+    <div class="product" onclick="sendPrompt('Wat zijn goede organische vormen voor glashangers die goed werken met waterjet snijden? Denk aan druppel, blad, moon shapes.')">
+      <div class="prod-name">Organische vorm pendant</div>
+      <div class="prod-price">€55 – €95</div>
+      <div class="prod-detail">Druppel, maanvorm, asymmetrisch blad. Kracht van waterjet: elke curve die je tekent wordt gesneden. Gecoat glas geeft kleur zonder verflaag.</div>
+      <span class="prod-material">Gecoat float</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:83%"></div></div>
+      <div class="margin-label">Marge ~80%</div>
+    </div>
+    <div class="product" onclick="sendPrompt('Kan ik een gepersonaliseerde glashangers maken met letters of initialen via de WAZER? Hoe werkt dat technisch?')">
+      <div class="prod-name">Gepersonaliseerd initialen-pendant</div>
+      <div class="prod-price">€65 – €110</div>
+      <div class="prod-detail">Letter of monogram waterjets gesneden. Personalisatie rechtvaardigt hogere prijs én kortere levertijd. Trouwcadeau-markt, geboorte, afstuderen.</div>
+      <span class="prod-material">Helder of gecoat float</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:80%"></div></div>
+      <div class="margin-label">Marge ~78% + hogere vraagprijs door custom</div>
+    </div>
+  </div>
+</div>
+
+<div class="cat">
+  <div class="cat-header">
+    <span class="cat-label week">Start week 3</span>
+    <span class="cat-title">Oorbellen</span>
+    <span class="cat-range">€35 – €120</span>
+  </div>
+  <p class="section-note">Twee identieke stukken per set vereist herhaalbaarheid — WAZER-bestanden zijn identiek reproduceerbaar. Kleinste stukken, dus meest materiaalefficiënt.</p>
+  <div class="products">
+    <div class="product" onclick="sendPrompt('Hoe maak ik een set glasoorbellen met de WAZER? Hoe bevestig ik de haakjes in floatglas zonder te boren?')">
+      <div class="prod-name">Geometrische statement oorbellen</div>
+      <div class="prod-price">€55 – €95 per set</div>
+      <div class="prod-detail">Grote platte vormen — rechthoek, halvemaan, ruit. 3–4mm float. Licht gewicht is voordeel van dun glas. Boren voor haakje of klemaansluiting.</div>
+      <span class="prod-material">Helder float 3–4mm</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:87%"></div></div>
+      <div class="margin-label">Marge ~85%</div>
+    </div>
+    <div class="product" onclick="sendPrompt('Welke maten werken voor glazen oorbellen? Wat is te zwaar en wat ziet er te klein uit?')">
+      <div class="prod-name">Mini stud-set (print fragment)</div>
+      <div class="prod-price">€35 – €65 per set</div>
+      <div class="prod-detail">Kleine cirkels of vierkanten, 8–12mm. Glijdt op studs. Werkt bijzonder goed met bedrukt glas — motief is zichtbaar zelfs op klein formaat.</div>
+      <span class="prod-material">Bedrukt restglas</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:88%"></div></div>
+      <div class="margin-label">Marge ~86% — hoog volume mogelijk</div>
+    </div>
+  </div>
+</div>
+
+<div class="cat">
+  <div class="cat-header">
+    <span class="cat-label month2">Maand 2</span>
+    <span class="cat-title">Broche &amp; badges</span>
+    <span class="cat-range">€55 – €130</span>
+  </div>
+  <p class="section-note">Groeiend segment in premium fashion. Geen boorwerk nodig — speldmechanisme wordt gelijmd. Grotere vlakken = meer van het Van Dijken print-verhaal zichtbaar.</p>
+  <div class="products">
+    <div class="product" onclick="sendPrompt('Hoe maak ik een glazen broche met restfloatglas? Welk speldmechanisme werkt het best en hoe bevestig je dat aan glas?')">
+      <div class="prod-name">Architectuur-broche</div>
+      <div class="prod-price">€65 – €130</div>
+      <div class="prod-detail">Gebouwachtige vorm of abstracte architecturale contour. 5–6cm breed. Sterkste positionering richting interieur- en architectuurpubliek. Past bij DDW-doelgroep.</div>
+      <span class="prod-material">Helder of gecoat float</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:82%"></div></div>
+      <div class="margin-label">Marge ~80%</div>
+    </div>
+    <div class="product" onclick="sendPrompt('Welke abstracte vormen werken goed voor glazen broches van restglas met een bijzonder verhaal?')">
+      <div class="prod-name">Print-fragment broche</div>
+      <div class="prod-price">€75 – €130</div>
+      <div class="prod-detail">Groter stuk bedrukt restglas als wearable art. Elk stuk documenteert een specifieke Van Dijken productierun — datum, project, materiaaltype op certificaat.</div>
+      <span class="prod-material">Bedrukt restglas</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:85%"></div></div>
+      <div class="margin-label">Marge ~83% + certificaat verhoogt prijs</div>
+    </div>
+  </div>
+</div>
+
+<div class="cat">
+  <div class="cat-header">
+    <span class="cat-label month2">Maand 2</span>
+    <span class="cat-title">Manchetknopen &amp; tie bars</span>
+    <span class="cat-range">€85 – €185 per set</span>
+  </div>
+  <p class="section-note">Onderbediend segment in Nederland voor premium glasontwerp. Zakelijke doelgroep, hogere betalingsbereidheid, relatief lage productiekost.</p>
+  <div class="products">
+    <div class="product" onclick="sendPrompt('Hoe maak ik glazen manchetknopen van restfloatglas met de WAZER? Wat zijn goede afmetingen en hoe monteer je het mechanisme?')">
+      <div class="prod-name">Manchetknopen set</div>
+      <div class="prod-price">€95 – €165 per set</div>
+      <div class="prod-detail">Vierkant 14x14mm of rond 16mm. Montagemechanisme van messing, verlijmd. Helder float of bedrukt glas. Ideaal als zakelijk cadeau — uniek verhaal op kaartje.</div>
+      <span class="prod-material">Helder float of bedrukt</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:84%"></div></div>
+      <div class="margin-label">Marge ~82%</div>
+    </div>
+    <div class="product" onclick="sendPrompt('Wat is een tie bar en hoe maak ik die van restfloatglas? Is dat technisch haalbaar met waterjet?')">
+      <div class="prod-name">Tie bar (dasspeld)</div>
+      <div class="prod-price">€85 – €145</div>
+      <div class="prod-detail">Langwerpige strook 6x50mm. Metalen clip-mechanisme gelijmd op glasstrook. Gecoat glas geeft kleur die opmerkelijk oogt bij formele kleding.</div>
+      <span class="prod-material">Gecoat of bedrukt float</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:81%"></div></div>
+      <div class="margin-label">Marge ~79%</div>
+    </div>
+  </div>
+</div>
+
+<div class="cat">
+  <div class="cat-header">
+    <span class="cat-label month3">Maand 3</span>
+    <span class="cat-title">Sleutelhangers &amp; tassenhanger</span>
+    <span class="cat-range">€25 – €65</span>
+  </div>
+  <p class="section-note">Laagste prijspunt maar hoogste volume. Instapproduct voor nieuwe klanten. Kan in bulk worden geproduceerd uit de allerkleinste snijresten.</p>
+  <div class="products">
+    <div class="product" onclick="sendPrompt('Hoe maak ik glazen sleutelhangers van restfloatglas die stevig genoeg zijn voor dagelijks gebruik? Welke dikte glas heb je nodig?')">
+      <div class="prod-name">Premium sleutelhanger</div>
+      <div class="prod-price">€25 – €45</div>
+      <div class="prod-detail">6mm float voor stevigheid. Afgeronde hoeken waterjet. Karabijnhaak van staal. Ideaal als introductieproduct op markten en pop-ups. Verkoopsnelheid hoog.</div>
+      <span class="prod-material">Helder float 6mm</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:88%"></div></div>
+      <div class="margin-label">Marge ~86% — volumeproduct</div>
+    </div>
+    <div class="product" onclick="sendPrompt('Hoe positioneer ik een glazen tassenhanger als luxecadeau en wat is een realistische verkoopprijs?')">
+      <div class="prod-name">Tassenhanger (bag charm)</div>
+      <div class="prod-price">€35 – €65</div>
+      <div class="prod-detail">Iets groter en decoratiever dan sleutelhanger. Goudkleurige ketting erbij. Bedrukt glas met fragment-motief — sterkste cadeaupositionering. Museumwinkel-geschikt.</div>
+      <span class="prod-material">Bedrukt of gecoat float</span>
+      <div class="margin-bar"><div class="margin-fill" style="width:85%"></div></div>
+      <div class="margin-label">Marge ~83%</div>
+    </div>
+  </div>
+</div>
+
+<div class="tip-box">
+  <p><strong>Het onderscheid dat de prijzen maakt:</strong> op Etsy zit het bulk glaskunst-sieradenaanbod op €15–50. Jij zit daar boven omdat jij drie dingen hebt die zij niet hebben — industrieel restmateriaal met een bewezen herkomst, precisie-waterjet snijkwaliteit die handmatig glasbewerking niet haalt, en een circulair verhaal dat te verifiëren is (Van Dijken Glas, Waddinxveen). Elk product heeft een certificaat nodig: materiaalbron, datum productierun, glastype. Dat certificaat is wat de €75 pendant onderscheidt van de €25 Etsy-hanger.</p>
+</div>
