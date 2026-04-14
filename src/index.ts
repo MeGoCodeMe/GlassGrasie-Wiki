@@ -51,7 +51,7 @@ function generateInviteToken(): string {
 }
 
 async function listContentFolder(folder: string, env: WikiEnv): Promise<{ folders: string[], files: { name: string, path: string, type: string }[], debugError?: string } | null> {
-  const url = 'https://api.github.com/repos/' + env.GITHUB_OWNER + '/' + env.GITHUB_REPO + '/contents/content' + (folder ? '/' + encodeURIComponent(folder) : '') + '?ref=' + env.GITHUB_BRANCH;
+  const url = 'https://api.github.com/repos/' + env.GITHUB_OWNER + '/' + env.GITHUB_REPO + '/contents' + (folder ? '/' + encodeURIComponent(folder) : '') + '?ref=' + env.GITHUB_BRANCH;
   console.log('[listContentFolder] folder:', folder, 'url:', url);
   try {
     console.log('[listContentFolder] Fetching URL:', url);
