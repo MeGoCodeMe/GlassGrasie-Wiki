@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Glass⏧Grasie — Brand Film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #060504; }
+  #root { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="animations.jsx"></script>
+<script type="text/babel">
+
+// ── Tweak defaults ─────────────────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "karakter": "anime",
+  "taal": "beide",
+  "accentKleur": "goud-warm",
+  "tempo": "langzaam"
+}/*EDITMODE-END*/;
+
+const ACCENT_MAP = {
+  'goud-warm': { hi: 'oklch(72% 0.13 82)',  lo: 'oklch(60% 0.10 82)'  },
+  'goud-koel': { hi: 'oklch(72% 0.10 200)', lo: 'oklch(58% 0.08 200)' },
+  'zilver':    { hi: 'oklch(80% 0.02 240)', lo: 'oklch(65% 0.02 240)' },
+  'koper':     { hi: 'oklch(65% 0.14 50)',  lo: 'oklch(52% 0.12 50)'  },
+};
+const MASCOT_MAP = {
+  '3d':    'uploads/mascot_nobg.png',
+  'anime': 'uploads/fashionme_nobg.png',
+};
+const TEMPO_MAP = { 'snel': 60, 'normaal': 90, 'langzaam': 120 };
+
+const TweakCtx = React.createContext(TWEAK_DEFAULTS);
+const useTweaks = () => React.useContext(TweakCtx);
+
+// ── Brand tokens ───────────────────────────────────────────────────────────
+const GOLD   = 'oklch(72% 0.13 82)';
+const GOLD2  = 'oklch(60% 0.10 82)';
+const CREAM  = 'oklch(95% 0.008 85)';
+const DARK   = '#0c0b08';
+const SERIF  = '"Playfair Display", Georgia, serif';
+const LOGO_FONT = '"Cormorant Garamond", Georgia, serif';
+const SANS   = '"DM Sans", system-ui, sans-serif';
+const MONO   = '"JetBrains Mono", ui-monospace, monospace';
+
+// ── Static shard data ──────────────────────────────────────────────────────
+const SHAPES = [
+  '0,80 40,0 100,20 85,100',
+  '20,0 100,30 70,100 0,65',
+  '50,0 100,45 55,100 0,70 15,20',
+  '0,40 60,0 100,55 45,100',
+  '10,0 90,10 100,80 60,100 0,60',
+  '30,0 100,20 80,100 0,75',
+  '0,20 70,0 100,50 80,100 10,90',
+  '20,0 100,40 90,100 0,80 5,30',
+];
+
+const SHARDS = [
+  { id:0,  x:120,  y:80,  s:180, r:15,  sh:0, bc:'rgba(200,195,185,0.07)', lc:'rgba(210,175,70,0.32)'  },
+  { id:1,  x:380,  y:260, s:140, r:-10, sh:1, bc:'rgba(200,195,185,0.05)', lc:'rgba(90,145,205,0.28)'  },
+  { id:2,  x:640,  y:45,  s:220, r:25,  sh:2, bc:'rgba(200,195,185,0.06)', lc:'rgba(90,185,140,0.26)'  },
+  { id:3,  x:890,  y:190, s:160, r:-20, sh:3, bc:'rgba(200,195,185,0.05)', lc:'rgba(205,170,70,0.30)'  },
+  { id:4,  x:1150, y:85,  s:190, r:8,   sh:4, bc:'rgba(200,195,185,0.04)', lc:'rgba(70,140,215,0.24)'  },
+  { id:5,  x:1430, y:215, s:150, r:-35, sh:5, bc:'rgba(200,195,185,0.06)', lc:'rgba(155,205,110,0.28)' },
+  { id:6,  x:1680, y:55,  s:200, r:18,  sh:6, bc:'rgba(200,195,185,0.05)', lc:'rgba(225,160,65,0.32)'  },
+  { id:7,  x:200,  y:720, s:170, r:-12, sh:7, bc:'rgba(200,195,185,0.06)', lc:'rgba(95,180,205,0.28)'  },
+  { id:8,  x:760,  y:620, s:130, r:30,  sh:0, bc:'rgba(200,195,185,0.04)', lc:'rgba(175,220,135,0.26)' },
+  { id:9,  x:1310, y:660, s:160, r:-22, sh:3, bc:'rgba(200,195,185,0.05)', lc:'rgba(205,140,75,0.30)'  },
+  { id:10, x:1760, y:510, s:140, r:42,  sh:5, bc:'rgba(200,195,185,0.04)', lc:'rgba(115,160,225,0.26)' },
+];
+
+// ── GlassShard ─────────────────────────────────────────────────────────────
+function GlassShard({ d, lit, progress, driftY = 0 }) {
+  const appear = Math.min(1, progress * 2.5);
+  const slowRot = progress * d.r * 0.12;
+  const drift = progress * 28 + driftY;
+  const color = lit ? d.lc : d.bc;
+  return (
+    <div style={{
+      position:'absolute', left:d.x, top: d.y - drift,
+      width:d.s, height:d.s,
+      opacity: appear,
+      transform:`rotate(${d.r + slowRot}deg)`,
+      pointerEvents:'none', willChange:'transform,opacity',
+    }}>
+      <svg viewBox="0 0 100 100" width={d.s} height={d.s}>
+        <defs>
+          <linearGradient id={`gl${d.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.18)"/>
+            <stop offset="100%" stopColor="rgba(255,255,255,0.01)"/>
+          </linearGradient>
+        </defs>
+        <polygon points={SHAPES[d.sh]} fill={color} stroke="rgba(255,255,255,0.10)" strokeWidth="0.7"/>
+        <polygon points={SHAPES[d.sh]} fill={`url(#gl${d.id})`}/>
+      </svg>
+    </div>
+  );
+}
+
+// ── Scene 1 — Waste (0–15s) ────────────────────────────────────────────────
+function Scene1() {
+  const t = useTime();
+  const { taal, accentKleur } = useTweaks();
+  const accent = ACCENT_MAP[accentKleur] || ACCENT_MAP['goud-warm'];
+  const textP = Easing.easeOutCubic(clamp((t - 4.5) / 1.5, 0, 1));
+  const subP  = Easing.easeOutCubic(clamp((t - 6.5) / 1.2, 0, 1));
+  const showNL = taal !== 'en';
+  const showEN = taal !== 'nl';
+  return (
+    <Sprite start={0} end={15}>
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(ellipse 55% 50% at 50% 55%, #1c1810 0%, ${DARK} 68%)`}}/>
+      {SHARDS.map(d => (
+        <GlassShard key={d.id} d={d} lit={false}
+          progress={clamp((t - d.id * 0.28) / 3.5, 0, 1)}/>
+      ))}
+      <div style={{
+        position:'absolute', left:'50%', top:'37%',
+        transform:'translateX(-50%)',
+        width: 80, height:1,
+        background:accent.hi,opacity:textP*0.35,
+      }}/>
+      {showNL && <div style={{
+        position:'absolute', left:'50%', top:'40%',
+        transform:`translateX(-50%) translateY(${(1-textP)*22}px)`,
+        opacity:textP, textAlign:'center', willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SERIF,fontSize:88,color:CREAM,fontWeight:400,letterSpacing:'-0.015em',lineHeight:1.05,textWrap:'balance'}}>
+          Wat anderen weggooien...
+        </div>
+      </div>}
+      {showEN && <div style={{
+        position:'absolute', left:'50%', top: showNL ? '62%' : '43%',
+        transform:`translateX(-50%) translateY(${(1-subP)*12}px)`,
+        opacity:subP * (showNL ? 0.45 : 0.9), textAlign:'center', willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SANS,fontSize: showNL ? 22 : 72,color:CREAM,fontWeight:300,letterSpacing:'0.22em',textTransform:'uppercase'}}>
+          What others throw away...
+        </div>
+      </div>}
+    </Sprite>
+  );
+}
+
+// ── Scene 2 — Transformation (15–32s) ─────────────────────────────────────
+function Scene2() {
+  const t = useTime();
+  const { taal, accentKleur } = useTweaks();
+  const accent = ACCENT_MAP[accentKleur] || ACCENT_MAP['goud-warm'];
+  const lt = t - 15;
+  const burstP = Easing.easeOutExpo(clamp(lt / 3.5, 0, 1));
+  const r = burstP * 180;
+  const textP  = Easing.easeOutCubic(clamp((lt - 4) / 1.6, 0, 1));
+  const text2P = Easing.easeOutCubic(clamp((lt - 6) / 1.2, 0, 1));
+  const p1 = Easing.easeOutCubic(clamp((lt - 9.5) / 1.0, 0, 1));
+  const p2 = Easing.easeOutCubic(clamp((lt - 11)  / 1.0, 0, 1));
+  const p3 = Easing.easeOutCubic(clamp((lt - 12.5)/ 1.0, 0, 1));
+  const RAYS = [0,40,80,120,160,200,240,280,320];
+  const showNL = taal !== 'en';
+  const showEN = taal !== 'nl';
+  return (
+    <Sprite start={15} end={32}>
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(ellipse ${r}% ${r*0.65}% at 50% 52%,
+          oklch(32% 0.07 82) 0%,
+          oklch(16% 0.04 82) 42%,
+          ${DARK} 68%)`}}/>
+      {RAYS.map((angle,i) => {
+        const rp = Easing.easeOutExpo(clamp((lt - i*0.06)/2.5, 0, 1));
+        return <div key={angle} style={{
+          position:'absolute', left:'50%', top:'50%',
+          width:950, height:1.5,
+          background:`linear-gradient(to right, ${accent.hi.replace(')',', 0.14)')
+            .replace('oklch(','rgba(').replace('%','').replace('%','').replace('%','')} , transparent)`,
+          transformOrigin:'0 50%',
+          transform:`rotate(${angle}deg)`,
+          opacity:rp*0.14, willChange:'opacity',
+          backgroundColor: 'transparent',
+        }}/>;
+      })}
+      {SHARDS.map(d => (
+        <GlassShard key={d.id} d={d} lit={true}
+          progress={clamp((lt - 0.3 - d.id*0.12)/2.5, 0, 1)}
+          driftY={lt * 2.5}/>
+      ))}
+      {showNL && <div style={{
+        position:'absolute', left:'50%', top:'35%',
+        transform:`translateX(-50%) translateY(${(1-textP)*26}px)`,
+        opacity:textP, textAlign:'center', willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SERIF,fontSize:118,color:accent.hi,fontWeight:400,letterSpacing:'-0.02em',lineHeight:1,fontStyle:'italic'}}>
+          ...bewaren wij.
+        </div>
+      </div>}
+      {showEN && <div style={{
+        position:'absolute', left:'50%', top: showNL ? '57%' : '38%',
+        transform:`translateX(-50%)`,
+        opacity:text2P * (showNL ? 0.5 : 0.95), textAlign:'center',
+      }}>
+        <div style={{fontFamily: showNL ? SANS : SERIF, fontSize: showNL ? 24 : 110,
+          color: showNL ? CREAM : accent.hi,
+          fontWeight:300, letterSpacing:'0.22em', textTransform: showNL ? 'uppercase' : 'none',
+          fontStyle: showNL ? 'normal' : 'italic'}}>
+          {showNL ? 'We keep it.' : '...we keep it.'}
+        </div>
+      </div>}
+      {[
+        {nl:'Precies gemaakt.',en:'Exactly crafted.',p:p1},
+        {nl:'Traceerbaar.',    en:'Traceable.',      p:p2},
+        {nl:'Uniek.',         en:'Unique.',          p:p3},
+      ].map((item,i) => (
+        <div key={i} style={{
+          position:'absolute', left:'50%', top:`${68+i*7.5}%`,
+          transform:`translateX(-50%) translateY(${(1-item.p)*14}px)`,
+          opacity:item.p, textAlign:'center',
+          display:'flex', alignItems:'center', gap:18,
+          willChange:'transform,opacity',
+        }}>
+          <div style={{width:36,height:1,background:accent.hi,opacity:0.5}}/>
+          {showNL && <span style={{fontFamily:SERIF,fontSize:30,color:CREAM,fontWeight:400}}>{item.nl}</span>}
+          {showEN && <span style={{fontFamily:SANS,fontSize: showNL ? 16 : 28,color:CREAM,opacity: showNL ? 0.38 : 0.85,fontWeight:300,letterSpacing:'0.12em'}}>{item.en}</span>}
+          <div style={{width:36,height:1,background:accent.hi,opacity:0.5}}/>
+        </div>
+      ))}
+    </Sprite>
+  );
+}
+
+// ── Scene 3 — Collection (32–55s) ──────────────────────────────────────────
+const PRODUCTS = [
+  {
+    nl:'Sieraden', en:'Jewellery', price:'€45 – €145',
+    nl2:'Watergesneden uit industrieel restfloatglas',
+    en2:'Waterjet-cut from float glass offcuts',
+    accent:'oklch(72% 0.13 82)',
+    bg:'linear-gradient(150deg, oklch(22% 0.07 82) 0%, oklch(15% 0.04 68) 100%)',
+  },
+  {
+    nl:'Objecten', en:'Home Objects', price:'€65 – €650',
+    nl2:'Kaarsenhouders, schalen, woonaccessoires',
+    en2:'Candle holders, bowls, home accessories',
+    accent:'oklch(68% 0.12 220)',
+    bg:'linear-gradient(150deg, oklch(20% 0.07 220) 0%, oklch(14% 0.04 205) 100%)',
+  },
+  {
+    nl:'Architectuur', en:'Architecture', price:'€350 – €850/m²',
+    nl2:'Bartops, wandpanelen, circulaire projecten',
+    en2:'Bartops, wall panels, circular projects',
+    accent:'oklch(70% 0.10 162)',
+    bg:'linear-gradient(150deg, oklch(19% 0.07 162) 0%, oklch(14% 0.04 148) 100%)',
+  },
+];
+
+function ProductCard({prod, progress}) {
+  const sp = Easing.easeOutBack(clamp(progress, 0, 1));
+  return (
+    <div style={{
+      width:490, padding:'40px 36px',
+      background: prod.bg,
+      border:`1px solid rgba(255,255,255,0.07)`,
+      borderRadius:3,
+      transform:`translateY(${(1-sp)*90}px)`,
+      opacity: clamp(progress*2.5, 0, 1),
+      willChange:'transform,opacity',
+      position:'relative', overflow:'hidden',
+    }}>
+      {/* Placeholder shot */}
+      <div style={{
+        width:'100%', height:190,
+        background:`repeating-linear-gradient(135deg,rgba(255,255,255,0.025) 0 10px,transparent 10px 20px)`,
+        border:`1px solid rgba(255,255,255,0.07)`,
+        borderRadius:2, marginBottom:28,
+        display:'flex', alignItems:'center', justifyContent:'center',
+      }}>
+        <span style={{fontFamily:MONO,fontSize:10,color:'rgba(255,255,255,0.18)',letterSpacing:'0.1em'}}>PRODUCT SHOT</span>
+      </div>
+      <div style={{fontFamily:SERIF,fontSize:46,color:CREAM,fontWeight:400,letterSpacing:'-0.01em',lineHeight:1,marginBottom:4}}>
+        {prod.nl}
+      </div>
+      <div style={{fontFamily:SANS,fontSize:12,color:CREAM,opacity:0.3,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:22}}>
+        {prod.en}
+      </div>
+      <div style={{fontFamily:SERIF,fontSize:30,color:prod.accent,fontWeight:400,marginBottom:14}}>
+        {prod.price}
+      </div>
+      <div style={{fontFamily:SANS,fontSize:15,color:CREAM,opacity:0.65,lineHeight:1.55}}>
+        {prod.nl2}
+      </div>
+      <div style={{fontFamily:SANS,fontSize:12,color:CREAM,opacity:0.28,lineHeight:1.55,marginTop:4}}>
+        {prod.en2}
+      </div>
+      {/* Corner accent */}
+      <div style={{position:'absolute',top:0,right:0,width:3,height:60,background:prod.accent,opacity:0.5}}/>
+    </div>
+  );
+}
+
+function Scene3() {
+  const t = useTime();
+  const lt = t - 32;
+  const hdrP = Easing.easeOutCubic(clamp(lt / 1.8, 0, 1));
+  return (
+    <Sprite start={32} end={55}>
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(ellipse 80% 60% at 50% 55%, #1c1a10 0%, ${DARK} 62%)`}}/>
+      {/* Header */}
+      <div style={{
+        position:'absolute', left:'50%', top:52,
+        transform:`translateX(-50%) translateY(${(1-hdrP)*18}px)`,
+        opacity:hdrP, textAlign:'center', willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SANS,fontSize:12,color:GOLD,letterSpacing:'0.32em',textTransform:'uppercase',marginBottom:14}}>
+          De Collectie · The Collection
+        </div>
+        <div style={{width:56,height:1,background:`rgba(210,175,80,0.38)`,margin:'0 auto'}}/>
+      </div>
+      {/* Cards */}
+      <div style={{
+        position:'absolute', left:'50%', top:'50%',
+        transform:'translate(-50%, -43%)',
+        display:'flex', gap:28,
+      }}>
+        {PRODUCTS.map((p,i) => (
+          <ProductCard key={i} prod={p}
+            progress={clamp((lt - 2 - i*1.4) / 1.8, 0, 1)}/>
+        ))}
+      </div>
+    </Sprite>
+  );
+}
+
+// ── Scene 4 — Rotterdam (55–72s) ───────────────────────────────────────────
+function Scene4() {
+  const t = useTime();
+  const lt = t - 55;
+  const gridP  = Easing.easeOutCubic(clamp(lt / 2.5, 0, 1));
+  const bg1P   = Easing.easeOutExpo(clamp((lt - 1) / 1.8, 0, 1));
+  const bg2P   = Easing.easeOutCubic(clamp((lt - 3.5) / 1.4, 0, 1));
+  const certP  = Easing.easeOutBack(clamp((lt - 5.5) / 2.2, 0, 1));
+  const quoteP = Easing.easeOutCubic(clamp((lt - 9) / 2.0, 0, 1));
+  return (
+    <Sprite start={55} end={72}>
+      <div style={{position:'absolute',inset:0,background:'#0c0b08'}}/>
+      {/* Grid motif */}
+      <div style={{
+        position:'absolute',inset:0,
+        backgroundImage:`linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px)`,
+        backgroundSize:'80px 80px',
+        opacity:gridP,
+      }}/>
+      {/* Ghost text */}
+      <div style={{
+        position:'absolute', left:120, top:140,
+        fontFamily:SERIF, fontSize:200, color:CREAM,
+        fontWeight:700, letterSpacing:'-0.04em', lineHeight:0.85,
+        opacity: bg1P * 0.055,
+        userSelect:'none', whiteSpace:'nowrap',
+      }}>
+        ROTTERDAM
+      </div>
+      {/* Real heading */}
+      <div style={{
+        position:'absolute', left:130, top:165,
+        transform:`translateX(${(1-bg1P)*-50}px)`,
+        opacity:bg1P, willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SERIF,fontSize:130,color:CREAM,fontWeight:400,letterSpacing:'-0.025em',lineHeight:1}}>
+          Rotterdam.
+        </div>
+      </div>
+      {/* Partners line */}
+      <div style={{
+        position:'absolute', left:135, top:345,
+        transform:`translateY(${(1-bg2P)*16}px)`,
+        opacity:bg2P, display:'flex', alignItems:'center', gap:20,
+        willChange:'transform,opacity',
+      }}>
+        {['BlueCity','×','Van Dijken Glas','×','WAZER Desktop'].map((item,i) => (
+          <span key={i} style={{
+            fontFamily: i%2===1 ? SERIF : SANS,
+            fontSize: i%2===1 ? 22 : 18,
+            color: i===0 ? GOLD : CREAM,
+            opacity: i%2===1 ? 0.22 : (i===0 ? 1 : 0.55),
+            letterSpacing: i%2===1 ? 0 : '0.14em',
+          }}>{item}</span>
+        ))}
+      </div>
+      {/* Certificate */}
+      <div style={{
+        position:'absolute', right:130, top:'50%',
+        transform:`translateY(-50%) scale(${0.72+0.28*certP})`,
+        opacity:certP, width:400,
+        border:`1px solid rgba(210,175,80,0.22)`,
+        padding:'30px 34px',
+        background:'rgba(255,255,255,0.018)',
+        willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SANS,fontSize:9,color:GOLD,letterSpacing:'0.28em',textTransform:'uppercase',marginBottom:18}}>
+          Certificaat van Herkomst · Certificate of Origin
+        </div>
+        <div style={{fontFamily:MONO,fontSize:12,color:CREAM,opacity:0.45,lineHeight:2.1}}>
+          <div>Materiaal: Float glas, bedrukt</div>
+          <div>Bron: Van Dijken Glas, Waddinxveen</div>
+          <div>Productierun: VD-2024-0138</div>
+          <div>Serie: GG-2025-0042</div>
+          <div>Datum: April 2025</div>
+        </div>
+        <div style={{marginTop:20,paddingTop:18,borderTop:'1px solid rgba(255,255,255,0.07)'}}>
+          <div style={{fontFamily:SERIF,fontSize:26,color:GOLD,fontWeight:400,fontStyle:'italic'}}>
+            Glass⏧Grasie®
+          </div>
+        </div>
+      </div>
+      {/* Quote */}
+      <div style={{
+        position:'absolute', left:130, bottom:100,
+        transform:`translateY(${(1-quoteP)*20}px)`,
+        opacity:quoteP, maxWidth:820,
+        willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SERIF,fontSize:34,color:CREAM,fontWeight:400,lineHeight:1.45,fontStyle:'italic',opacity:0.88}}>
+          "Elk stuk vertelt een verhaal<br/>dat niemand anders kan vertellen."
+        </div>
+        <div style={{fontFamily:SANS,fontSize:17,color:CREAM,opacity:0.32,marginTop:14,letterSpacing:'0.06em'}}>
+          Every piece tells a story no one else can tell.
+        </div>
+      </div>
+    </Sprite>
+  );
+}
+
+// ── Scene 5 — Mascot + Logo (72–90s) ──────────────────────────────────────
+function Scene5() {
+  const t = useTime();
+  const { karakter, taal, accentKleur } = useTweaks();
+  const accent = ACCENT_MAP[accentKleur] || ACCENT_MAP['goud-warm'];
+  const mascotSrc = MASCOT_MAP[karakter] || MASCOT_MAP['3d'];
+  const lt = t - 72;
+  const bgP      = Easing.easeOutCubic(clamp(lt / 2.5, 0, 1));
+  const mascotP  = Easing.easeOutCubic(clamp((lt - 1) / 2.8, 0, 1));
+  const logoP    = Easing.easeOutBack(clamp((lt - 3.5) / 2.2, 0, 1));
+  const taglineP = Easing.easeOutCubic(clamp((lt - 6) / 1.8, 0, 1));
+  const subP     = Easing.easeOutCubic(clamp((lt - 7.8) / 1.4, 0, 1));
+  const siteP    = Easing.easeOutCubic(clamp((lt - 11) / 1.2, 0, 1));
+  const zoom = 1 + mascotP * 0.03;
+  const showNL = taal !== 'en';
+  const showEN = taal !== 'nl';
+  return (
+    <Sprite start={72} end={90}>
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(ellipse 65% 65% at 32% 100%,
+          oklch(22% 0.07 82) 0%,
+          oklch(12% 0.03 82) 45%,
+          ${DARK} 70%)`,
+        opacity:bgP}}/>
+      {SHARDS.slice(0,6).map(d => (
+        <GlassShard key={d.id}
+          d={{...d, x:d.x*0.45+50, y:d.y*0.6+100, s:d.s*0.7}}
+          lit={true} progress={clamp((lt-2)/5,0,1)}/>
+      ))}
+      {/* Mascot */}
+      <div style={{
+        position:'absolute', right: 80 + (1-mascotP)*220,
+        bottom:0, width:560,
+        opacity: mascotP,
+        transform:`scale(${zoom})`, transformOrigin:'bottom center',
+        willChange:'transform,opacity',
+      }}>
+        <img src={mascotSrc} alt="Glass⏧Grasie mascot"
+          style={{width:'100%',objectFit:'contain',display:'block'}}/>
+      </div>
+      {/* Logo wordmark */}
+      <div style={{
+        position:'absolute', left:130, top:'22%',
+        transform:`translateY(${(1-logoP)*32}px)`,
+        opacity:logoP, willChange:'transform,opacity',
+      }}>
+        <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:28}}>
+          <svg width="38" height="38" viewBox="0 0 38 38">
+            <polygon points="19,2 36,19 19,36 2,19" fill="none" stroke={accent.hi} strokeWidth="1.4"/>
+            <polygon points="19,8 30,19 19,30 8,19" fill={accent.hi} opacity="0.18"/>
+          </svg>
+          <div style={{width:1,height:32,background:'rgba(210,175,80,0.25)'}}/>
+          <div style={{fontFamily:SANS,fontSize:10,color:accent.hi,letterSpacing:'0.28em',textTransform:'uppercase',opacity:0.7}}>
+            Rotterdam, NL · Est. 2025
+          </div>
+        </div>
+        <div style={{fontFamily:LOGO_FONT,fontSize:108,color:CREAM,fontWeight:400,letterSpacing:'-0.05em',lineHeight:0.92,position:'relative'}}>
+          Glass⏧Grasie
+          <span style={{fontFamily:SERIF,fontSize:24,color:accent.hi,verticalAlign:'super',marginLeft:4}}>®</span>
+        </div>
+      </div>
+      {/* Tagline NL */}
+      {showNL && <div style={{
+        position:'absolute', left:133, top:'calc(22% + 188px)',
+        transform:`translateY(${(1-taglineP)*16}px)`,
+        opacity:taglineP, willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SANS,fontSize:28,color:CREAM,fontWeight:300,letterSpacing:'0.07em'}}>
+          Geconstrueerd glas uit Rotterdam.
+        </div>
+      </div>}
+      {/* English */}
+      {showEN && <div style={{
+        position:'absolute', left:134,
+        top: showNL ? 'calc(22% + 232px)' : 'calc(22% + 188px)',
+        opacity: showNL ? subP * 0.38 : taglineP,
+      }}>
+        <div style={{fontFamily:SANS,fontSize: showNL ? 17 : 28,color:CREAM,fontWeight:300,letterSpacing:'0.14em',textTransform:'uppercase'}}>
+          Constructed glass from Rotterdam.
+        </div>
+      </div>}
+      <div style={{
+        position:'absolute', left:133, top:'calc(22% + 272px)',
+        opacity: taglineP * 0.3, display:'flex', alignItems:'center', gap:12,
+      }}>
+        <div style={{width:44,height:1,background:accent.hi}}/>
+        <svg width="8" height="8" viewBox="0 0 8 8">
+          <polygon points="4,0 8,4 4,8 0,4" fill={accent.hi}/>
+        </svg>
+        <div style={{width:44,height:1,background:accent.hi}}/>
+      </div>
+      <div style={{position:'absolute',left:133,bottom:70,opacity:siteP * 0.3}}>
+        <div style={{fontFamily:SANS,fontSize:15,color:CREAM,letterSpacing:'0.24em',textTransform:'uppercase'}}>
+          glassgrasie.nl
+        </div>
+      </div>
+    </Sprite>
+  );
+}
+
+// ── Flash transition ───────────────────────────────────────────────────────
+function Flash({ at, dur=0.45 }) {
+  const t = useTime();
+  const d = Math.abs(t - at);
+  const op = d < dur ? (1 - d/dur) * (1 - d/dur) * 0.9 : 0;
+  if (op < 0.01) return null;
+  return <div style={{position:'absolute',inset:0,background:'#000',opacity:op,pointerEvents:'none'}}/>;
+}
+
+// ── Timestamp screen label ─────────────────────────────────────────────────
+function TSLabel() {
+  const t = useTime();
+  const sec = Math.floor(t);
+  return <div data-screen-label={`${sec}s`} style={{position:'absolute',inset:0,pointerEvents:'none'}}/>;
+}
+
+// ── Tweaks Panel ───────────────────────────────────────────────────────────
+function TweaksPanel({ tweaks, update, visible }) {
+  if (!visible) return null;
+  const panelStyle = {
+    position:'fixed', bottom:60, right:16, zIndex:9999,
+    background:'rgba(12,11,8,0.97)', border:'1px solid rgba(210,175,80,0.25)',
+    padding:'20px 22px', width:260, fontFamily:SANS,
+    boxShadow:'0 8px 32px rgba(0,0,0,0.6)',
+  };
+  const labelStyle = { fontSize:7, letterSpacing:'3px', color:'rgba(210,175,80,0.6)',
+    textTransform:'uppercase', marginBottom:8, display:'block' };
+  const rowStyle = { marginBottom:18 };
+  const btnGroupStyle = { display:'flex', gap:4, flexWrap:'wrap' };
+  const btn = (key, val, label) => {
+    const active = tweaks[key] === val;
+    return <button key={val} onClick={() => update(key, val)} style={{
+      fontFamily:SANS, fontSize:7, letterSpacing:'2px', textTransform:'uppercase',
+      padding:'6px 10px', cursor:'pointer',
+      background: active ? 'rgba(210,175,80,0.18)' : 'rgba(255,255,255,0.04)',
+      border: active ? '1px solid rgba(210,175,80,0.5)' : '1px solid rgba(255,255,255,0.08)',
+      color: active ? 'oklch(72% 0.13 82)' : 'rgba(232,226,216,0.5)',
+      transition:'all 150ms',
+    }}>{label}</button>;
+  };
+  return (
+    <div style={panelStyle}>
+      <div style={{fontFamily:SANS,fontSize:8,letterSpacing:'4px',color:'oklch(72% 0.13 82)',
+        textTransform:'uppercase',marginBottom:18,paddingBottom:12,
+        borderBottom:'1px solid rgba(255,255,255,0.07)'}}>Tweaks</div>
+
+      <div style={rowStyle}>
+        <span style={labelStyle}>Karakter</span>
+        <div style={btnGroupStyle}>
+          {btn('karakter','3d','3D Karakter')}
+          {btn('karakter','anime','Anime')}
+        </div>
+      </div>
+
+      <div style={rowStyle}>
+        <span style={labelStyle}>Taal</span>
+        <div style={btnGroupStyle}>
+          {btn('taal','nl','NL')}
+          {btn('taal','en','EN')}
+          {btn('taal','beide','Beide')}
+        </div>
+      </div>
+
+      <div style={rowStyle}>
+        <span style={labelStyle}>Accent kleur</span>
+        <div style={btnGroupStyle}>
+          {btn('accentKleur','goud-warm','Goud')}
+          {btn('accentKleur','goud-koel','Blauw')}
+          {btn('accentKleur','zilver','Zilver')}
+          {btn('accentKleur','koper','Koper')}
+        </div>
+      </div>
+
+      <div style={rowStyle}>
+        <span style={labelStyle}>Tempo</span>
+        <div style={btnGroupStyle}>
+          {btn('tempo','snel','Snel')}
+          {btn('tempo','normaal','Normaal')}
+          {btn('tempo','langzaam','Langzaam')}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── App ────────────────────────────────────────────────────────────────────
+function App() {
+  const [tweaks, setTweaks] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem('gg-tweaks-v2');
+      return saved ? {...TWEAK_DEFAULTS, ...JSON.parse(saved)} : TWEAK_DEFAULTS;
+    } catch { return TWEAK_DEFAULTS; }
+  });
+  const [panelVisible, setPanelVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode')   setPanelVisible(true);
+      if (e.data?.type === '__deactivate_edit_mode') setPanelVisible(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({type: '__edit_mode_available'}, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  const update = (key, val) => {
+    const next = {...tweaks, [key]: val};
+    setTweaks(next);
+    localStorage.setItem('gg-tweaks-v2', JSON.stringify(next));
+    window.parent.postMessage({type: '__edit_mode_set_keys', edits: {[key]: val}}, '*');
+  };
+
+  const duration = TEMPO_MAP[tweaks.tempo] || 90;
+
+  return (
+    <TweakCtx.Provider value={tweaks}>
+      <Stage width={1920} height={1080} duration={duration} background={DARK}
+        persistKey="gg-brand-v2" loop={false} autoplay={true}>
+        <Scene1/>
+        <Scene2/>
+        <Scene3/>
+        <Scene4/>
+        <Scene5/>
+        <Flash at={15}/>
+        <Flash at={32}/>
+        <Flash at={55}/>
+        <Flash at={72}/>
+        <TSLabel/>
+      </Stage>
+      <TweaksPanel tweaks={tweaks} update={update} visible={panelVisible}/>
+    </TweakCtx.Provider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
