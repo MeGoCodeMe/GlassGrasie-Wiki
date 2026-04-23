@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Brand Collateral Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html, body, #root { width:100%; height:100%; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+// DesignCanvas.jsx — Figma-ish design canvas wrapper
+// Warm gray grid bg + Sections + Artboards + PostIt notes.
+// Artboards are reorderable (grip-drag), labels/titles are inline-editable,
+// and any artboard can be opened in a fullscreen focus overlay (←/→/Esc).
+// State persists to a .design-canvas.state.json sidecar via the host
+// bridge. No assets, no deps.
+//
+// Usage:
+//   <DesignCanvas>
+//     <DCSection id="onboarding" title="Onboarding" subtitle="First-run variants">
+//       <DCArtboard id="a" label="A · Dusk" width={260} height={480}>…</DCArtboard>
+//       <DCArtboard id="b" label="B · Minimal" width={260} height={480}>…</DCArtboard>
+//     </DCSection>
+//   </DesignCanvas>
+
+const DC = {
+  bg: '#f0eee9',
+  grid: 'rgba(0,0,0,0.06)',
+  label: 'rgba(60,50,40,0.7)',
+  title: 'rgba(40,30,20,0.85)',
+  subtitle: 'rgba(60,50,40,0.6)',
+  postitBg: '#fef4a8',
+  postitText: '#5a4a2a',
+  font: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+};
+
+// One-time CSS injection (classes are dc-prefixed so they don't collide with
+// the hosted design's own styles).
+if (typeof document !== 'undefined' && !document.getElementById('dc-styles')) {
+  const s = document.createElement('style');
+  s.id = 'dc-styles';
+  s.textContent = [
+    '.dc-editable{cursor:text;outline:none;white-space:nowrap;border-radius:3px;padding:0 2px;margin:0 -2px}',
+    '.dc-editable:focus{background:#fff;box-shadow:0 0 0 1.5px #c96442}',
+    '[data-dc-slot]{transition:transform .18s cubic-bezier(.2,.7,.3,1)}',
+    '[data-dc-slot].dc-dragging{transition:none;z-index:10;pointer-events:none}',
+    '[data-dc-slot].dc-dragging .dc-card{box-shadow:0 12px 40px rgba(0,0,0,.25),0 0 0 2px #c96442;transform:scale(1.02)}',
+    '.dc-card{transition:box-shadow .15s,transform .15s}',
+    '.dc-card *{scrollbar-width:none}',
+    '.dc-card *::-webkit-scrollbar{display:none}',
+    '.dc-labelrow{display:flex;align-items:center;gap:4px;height:24px}',
+    '.dc-grip{cursor:grab;display:flex;align-items:center;padding:5px 4px;border-radius:4px;transition:background .12s}',
+    '.dc-grip:hover{background:rgba(0,0,0,.08)}',
+    '.dc-grip:active{cursor:grabbing}',
+    '.dc-labeltext{cursor:pointer;border-radius:4px;padding:3px 6px;display:flex;align-items:center;transition:background .12s}',
+    '.dc-labeltext:hover{background:rgba(0,0,0,.05)}',
+    '.dc-expand{position:absolute;bottom:100%;right:0;margin-bottom:5px;z-index:2;opacity:0;transition:opacity .12s,background .12s;',
+    '  width:22px;height:22px;border-radius:5px;border:none;cursor:pointer;padding:0;',
+    '  background:transparent;color:rgba(60,50,40,.7);display:flex;align-items:center;justify-content:center}',
+    '.dc-expand:hover{background:rgba(0,0,0,.06);color:#2a251f}',
+    '[data-dc-slot]:hover .dc-expand{opacity:1}',
+  ].join('\n');
+  document.head.appendChild(s);
+}
+
+const DCCtx = React.createContext(null);
+
+// ─────────────────────────────────────────────────────────────
+// DesignCanvas — stateful wrapper around the pan/zoom viewport.
+// Owns runtime state (per-section order, renamed titles/labels, focused
+// artboard). Order/titles/labels persist to a .design-canvas.state.json
+// sidecar next to the HTML. Reads go via plain fetch() so the saved
+// arrangement is visible anywhere the HTML + sidecar are served together
+// (omelette preview, direct link, downloaded zip). Writes go through the
+// host's window.omelette bridge — editing requires the omelette runtime.
+// Focus is ephemeral.
+// ─────────────────────────────────────────────────────────────
+const DC_STATE_FILE = '.design-canvas.state.json';
+
+function DesignCanvas({ children, minScale, maxScale, style }) {
+  const [state, setState] = React.useState({ sections: {}, focus: null });
+  // Hold rendering until the sidecar read settles so the saved order/titles
+  // appear on first paint (no source-order flash). didRead gates writes until
+  // the read settles so the empty initial state can't clobber a slow read;
+  // skipNextWrite suppresses the one echo-write that would otherwise follow
+  // hydration.
+  const [ready, setReady] = React.useState(false);
+  const didRead = React.useRef(false);
+  const skipNextWrite = React.useRef(false);
+
+  React.useEffect(() => {
+    let off = false;
+    fetch('./' + DC_STATE_FILE)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((saved) => {
+        if (off || !saved || !saved.sections) return;
+        skipNextWrite.current = true;
+        setState((s) => ({ ...s, sections: saved.sections }));
+      })
+      .catch(() => {})
+      .finally(() => { didRead.current = true; if (!off) setReady(true); });
+    const t = setTimeout(() => { if (!off) setReady(true); }, 150);
+    return () => { off = true; clearTimeout(t); };
+  }, []);
+
+  React.useEffect(() => {
+    if (!didRead.current) return;
+    if (skipNextWrite.current) { skipNextWrite.current = false; return; }
+    const t = setTimeout(() => {
+      window.omelette?.writeFile(DC_STATE_FILE, JSON.stringify({ sections: state.sections })).catch(() => {});
+    }, 250);
+    return () => clearTimeout(t);
+  }, [state.sections]);
+
+  // Build registries synchronously from children so FocusOverlay can read
+  // them in the same render. Only direct DCSection > DCArtboard children are
+  // walked — wrapping them in other elements opts out of focus/reorder.
+  const registry = {};     // slotId -> { sectionId, artboard }
+  const sectionMeta = {};  // sectionId -> { title, subtitle, slotIds[] }
+  const sectionOrder = [];
+  React.Children.forEach(children, (sec) => {
+    if (!sec || sec.type !== DCSection) return;
+    const sid = sec.props.id ?? sec.props.title;
+    if (!sid) return;
+    sectionOrder.push(sid);
+    const persisted = state.sections[sid] || {};
+    const srcIds = [];
+    React.Children.forEach(sec.props.children, (ab) => {
+      if (!ab || ab.type !== DCArtboard) return;
+      const aid = ab.props.id ?? ab.props.label;
+      if (!aid) return;
+      registry[`${sid}/${aid}`] = { sectionId: sid, artboard: ab };
+      srcIds.push(aid);
+    });
+    const kept = (persisted.order || []).filter((k) => srcIds.includes(k));
+    sectionMeta[sid] = {
+      title: persisted.title ?? sec.props.title,
+      subtitle: sec.props.subtitle,
+      slotIds: [...kept, ...srcIds.filter((k) => !kept.includes(k))],
+    };
+  });
+
+  const api = React.useMemo(() => ({
+    state,
+    section: (id) => state.sections[id] || {},
+    patchSection: (id, p) => setState((s) => ({
+      ...s,
+      sections: { ...s.sections, [id]: { ...s.sections[id], ...(typeof p === 'function' ? p(s.sections[id] || {}) : p) } },
+    })),
+    setFocus: (slotId) => setState((s) => ({ ...s, focus: slotId })),
+  }), [state]);
+
+  // Esc exits focus; any outside pointerdown commits an in-progress rename.
+  React.useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') api.setFocus(null); };
+    const onPd = (e) => {
+      const ae = document.activeElement;
+      if (ae && ae.isContentEditable && !ae.contains(e.target)) ae.blur();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPd, true);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPd, true);
+    };
+  }, [api]);
+
+  return (
+    <DCCtx.Provider value={api}>
+      <DCViewport minScale={minScale} maxScale={maxScale} style={style}>{ready && children}</DCViewport>
+      {state.focus && registry[state.focus] && (
+        <DCFocusOverlay entry={registry[state.focus]} sectionMeta={sectionMeta} sectionOrder={sectionOrder} />
+      )}
+    </DCCtx.Provider>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// DCViewport — transform-based pan/zoom (internal)
+//
+// Input mapping (Figma-style):
+//   • trackpad pinch  → zoom   (ctrlKey wheel; Safari gesture* events)
+//   • trackpad scroll → pan    (two-finger)
+//   • mouse wheel     → zoom   (notched; distinguished from trackpad scroll)
+//   • middle-drag / primary-drag-on-bg → pan
+//
+// Transform state lives in a ref and is written straight to the DOM
+// (translate3d + will-change) so wheel ticks don't go through React —
+// keeps pans at 60fps on dense canvases.
+// ─────────────────────────────────────────────────────────────
+function DCViewport({ children, minScale = 0.1, maxScale = 8, style = {} }) {
+  const vpRef = React.useRef(null);
+  const worldRef = React.useRef(null);
+  const tf = React.useRef({ x: 0, y: 0, scale: 1 });
+
+  const apply = React.useCallback(() => {
+    const { x, y, scale } = tf.current;
+    const el = worldRef.current;
+    if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+  }, []);
+
+  React.useEffect(() => {
+    const vp = vpRef.current;
+    if (!vp) return;
+
+    const zoomAt = (cx, cy, factor) => {
+      const r = vp.getBoundingClientRect();
+      const px = cx - r.left, py = cy - r.top;
+      const t = tf.current;
+      const next = Math.min(maxScale, Math.max(minScale, t.scale * factor));
+      const k = next / t.scale;
+      // keep the world point under the cursor fixed
+      t.x = px - (px - t.x) * k;
+      t.y = py - (py - t.y) * k;
+      t.scale = next;
+      apply();
+    };
+
+    // Mouse-wheel vs trackpad-scroll heuristic. A physical wheel sends
+    // line-mode deltas (Firefox) or large integer pixel deltas with no X
+    // component (Chrome/Safari, typically multiples of 100/120). Trackpad
+    // two-finger scroll sends small/fractional pixel deltas, often with
+    // non-zero deltaX. ctrlKey is set by the browser for trackpad pinch.
+    const isMouseWheel = (e) =>
+      e.deltaMode !== 0 ||
+      (e.deltaX === 0 && Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 40);
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      if (isGesturing) return; // Safari: gesture* owns the pinch — discard concurrent wheels
+      if (e.ctrlKey) {
+        // trackpad pinch (or explicit ctrl+wheel)
+        zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+      } else if (isMouseWheel(e)) {
+        // notched mouse wheel — fixed-ratio step per click
+        zoomAt(e.clientX, e.clientY, Math.exp(-Math.sign(e.deltaY) * 0.18));
+      } else {
+        // trackpad two-finger scroll — pan
+        tf.current.x -= e.deltaX;
+        tf.current.y -= e.deltaY;
+        apply();
+      }
+    };
+
+    // Safari sends native gesture* events for trackpad pinch with a smooth
+    // e.scale; preferring these over the ctrl+wheel fallback gives a much
+    // better feel there. No-ops on other browsers. Safari also fires
+    // ctrlKey wheel events during the same pinch — isGesturing makes
+    // onWheel drop those entirely so they neither zoom nor pan.
+    let gsBase = 1;
+    let isGesturing = false;
+    const onGestureStart = (e) => { e.preventDefault(); isGesturing = true; gsBase = tf.current.scale; };
+    const onGestureChange = (e) => {
+      e.preventDefault();
+      zoomAt(e.clientX, e.clientY, (gsBase * e.scale) / tf.current.scale);
+    };
+    const onGestureEnd = (e) => { e.preventDefault(); isGesturing = false; };
+
+    // Drag-pan: middle button anywhere, or primary button on canvas
+    // background (anything that isn't an artboard or an inline editor).
+    let drag = null;
+    const onPointerDown = (e) => {
+      const onBg = !e.target.closest('[data-dc-slot], .dc-editable');
+      if (!(e.button === 1 || (e.button === 0 && onBg))) return;
+      e.preventDefault();
+      vp.setPointerCapture(e.pointerId);
+      drag = { id: e.pointerId, lx: e.clientX, ly: e.clientY };
+      vp.style.cursor = 'grabbing';
+    };
+    const onPointerMove = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      tf.current.x += e.clientX - drag.lx;
+      tf.current.y += e.clientY - drag.ly;
+      drag.lx = e.clientX; drag.ly = e.clientY;
+      apply();
+    };
+    const onPointerUp = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      vp.releasePointerCapture(e.pointerId);
+      drag = null;
+      vp.style.cursor = '';
+    };
+
+    vp.addEventListener('wheel', onWheel, { passive: false });
+    vp.addEventListener('gesturestart', onGestureStart, { passive: false });
+    vp.addEventListener('gesturechange', onGestureChange, { passive: false });
+    vp.addEventListener('gestureend', onGestureEnd, { passive: false });
+    vp.addEventListener('pointerdown', onPointerDown);
+    vp.addEventListener('pointermove', onPointerMove);
+    vp.addEventListener('pointerup', onPointerUp);
+    vp.addEventListener('pointercancel', onPointerUp);
+    return () => {
+      vp.removeEventListener('wheel', onWheel);
+      vp.removeEventListener('gesturestart', onGestureStart);
+      vp.removeEventListener('gesturechange', onGestureChange);
+      vp.removeEventListener('gestureend', onGestureEnd);
+      vp.removeEventListener('pointerdown', onPointerDown);
+      vp.removeEventListener('pointermove', onPointerMove);
+      vp.removeEventListener('pointerup', onPointerUp);
+      vp.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [apply, minScale, maxScale]);
+
+  const gridSvg = `url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M120 0H0v120' fill='none' stroke='${encodeURIComponent(DC.grid)}' stroke-width='1'/%3E%3C/svg%3E")`;
+  return (
+    <div
+      ref={vpRef}
+      className="design-canvas"
+      style={{
+        height: '100vh', width: '100vw',
+        background: DC.bg,
+        overflow: 'hidden',
+        overscrollBehavior: 'none',
+        touchAction: 'none',
+        position: 'relative',
+        fontFamily: DC.font,
+        boxSizing: 'border-box',
+        ...style,
+      }}
+    >
+      <div
+        ref={worldRef}
+        style={{
+          position: 'absolute', top: 0, left: 0,
+          transformOrigin: '0 0',
+          willChange: 'transform',
+          width: 'max-content', minWidth: '100%',
+          minHeight: '100%',
+          padding: '60px 0 80px',
+        }}
+      >
+        <div style={{ position: 'absolute', inset: -6000, backgroundImage: gridSvg, backgroundSize: '120px 120px', pointerEvents: 'none', zIndex: -1 }} />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// DCSection — editable title + h-row of artboards in persisted order
+// ─────────────────────────────────────────────────────────────
+function DCSection({ id, title, subtitle, children, gap = 48 }) {
+  const ctx = React.useContext(DCCtx);
+  const sid = id ?? title;
+  const all = React.Children.toArray(children);
+  const artboards = all.filter((c) => c && c.type === DCArtboard);
+  const rest = all.filter((c) => !(c && c.type === DCArtboard));
+  const srcOrder = artboards.map((a) => a.props.id ?? a.props.label);
+  const sec = (ctx && sid && ctx.section(sid)) || {};
+
+  const order = React.useMemo(() => {
+    const kept = (sec.order || []).filter((k) => srcOrder.includes(k));
+    return [...kept, ...srcOrder.filter((k) => !kept.includes(k))];
+  }, [sec.order, srcOrder.join('|')]);
+
+  const byId = Object.fromEntries(artboards.map((a) => [a.props.id ?? a.props.label, a]));
+
+  return (
+    <div data-dc-section={sid} style={{ marginBottom: 80, position: 'relative' }}>
+      <div style={{ padding: '0 60px 56px' }}>
+        <DCEditable tag="div" value={sec.title ?? title}
+          onChange={(v) => ctx && sid && ctx.patchSection(sid, { title: v })}
+          style={{ fontSize: 28, fontWeight: 600, color: DC.title, letterSpacing: -0.4, marginBottom: 6, display: 'inline-block' }} />
+        {subtitle && <div style={{ fontSize: 16, color: DC.subtitle }}>{subtitle}</div>}
+      </div>
+      <div style={{ display: 'flex', gap, padding: '0 60px', alignItems: 'flex-start', width: 'max-content' }}>
+        {order.map((k) => (
+          <DCArtboardFrame key={k} sectionId={sid} artboard={byId[k]} order={order}
+            label={(sec.labels || {})[k] ?? byId[k].props.label}
+            onRename={(v) => ctx && ctx.patchSection(sid, (x) => ({ labels: { ...x.labels, [k]: v } }))}
+            onReorder={(next) => ctx && ctx.patchSection(sid, { order: next })}
+            onFocus={() => ctx && ctx.setFocus(`${sid}/${k}`)} />
+        ))}
+      </div>
+      {rest}
+    </div>
+  );
+}
+
+// DCArtboard — marker; rendered by DCArtboardFrame via DCSection.
+function DCArtboard() { return null; }
+
+function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorder, onFocus }) {
+  const { id: rawId, label: rawLabel, width = 260, height = 480, children, style = {} } = artboard.props;
+  const id = rawId ?? rawLabel;
+  const ref = React.useRef(null);
+
+  // Live drag-reorder: dragged card sticks to cursor; siblings slide into
+  // their would-be slots in real time via transforms. DOM order only
+  // changes on drop.
+  const onGripDown = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const me = ref.current;
+    // translateX is applied in local (pre-scale) space but pointer deltas and
+    // getBoundingClientRect().left are screen-space — divide by the viewport's
+    // current scale so the dragged card tracks the cursor at any zoom level.
+    const scale = me.getBoundingClientRect().width / me.offsetWidth || 1;
+    const peers = Array.from(document.querySelectorAll(`[data-dc-section="${sectionId}"] [data-dc-slot]`));
+    const homes = peers.map((el) => ({ el, id: el.dataset.dcSlot, x: el.getBoundingClientRect().left }));
+    const slotXs = homes.map((h) => h.x);
+    const startIdx = order.indexOf(id);
+    const startX = e.clientX;
+    let liveOrder = order.slice();
+    me.classList.add('dc-dragging');
+
+    const layout = () => {
+      for (const h of homes) {
+        if (h.id === id) continue;
+        const slot = liveOrder.indexOf(h.id);
+        h.el.style.transform = `translateX(${(slotXs[slot] - h.x) / scale}px)`;
+      }
+    };
+
+    const move = (ev) => {
+      const dx = ev.clientX - startX;
+      me.style.transform = `translateX(${dx / scale}px)`;
+      const cur = homes[startIdx].x + dx;
+      let nearest = 0, best = Infinity;
+      for (let i = 0; i < slotXs.length; i++) {
+        const d = Math.abs(slotXs[i] - cur);
+        if (d < best) { best = d; nearest = i; }
+      }
+      if (liveOrder.indexOf(id) !== nearest) {
+        liveOrder = order.filter((k) => k !== id);
+        liveOrder.splice(nearest, 0, id);
+        layout();
+      }
+    };
+
+    const up = () => {
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      const finalSlot = liveOrder.indexOf(id);
+      me.classList.remove('dc-dragging');
+      me.style.transform = `translateX(${(slotXs[finalSlot] - homes[startIdx].x) / scale}px)`;
+      // After the settle transition, kill transitions + clear transforms +
+      // commit the reorder in the same frame so there's no visual snap-back.
+      setTimeout(() => {
+        for (const h of homes) { h.el.style.transition = 'none'; h.el.style.transform = ''; }
+        if (liveOrder.join('|') !== order.join('|')) onReorder(liveOrder);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          for (const h of homes) h.el.style.transition = '';
+        }));
+      }, 180);
+    };
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  };
+
+  return (
+    <div ref={ref} data-dc-slot={id} style={{ position: 'relative', flexShrink: 0 }}>
+      <div className="dc-labelrow" style={{ position: 'absolute', bottom: '100%', left: -4, marginBottom: 4, color: DC.label }}>
+        <div className="dc-grip" onPointerDown={onGripDown} title="Drag to reorder">
+          <svg width="9" height="13" viewBox="0 0 9 13" fill="currentColor"><circle cx="2" cy="2" r="1.1"/><circle cx="7" cy="2" r="1.1"/><circle cx="2" cy="6.5" r="1.1"/><circle cx="7" cy="6.5" r="1.1"/><circle cx="2" cy="11" r="1.1"/><circle cx="7" cy="11" r="1.1"/></svg>
+        </div>
+        <div className="dc-labeltext" onClick={onFocus} title="Click to focus">
+          <DCEditable value={label} onChange={onRename} onClick={(e) => e.stopPropagation()}
+            style={{ fontSize: 15, fontWeight: 500, color: DC.label, lineHeight: 1 }} />
+        </div>
+      </div>
+      <button className="dc-expand" onClick={onFocus} onPointerDown={(e) => e.stopPropagation()} title="Focus">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M7 1h4v4M5 11H1V7M11 1L7.5 4.5M1 11l3.5-3.5"/></svg>
+      </button>
+      <div className="dc-card"
+        style={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06)', overflow: 'hidden', width, height, background: '#fff', ...style }}>
+        {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 13, fontFamily: DC.font }}>{id}</div>}
+      </div>
+    </div>
+  );
+}
+
+// Inline rename — commits on blur or Enter.
+function DCEditable({ value, onChange, style, tag = 'span', onClick }) {
+  const T = tag;
+  return (
+    <T className="dc-editable" contentEditable suppressContentEditableWarning
+      onClick={onClick}
+      onPointerDown={(e) => e.stopPropagation()}
+      onBlur={(e) => onChange && onChange(e.currentTarget.textContent)}
+      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+      style={style}>{value}</T>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Focus mode — overlay one artboard; ←/→ within section, ↑/↓ across
+// sections, Esc or backdrop click to exit.
+// ─────────────────────────────────────────────────────────────
+function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
+  const ctx = React.useContext(DCCtx);
+  const { sectionId, artboard } = entry;
+  const sec = ctx.section(sectionId);
+  const meta = sectionMeta[sectionId];
+  const peers = meta.slotIds;
+  const aid = artboard.props.id ?? artboard.props.label;
+  const idx = peers.indexOf(aid);
+  const secIdx = sectionOrder.indexOf(sectionId);
+
+  const go = (d) => { const n = peers[(idx + d + peers.length) % peers.length]; if (n) ctx.setFocus(`${sectionId}/${n}`); };
+  const goSection = (d) => {
+    const ns = sectionOrder[(secIdx + d + sectionOrder.length) % sectionOrder.length];
+    const first = sectionMeta[ns] && sectionMeta[ns].slotIds[0];
+    if (first) ctx.setFocus(`${ns}/${first}`);
+  };
+
+  React.useEffect(() => {
+    const k = (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); goSection(-1); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); goSection(1); }
+    };
+    document.addEventListener('keydown', k);
+    return () => document.removeEventListener('keydown', k);
+  });
+
+  const { width = 260, height = 480, children } = artboard.props;
+  const [vp, setVp] = React.useState({ w: window.innerWidth, h: window.innerHeight });
+  React.useEffect(() => { const r = () => setVp({ w: window.innerWidth, h: window.innerHeight }); window.addEventListener('resize', r); return () => window.removeEventListener('resize', r); }, []);
+  const scale = Math.max(0.1, Math.min((vp.w - 200) / width, (vp.h - 260) / height, 2));
+
+  const [ddOpen, setDd] = React.useState(false);
+  const Arrow = ({ dir, onClick }) => (
+    <button onClick={(e) => { e.stopPropagation(); onClick(); }}
+      style={{ position: 'absolute', top: '50%', [dir]: 28, transform: 'translateY(-50%)',
+        border: 'none', background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.9)',
+        width: 44, height: 44, borderRadius: 22, fontSize: 18, cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.18)')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.08)')}>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d={dir === 'left' ? 'M11 3L5 9l6 6' : 'M7 3l6 6-6 6'} /></svg>
+    </button>
+  );
+
+  // Portal to body so position:fixed is the real viewport regardless of any
+  // transform on DesignCanvas's ancestors (including the canvas zoom itself).
+  return ReactDOM.createPortal(
+    <div onClick={() => ctx.setFocus(null)}
+      onWheel={(e) => e.preventDefault()}
+      style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(24,20,16,.6)', backdropFilter: 'blur(14px)',
+        fontFamily: DC.font, color: '#fff' }}>
+
+      {/* top bar: section dropdown (left) · close (right) */}
+      <div onClick={(e) => e.stopPropagation()}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 72, display: 'flex', alignItems: 'flex-start', padding: '16px 20px 0', gap: 16 }}>
+        <div style={{ position: 'relative' }}>
+          <button onClick={() => setDd((o) => !o)}
+            style={{ border: 'none', background: 'transparent', color: '#fff', cursor: 'pointer', padding: '6px 8px',
+              borderRadius: 6, textAlign: 'left', fontFamily: 'inherit' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>{meta.title}</span>
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" style={{ opacity: .7 }}><path d="M2 4l3.5 3.5L9 4"/></svg>
+            </span>
+            {meta.subtitle && <span style={{ display: 'block', fontSize: 13, opacity: .6, fontWeight: 400, marginTop: 2 }}>{meta.subtitle}</span>}
+          </button>
+          {ddOpen && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: '#2a251f', borderRadius: 8,
+              boxShadow: '0 8px 32px rgba(0,0,0,.4)', padding: 4, minWidth: 200, zIndex: 10 }}>
+              {sectionOrder.map((sid) => (
+                <button key={sid} onClick={() => { setDd(false); const f = sectionMeta[sid].slotIds[0]; if (f) ctx.setFocus(`${sid}/${f}`); }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', border: 'none', cursor: 'pointer',
+                    background: sid === sectionId ? 'rgba(255,255,255,.1)' : 'transparent', color: '#fff',
+                    padding: '8px 12px', borderRadius: 5, fontSize: 14, fontWeight: sid === sectionId ? 600 : 400, fontFamily: 'inherit' }}>
+                  {sectionMeta[sid].title}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div style={{ flex: 1 }} />
+        <button onClick={() => ctx.setFocus(null)}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.12)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,.7)', width: 32, height: 32,
+            borderRadius: 16, fontSize: 20, cursor: 'pointer', lineHeight: 1, transition: 'background .12s' }}>×</button>
+      </div>
+
+      {/* card centered, label + index below — only the card itself stops
+          propagation so any backdrop click (including the margins around
+          the card) exits focus */}
+      <div
+        style={{ position: 'absolute', top: 64, bottom: 56, left: 100, right: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <div onClick={(e) => e.stopPropagation()} style={{ width: width * scale, height: height * scale, position: 'relative' }}>
+          <div style={{ width, height, transform: `scale(${scale})`, transformOrigin: 'top left', background: '#fff', borderRadius: 2, overflow: 'hidden',
+            boxShadow: '0 20px 80px rgba(0,0,0,.4)' }}>
+            {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb' }}>{aid}</div>}
+          </div>
+        </div>
+        <div onClick={(e) => e.stopPropagation()} style={{ fontSize: 14, fontWeight: 500, opacity: .85, textAlign: 'center' }}>
+          {(sec.labels || {})[aid] ?? artboard.props.label}
+          <span style={{ opacity: .5, marginLeft: 10, fontVariantNumeric: 'tabular-nums' }}>{idx + 1} / {peers.length}</span>
+        </div>
+      </div>
+
+      <Arrow dir="left" onClick={() => go(-1)} />
+      <Arrow dir="right" onClick={() => go(1)} />
+
+      {/* dots */}
+      <div onClick={(e) => e.stopPropagation()}
+        style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8 }}>
+        {peers.map((p, i) => (
+          <button key={p} onClick={() => ctx.setFocus(`${sectionId}/${p}`)}
+            style={{ border: 'none', padding: 0, cursor: 'pointer', width: 6, height: 6, borderRadius: 3,
+              background: i === idx ? '#fff' : 'rgba(255,255,255,.3)' }} />
+        ))}
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Post-it — absolute-positioned sticky note
+// ─────────────────────────────────────────────────────────────
+function DCPostIt({ children, top, left, right, bottom, rotate = -2, width = 180 }) {
+  return (
+    <div style={{
+      position: 'absolute', top, left, right, bottom, width,
+      background: DC.postitBg, padding: '14px 16px',
+      fontFamily: '"Comic Sans MS", "Marker Felt", "Segoe Print", cursive',
+      fontSize: 14, lineHeight: 1.4, color: DC.postitText,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+      transform: `rotate(${rotate}deg)`,
+      zIndex: 5,
+    }}>{children}</div>
+  );
+}
+
+Object.assign(window, { DesignCanvas, DCSection, DCArtboard, DCPostIt });
+
+
+</script>
+<script type="text/babel">
+
+// ── Brand tokens ────────────────────────────────────────────────────────────
+const S = "'Syncopate',sans-serif";
+const R = "'Cormorant Garamond',Georgia,serif";
+const M = "'JetBrains Mono',ui-monospace,monospace";
+const BG    = '#0D0C0B';
+const BG2   = '#100F0D';
+const RULE  = '#1C1810';
+const GOLD  = '#8B7355';
+const GOLD_HI = '#C9A87C';
+const CREAM = '#E8E2D8';
+const T2    = '#D4C9B8';
+const T3    = '#8A8070';
+const T4    = '#5A5044';
+const T5    = '#3A3020';
+const PAPER = '#F0EAE0';
+const BG3   = '#0A0908';
+
+// ── Shared components ───────────────────────────────────────────────────────
+const Wordmark = ({ size=14, dark=true, center=false, reg=false }) => (
+  <div style={{fontFamily:R,fontWeight:400,fontSize:size,letterSpacing:'-0.05em',
+    color:dark?CREAM:BG,textAlign:center?'center':'left',lineHeight:1}}>
+    Glass⏧Grasie{reg && <sup style={{fontSize:size*0.45,color:GOLD_HI,verticalAlign:'super',letterSpacing:0}}>®</sup>}
+  </div>
+);
+
+const DiamondMark = ({ size=24, color=GOLD_HI }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24">
+    <polygon points="12,1 23,12 12,23 1,12" fill="none" stroke={color} strokeWidth="1.2"/>
+    <polygon points="12,5 19,12 12,19 5,12" fill={color} opacity="0.2"/>
+  </svg>
+);
+
+const Shard = ({ w=80, h=80, color=GOLD_HI, opacity=0.12 }) => (
+  <svg width={w} height={h} viewBox="0 0 100 100" style={{position:'absolute',pointerEvents:'none'}}>
+    <polygon points="15,85 45,5 92,22 78,95" fill={color} opacity={opacity}/>
+    <polygon points="15,85 45,5 92,22 78,95" fill="url(#sg)" opacity="0.5"/>
+    <defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="white" stopOpacity="0.2"/>
+      <stop offset="100%" stopColor="white" stopOpacity="0"/>
+    </linearGradient></defs>
+  </svg>
+);
+
+const RuleLine = ({ vertical=false, color=RULE, length='100%' }) => (
+  <div style={{
+    width: vertical ? 1 : length,
+    height: vertical ? length : 1,
+    background: color,
+    flexShrink:0,
+  }}/>
+);
+
+const Label = ({ children, color=GOLD, size=7 }) => (
+  <div style={{fontFamily:S,fontSize:size,letterSpacing:'3px',color,textTransform:'uppercase'}}>{children}</div>
+);
+
+const Mono = ({ children, color=T2, size=10 }) => (
+  <div style={{fontFamily:M,fontSize:size,color,lineHeight:1.8}}>{children}</div>
+);
+
+// ── SECTION 1 — Business Card ───────────────────────────────────────────────
+
+// ── Parameterised business card ─────────────────────────────────────────────
+const PersonCard = ({ name, title, email, phone, website='glassgrasie.com', dark=true }) => (
+  <div style={{width:'100%',height:'100%',background:dark?BG:BG2,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'24px 22px 20px'}}>
+    <Shard w={100} h={100} color={GOLD_HI} opacity={0.08}/>
+    <div style={{position:'absolute',bottom:-20,right:-20,opacity:0.06}}>
+      <svg width={120} height={120} viewBox="0 0 24 24"><polygon points="12,1 23,12 12,23 1,12" fill={GOLD_HI}/></svg>
+    </div>
+    <Wordmark size={10} dark={true} reg={true}/>
+    <div>
+      {name && <div style={{fontFamily:R,fontStyle:'italic',fontSize:16,color:CREAM,marginBottom:3}}>{name}</div>}
+      {title && <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:12}}>{title}</div>}
+      <RuleLine color={RULE}/>
+      <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:3}}>
+        <Mono size={9} color={T3}>{email}</Mono>
+        {phone && <Mono size={9} color={T3}>{phone}</Mono>}
+        <Mono size={9} color={T3}>{website} · Rotterdam</Mono>
+      </div>
+    </div>
+  </div>
+);
+
+const BusinessCardFront = () => (
+  <PersonCard
+    name="Orville Dias"
+    title="Oprichter · Founder"
+    email="orville@glassgrasie.com"
+    phone="+31 6 8680 0505"
+  />
+);
+
+const BusinessCardBack = () => (
+  <div style={{width:'100%',height:'100%',background:BG2,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12}}>
+    <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px)`,backgroundSize:'20px 20px'}}/>
+    <DiamondMark size={32} color={GOLD_HI}/>
+    <Wordmark size={10} dark={true} center={true} reg={true}/>
+    <Label color={T5} size={6}>Geconstrueerd glas · Rotterdam</Label>
+  </div>
+);
+
+// ── SECTION 2 — A4 Letterhead ───────────────────────────────────────────────
+const LetterheadA4 = () => (
+  <div style={{width:'100%',height:'100%',background:PAPER,position:'relative',display:'flex',flexDirection:'column'}}>
+    {/* Header bar */}
+    <div style={{background:BG,padding:'16px 28px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+      <Wordmark size={10} dark={true}/>
+      <Label color={T5} size={6}>Rotterdam, NL · glassgrasie.com</Label>
+    </div>
+    <div style={{height:2,background:GOLD,opacity:0.4}}/>
+    {/* Body area */}
+    <div style={{flex:1,padding:'28px 28px 20px',display:'flex',flexDirection:'column',gap:12}}>
+      <div style={{display:'flex',gap:40,marginBottom:8}}>
+        <div>
+          <Label color={GOLD} size={6}>Datum</Label>
+          <div style={{fontFamily:R,fontSize:12,color:T4,marginTop:3}}>21 april 2026</div>
+        </div>
+        <div>
+          <Label color={GOLD} size={6}>Referentie</Label>
+          <div style={{fontFamily:M,fontSize:10,color:T4,marginTop:3}}>GG-2026-L001</div>
+        </div>
+      </div>
+      <div style={{fontFamily:R,fontSize:11,color:T4,lineHeight:1.8,flex:1}}>
+        Geachte relatie,<br/><br/>
+        Hierbij ontvangt u het overzicht van uw bestelling bij Glass⏧Grasie®. Elk stuk is waterjet-gesneden uit industrieel restfloatglas van Van Dijken Glas, Waddinxveen — traceerbaar tot de productierun en voorzien van een NFT Certificaat van Herkomst.<br/><br/>
+        Met vriendelijke groet,
+      </div>
+      <div style={{fontFamily:R,fontStyle:'italic',fontSize:13,color:BG}}>Sergio Dias</div>
+    </div>
+    {/* Footer */}
+    <div style={{borderTop:`1px solid rgba(0,0,0,0.1)`,padding:'8px 28px',display:'flex',justifyContent:'space-between'}}>
+      <div style={{fontFamily:M,fontSize:7,color:'rgba(0,0,0,0.3)'}}>KVK: 0000000 · BTW: NL000000000B01</div>
+      <div style={{fontFamily:M,fontSize:7,color:'rgba(0,0,0,0.3)'}}>IBAN: NL00 XXXX 0000 0000 00</div>
+    </div>
+  </div>
+);
+
+// ── SECTION 2b — Invoice ────────────────────────────────────────────────────
+const InvoiceA4 = () => (
+  <div style={{width:'100%',height:'100%',background:PAPER,display:'flex',flexDirection:'column'}}>
+    <div style={{background:BG,padding:'14px 24px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+      <Wordmark size={9} dark={true}/>
+      <div style={{fontFamily:S,fontSize:8,letterSpacing:'4px',color:GOLD,textTransform:'uppercase'}}>Factuur</div>
+    </div>
+    <div style={{height:2,background:GOLD,opacity:0.4}}/>
+    <div style={{padding:'20px 24px',flex:1,display:'flex',flexDirection:'column',gap:10}}>
+      <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+        <div><Label color={GOLD} size={6}>Factuurnummer</Label><div style={{fontFamily:M,fontSize:10,color:T4,marginTop:2}}>GG-INV-2026-001</div></div>
+        <div><Label color={GOLD} size={6}>Datum</Label><div style={{fontFamily:M,fontSize:10,color:T4,marginTop:2}}>21-04-2026</div></div>
+        <div><Label color={GOLD} size={6}>Vervaldatum</Label><div style={{fontFamily:M,fontSize:10,color:T4,marginTop:2}}>05-05-2026</div></div>
+      </div>
+      <div style={{height:1,background:'rgba(0,0,0,0.08)'}}/>
+      {/* Items */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr auto auto',gap:'4px 16px'}}>
+        <div style={{fontFamily:S,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>Omschrijving</div>
+        <div style={{fontFamily:S,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase',textAlign:'right'}}>Aantal</div>
+        <div style={{fontFamily:S,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase',textAlign:'right'}}>Bedrag</div>
+        {[
+          ['Fragment Tie Bar — Forest Floor · GG-2025-0042','1','€ 145,00'],
+          ['Fragment Manchetknopen — Helder · GG-2026-0003','1','€ 125,00'],
+          ['NFT Certificaat van Herkomst','2','incl.'],
+        ].map(([d,q,p],i)=>(
+          <React.Fragment key={i}>
+            <div style={{fontFamily:R,fontSize:10,color:T4,paddingTop:4}}>{d}</div>
+            <div style={{fontFamily:M,fontSize:10,color:T4,textAlign:'right',paddingTop:4}}>{q}</div>
+            <div style={{fontFamily:M,fontSize:10,color:T4,textAlign:'right',paddingTop:4}}>{p}</div>
+          </React.Fragment>
+        ))}
+      </div>
+      <div style={{height:1,background:'rgba(0,0,0,0.08)',marginTop:4}}/>
+      <div style={{display:'flex',justifyContent:'flex-end',gap:16,marginTop:4}}>
+        <div style={{textAlign:'right'}}>
+          <div style={{fontFamily:S,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase',marginBottom:3}}>Subtotaal excl. BTW</div>
+          <div style={{fontFamily:S,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase',marginBottom:3}}>BTW 21%</div>
+          <div style={{fontFamily:S,fontSize:7,letterSpacing:'2px',color:BG,textTransform:'uppercase',marginBottom:3}}>Totaal</div>
+        </div>
+        <div style={{textAlign:'right'}}>
+          <div style={{fontFamily:M,fontSize:10,color:T4,marginBottom:3}}>€ 270,00</div>
+          <div style={{fontFamily:M,fontSize:10,color:T4,marginBottom:3}}>€ 56,70</div>
+          <div style={{fontFamily:M,fontSize:11,color:BG,fontWeight:700}}>€ 326,70</div>
+        </div>
+      </div>
+      <div style={{marginTop:'auto',padding:'10px 12px',background:`${GOLD}15`,border:`1px solid ${GOLD}33`}}>
+        <div style={{fontFamily:M,fontSize:8,color:T4}}>IBAN: NL00 XXXX 0000 0000 00 · O.v.v. GG-INV-2026-001</div>
+      </div>
+    </div>
+    <div style={{borderTop:'1px solid rgba(0,0,0,0.08)',padding:'6px 24px',display:'flex',justifyContent:'space-between'}}>
+      <div style={{fontFamily:M,fontSize:7,color:'rgba(0,0,0,0.3)'}}>KVK: 0000000</div>
+      <div style={{fontFamily:M,fontSize:7,color:'rgba(0,0,0,0.3)'}}>glassgrasie.com</div>
+    </div>
+  </div>
+);
+
+// ── SECTION 3 — Print Sizes ─────────────────────────────────────────────────
+const PrintTemplate = ({ title, subtitle, size, isLight=false }) => (
+  <div style={{width:'100%',height:'100%',background:isLight?PAPER:BG,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',justifyContent:'space-between',padding:size==='A1'?'28px':'18px'}}>
+    {!isLight && <div style={{position:'absolute',inset:0,backgroundImage:`radial-gradient(ellipse 60% 50% at 60% 50%,#1C1810 0%,${BG} 70%)`,pointerEvents:'none'}}/>}
+    <Shard w={isLight?60:80} h={isLight?60:80} color={isLight?BG:GOLD_HI} opacity={isLight?0.06:0.1}/>
+    <div style={{position:'relative',zIndex:1,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+      <Wordmark size={size==='A1'?11:size==='A2'?10:9} dark={!isLight}/>
+      <Label color={isLight?T4:T5} size={5}>{size}</Label>
+    </div>
+    <div style={{position:'relative',zIndex:1}}>
+      {title && <div style={{fontFamily:R,fontStyle:'italic',fontWeight:300,
+        fontSize:size==='A1'?28:size==='A2'?22:size==='A3'?18:size==='A4'?14:12,
+        color:isLight?BG:CREAM,lineHeight:1.1,marginBottom:6}}>{title}</div>}
+      {subtitle && <div style={{fontFamily:S,fontSize:5,letterSpacing:'2px',
+        color:isLight?T4:T5,textTransform:'uppercase'}}>{subtitle}</div>}
+    </div>
+    <div style={{position:'relative',zIndex:1,display:'flex',justifyContent:'space-between',alignItems:'flex-end'}}>
+      <Label color={isLight?T4:T5} size={5}>Rotterdam · glassgrasie.com</Label>
+      <DiamondMark size={16} color={isLight?GOLD:GOLD_HI}/>
+    </div>
+  </div>
+);
+
+// ── SECTION 4 — Envelope ────────────────────────────────────────────────────
+const Envelope = () => (
+  <div style={{width:'100%',height:'100%',background:PAPER,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column'}}>
+    {/* Flap area */}
+    <div style={{height:'40%',background:'#E8E2D4',borderBottom:`1px solid rgba(0,0,0,0.08)`,position:'relative',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,clipPath:'polygon(0 0, 50% 100%, 100% 0)',background:'#E4DED6'}}/>
+      <div style={{position:'relative',zIndex:1,marginTop:-20}}>
+        <DiamondMark size={20} color={GOLD}/>
+      </div>
+    </div>
+    {/* Front */}
+    <div style={{flex:1,padding:'16px 20px',display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
+      <div style={{display:'flex',justifyContent:'flex-end'}}>
+        <div style={{width:40,height:28,border:'1px solid rgba(0,0,0,0.15)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <div style={{fontFamily:M,fontSize:6,color:'rgba(0,0,0,0.2)'}}>stamp</div>
+        </div>
+      </div>
+      <div style={{textAlign:'center'}}>
+        <Wordmark size={9} dark={false} center={true}/>
+        <div style={{fontFamily:M,fontSize:8,color:T4,marginTop:6}}>Orteliusplein 4, 3014 RN Rotterdam</div>
+      </div>
+      {/* Return address */}
+      <div>
+        <div style={{fontFamily:M,fontSize:7,color:T4,lineHeight:1.8}}>
+          Glass⏧Grasie® · Rotterdam, NL<br/>glassgrasie.com
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// ── SECTION 5 — Stickers ────────────────────────────────────────────────────
+const StickerRound = () => (
+  <div style={{width:'100%',height:'100%',background:'#f5f3ef',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{width:110,height:110,borderRadius:'50%',background:BG,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6,boxShadow:'0 2px 12px rgba(0,0,0,0.15)'}}>
+      <DiamondMark size={20} color={GOLD_HI}/>
+      <Wordmark size={7} dark={true} center={true}/>
+      <Label color={T5} size={4}>Rotterdam</Label>
+    </div>
+  </div>
+);
+
+const StickerRect = () => (
+  <div style={{width:'100%',height:'100%',background:'#f5f3ef',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{width:140,height:52,background:BG,display:'flex',alignItems:'center',justifyContent:'center',gap:12,padding:'0 16px',boxShadow:'0 2px 12px rgba(0,0,0,0.15)'}}>
+      <DiamondMark size={14} color={GOLD_HI}/>
+      <Wordmark size={8} dark={true}/>
+    </div>
+  </div>
+);
+
+const StickerCertified = () => (
+  <div style={{width:'100%',height:'100%',background:'#f5f3ef',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{position:'relative',width:110,height:110}}>
+      {/* Starburst */}
+      <svg width={110} height={110} viewBox="0 0 110 110" style={{position:'absolute',inset:0}}>
+        {Array.from({length:16},(_,i)=>{
+          const a=(i/16)*Math.PI*2,a2=((i+0.5)/16)*Math.PI*2;
+          const r1=52,r2=46;
+          const x1=55+r1*Math.cos(a),y1=55+r1*Math.sin(a);
+          const x2=55+r2*Math.cos(a2),y2=55+r2*Math.sin(a2);
+          return <line key={i} x1={x1} y1={y1} x2={55} y2={55} stroke={GOLD} strokeWidth="1" opacity="0.6"/>;
+        })}
+        <circle cx="55" cy="55" r="44" fill={BG} stroke={GOLD_HI} strokeWidth="1.5"/>
+        <circle cx="55" cy="55" r="36" fill="none" stroke={GOLD} strokeWidth="0.5" strokeDasharray="3 2"/>
+      </svg>
+      <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:3}}>
+        <Label color={GOLD_HI} size={5}>Blockchain</Label>
+        <DiamondMark size={14} color={GOLD_HI}/>
+        <Label color={GOLD_HI} size={5}>Verified</Label>
+      </div>
+    </div>
+  </div>
+);
+
+const StickerQR = () => (
+  <div style={{width:'100%',height:'100%',background:'#f5f3ef',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{background:PAPER,padding:12,border:`1px solid rgba(0,0,0,0.08)`,display:'flex',flexDirection:'column',alignItems:'center',gap:6,boxShadow:'0 1px 6px rgba(0,0,0,0.1)'}}>
+      {/* Mini QR placeholder */}
+      <div style={{width:60,height:60,background:BG,display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'1px',padding:4}}>
+        {Array.from({length:49},(_,i)=>{
+          const r=Math.floor(i/7),c=i%7;
+          const corner=(r<2&&c<2)||(r<2&&c>4)||(r>4&&c<2);
+          const on=corner||((i*37+13)%7>3);
+          return <div key={i} style={{background:on?CREAM:'transparent'}}/>;
+        })}
+      </div>
+      <div style={{fontFamily:M,fontSize:6,color:T4}}>GG-2026-0042</div>
+      <Wordmark size={6} dark={false} center={true}/>
+    </div>
+  </div>
+);
+
+// ── SECTION 6 — Hang Tag ────────────────────────────────────────────────────
+const HangTagFront = () => (
+  <div style={{width:'100%',height:'100%',background:BG,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',padding:'16px 14px'}}>
+    <Shard w={60} h={60} color={GOLD_HI} opacity={0.09}/>
+    {/* Hole */}
+    <div style={{width:12,height:12,borderRadius:'50%',border:`1px solid ${RULE}`,background:BG2,margin:'0 auto 14px'}}/>
+    <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
+      <Wordmark size={7} dark={true} center={true}/>
+      <div style={{textAlign:'center'}}>
+        <div style={{fontFamily:R,fontStyle:'italic',fontSize:13,color:CREAM,marginBottom:2}}>Fragment Tie Bar</div>
+        <div style={{fontFamily:R,fontStyle:'italic',fontSize:10,color:T4,marginBottom:10}}>Forest Floor</div>
+        <div style={{fontFamily:S,fontSize:9,letterSpacing:'2px',color:GOLD_HI}}>€ 145</div>
+      </div>
+      <div style={{textAlign:'center'}}>
+        <Label color={T5} size={5}>GG-2025-0042</Label>
+        <Label color={T5} size={4}>Van Dijken Glas · Run 001</Label>
+      </div>
+    </div>
+  </div>
+);
+
+const HangTagBack = () => (
+  <div style={{width:'100%',height:'100%',background:BG2,display:'flex',flexDirection:'column',padding:'16px 14px',gap:8}}>
+    <div style={{width:12,height:12,borderRadius:'50%',border:`1px solid ${RULE}`,background:BG,margin:'0 auto 10px'}}/>
+    <Label color={GOLD} size={5}>Certificaat van Herkomst</Label>
+    <div style={{fontFamily:M,fontSize:7,color:T4,lineHeight:1.9,flex:1}}>
+      Materiaal: Bedrukt restglas<br/>
+      Bron: Van Dijken Glas<br/>
+      Run: VD-2025-0138<br/>
+      Datum: Maart 2025<br/>
+      Kwaliteit: A<br/>
+      CO₂: 0.087 kg offset
+    </div>
+    <div style={{textAlign:'center'}}>
+      {/* Mini QR */}
+      <div style={{width:44,height:44,margin:'0 auto 4px',background:PAPER,padding:3,display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'0.5px'}}>
+        {Array.from({length:49},(_,i)=>{
+          const r2=Math.floor(i/7),c2=i%7;
+          const corner=(r2<2&&c2<2)||(r2<2&&c2>4)||(r2>4&&c2<2);
+          const on=corner||((i*31+7)%7>3);
+          return <div key={i} style={{background:on?BG:PAPER}}/>;
+        })}
+      </div>
+      <div style={{fontFamily:M,fontSize:6,color:T5}}>glassgrasie.com/cert</div>
+    </div>
+  </div>
+);
+
+// ── SECTION 7 — Apparel ─────────────────────────────────────────────────────
+const Tshirt = ({ dark=true }) => {
+  const bg = dark ? BG : PAPER;
+  const fg = dark ? CREAM : BG;
+  const accent = GOLD_HI;
+  return (
+    <div style={{width:'100%',height:'100%',background:'#e8e6e2',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{position:'relative',width:160,height:180}}>
+        {/* T-shirt shape */}
+        <svg width={160} height={180} viewBox="0 0 160 180" style={{position:'absolute',inset:0}}>
+          <path d="M45,0 L20,20 L0,15 L10,55 L30,48 L30,175 L130,175 L130,48 L150,55 L160,15 L140,20 L115,0 Q95,-5 80,8 Q65,-5 45,0Z"
+            fill={bg} stroke="rgba(0,0,0,0.12)" strokeWidth="1"/>
+        </svg>
+        {/* Print placement */}
+        <div style={{position:'absolute',top:55,left:0,right:0,display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
+          <DiamondMark size={20} color={accent}/>
+          <div style={{fontFamily:R,fontWeight:400,fontSize:13,letterSpacing:'-0.03em',color:fg,textAlign:'center'}}>
+            Glass⏧Grasie
+          </div>
+          <div style={{fontFamily:S,fontSize:5,letterSpacing:'3px',color:dark?T5:T4,textTransform:'uppercase'}}>Rotterdam · Est. 2025</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Hoodie = ({ dark=true }) => {
+  const bg = dark ? BG : PAPER;
+  const fg = dark ? CREAM : BG;
+  return (
+    <div style={{width:'100%',height:'100%',background:'#e2e0dc',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{position:'relative',width:160,height:190}}>
+        <svg width={160} height={190} viewBox="0 0 160 190" style={{position:'absolute',inset:0}}>
+          {/* Hood */}
+          <path d="M45,10 Q55,0 80,0 Q105,0 115,10 Q90,5 80,20 Q70,5 45,10Z" fill={bg} opacity="0.9"/>
+          {/* Collar */}
+          <path d="M45,10 L20,25 L0,20 L5,65 L30,55 L30,185 L130,185 L130,55 L155,65 L160,20 L140,25 L115,10 Q95,15 80,20 Q65,15 45,10Z"
+            fill={bg} stroke="rgba(0,0,0,0.12)" strokeWidth="1"/>
+          {/* Pocket */}
+          <rect x="55" y="120" width="50" height="32" rx="2" fill="none" stroke={dark?RULE:'rgba(0,0,0,0.1)'} strokeWidth="1"/>
+        </svg>
+        <div style={{position:'absolute',top:58,left:0,right:0,display:'flex',flexDirection:'column',alignItems:'center',gap:5}}>
+          <div style={{fontFamily:R,fontWeight:400,fontSize:11,letterSpacing:'-0.03em',color:fg,textAlign:'center'}}>
+            Glass⏧Grasie
+          </div>
+          <DiamondMark size={14} color={GOLD_HI}/>
+          <div style={{fontFamily:S,fontSize:4,letterSpacing:'2px',color:dark?T5:T4,textTransform:'uppercase'}}>Geconstrueerd glas</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Beanie = ({ dark=true }) => {
+  const bg = dark ? BG : '#D4C9B8';
+  const fg = dark ? CREAM : BG;
+  return (
+    <div style={{width:'100%',height:'100%',background:'#e2e0dc',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{position:'relative',width:140,height:130}}>
+        <svg width={140} height={130} viewBox="0 0 140 130" style={{position:'absolute',inset:0}}>
+          {/* Beanie shape */}
+          <path d="M10,80 Q5,35 70,10 Q135,35 130,80 Z" fill={bg} stroke="rgba(0,0,0,0.12)" strokeWidth="1"/>
+          {/* Brim */}
+          <rect x="5" y="78" width="130" height="22" rx="4" fill={dark?BG2:'#C4B9A8'} stroke="rgba(0,0,0,0.1)" strokeWidth="1"/>
+          {/* Pom */}
+          <circle cx="70" cy="12" r="9" fill={GOLD} opacity="0.9"/>
+          <circle cx="70" cy="12" r="6" fill={GOLD_HI}/>
+          {/* Ribbing */}
+          {[20,26,32,38,44,50].map(x=>(
+            <line key={x} x1={x} y1={78} x2={x-2} y2={100} stroke={dark?RULE:'rgba(0,0,0,0.08)'} strokeWidth="1"/>
+          ))}
+        </svg>
+        <div style={{position:'absolute',top:38,left:0,right:0,display:'flex',flexDirection:'column',alignItems:'center',gap:3}}>
+          <div style={{fontFamily:S,fontWeight:700,fontSize:6,letterSpacing:'2px',color:fg}}>
+            G<span style={{color:GOLD_HI}}>⏧</span>G
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── SECTION 8 — Product Box ─────────────────────────────────────────────────
+const ProductBoxLid = () => (
+  <div style={{width:'100%',height:'100%',background:BG,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14}}>
+    {/* Subtle grid */}
+    <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px)`,backgroundSize:'24px 24px'}}/>
+    <Shard w={100} h={100} color={GOLD_HI} opacity={0.07}/>
+    <div style={{position:'relative',zIndex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:10}}>
+      <DiamondMark size={28} color={GOLD_HI}/>
+      <Wordmark size={12} dark={true} center={true}/>
+      <Label color={T5} size={5}>Geconstrueerd glas · Rotterdam</Label>
+    </div>
+    <div style={{position:'absolute',bottom:14,left:0,right:0,display:'flex',justifyContent:'center'}}>
+      <div style={{width:40,height:1,background:`${GOLD}44`}}/>
+    </div>
+  </div>
+);
+
+const ProductBoxInner = () => (
+  <div style={{width:'100%',height:'100%',background:BG2,display:'flex',flexDirection:'column',padding:'18px 16px',gap:10}}>
+    <Label color={GOLD} size={6}>Uw Glass⏧Grasie® object</Label>
+    {/* Insert tray */}
+    <div style={{flex:1,border:`1px solid ${RULE}`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',background:'#0A0908'}}>
+      <div style={{width:80,height:80,background:BG3,border:`1px solid ${RULE}`,borderRadius:2,display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <DiamondMark size={20} color={GOLD}/>
+      </div>
+      <div style={{position:'absolute',bottom:6,right:8,fontFamily:M,fontSize:7,color:T5}}>object inlegvak</div>
+    </div>
+    {/* Accessories row */}
+    <div style={{display:'flex',gap:8}}>
+      {['Certificaat','Zijdepapier','Hangtag'].map(item=>(
+        <div key={item} style={{flex:1,height:28,border:`1px solid ${RULE}`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <div style={{fontFamily:M,fontSize:6,color:T5}}>{item}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const TissuePaper = () => (
+  <div style={{width:'100%',height:'100%',background:PAPER,position:'relative',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    {/* Repeated pattern */}
+    {Array.from({length:20},(_,i)=>{
+      const x=(i%5)*52+10, y=Math.floor(i/5)*52+10;
+      return (
+        <div key={i} style={{position:'absolute',left:x,top:y,opacity:0.08}}>
+          <DiamondMark size={24} color={BG}/>
+        </div>
+      );
+    })}
+    <div style={{position:'relative',zIndex:1,opacity:0.12}}>
+      <Wordmark size={11} dark={false} center={true}/>
+    </div>
+  </div>
+);
+
+// ── Industrial packaging components ─────────────────────────────────────────
+const INK='#0A0908', INK2='#141210', INK3='#1C1A18';
+const YELLOW='#F5C800', DGREY='#3A3830', WHITE2='#F2EFE8', LGREY='#C8C4BC';
+
+const HazardBar = ({h=18}) => (
+  <div style={{width:'100%',height:h,flexShrink:0,
+    backgroundImage:`repeating-linear-gradient(-45deg,${YELLOW} 0px,${YELLOW} ${h*0.6}px,${INK} ${h*0.6}px,${INK} ${h*1.2}px)`}}/>
+);
+
+const WarnTri = ({size=36}) => (
+  <svg width={size} height={size} viewBox="0 0 36 36" style={{flexShrink:0}}>
+    <polygon points="18,3 34,33 2,33" fill={YELLOW} stroke={INK} strokeWidth="1.5"/>
+    <text x="18" y="28" textAnchor="middle" fontFamily="'JetBrains Mono',monospace" fontWeight="700" fontSize="16" fill={INK}>!</text>
+  </svg>
+);
+
+const MiniBarcode = ({value='GG-2025-0042',w=110,h=32}) => {
+  const bars = Array.from({length:48},(_,i)=>(i*37+17)%13<6);
+  const bw=w/48;
+  return (
+    <svg width={w} height={h+12} viewBox={`0 0 ${w} ${h+12}`}>
+      <rect width={w} height={h+12} fill={WHITE2}/>
+      {bars.map((on,i)=>on&&<rect key={i} x={i*bw} y={2} width={bw-0.4} height={h} fill={INK}/>)}
+      <text x={w/2} y={h+11} textAnchor="middle" fontFamily="'JetBrains Mono',monospace" fontSize="6" fill={INK}>{value}</text>
+    </svg>
+  );
+};
+
+const IndustrialBox3D = () => (
+  <div style={{width:'100%',height:'100%',background:'#141210',display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
+    <div style={{position:'absolute',bottom:'12%',left:'50%',transform:'translateX(-50%)',
+      width:320,height:18,background:'rgba(0,0,0,0.45)',filter:'blur(10px)',borderRadius:'50%'}}/>
+    <svg width={460} height={360} viewBox="0 0 460 360" style={{overflow:'visible'}}>
+      <defs>
+        <linearGradient id="ibfg" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#181614"/><stop offset="100%" stopColor="#0A0908"/></linearGradient>
+        <linearGradient id="ibtg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#252220"/><stop offset="100%" stopColor="#181614"/></linearGradient>
+        <linearGradient id="ibrg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#0F0E0C"/><stop offset="100%" stopColor="#0A0908"/></linearGradient>
+      </defs>
+      {/* Right face */}
+      <polygon points="320,82 450,132 450,292 320,242" fill="url(#ibrg)" stroke="#2a2826" strokeWidth="1"/>
+      <polygon points="320,82 450,132 450,152 320,102" fill={YELLOW} opacity="0.85"/>
+      <polygon points="320,222 450,272 450,292 320,242" fill={YELLOW} opacity="0.85"/>
+      <text x="385" y="185" textAnchor="middle" fontFamily="'Syncopate',sans-serif" fontWeight="700" fontSize="9" fill={YELLOW} transform="rotate(22,385,185)" letterSpacing="2">G⏧G</text>
+      <text x="385" y="200" textAnchor="middle" fontFamily="'JetBrains Mono',monospace" fontSize="7" fill={DGREY} transform="rotate(22,385,200)">FRAGILE</text>
+      {/* Top face */}
+      <polygon points="18,82 320,82 450,132 148,132" fill="url(#ibtg)" stroke="#2a2826" strokeWidth="1"/>
+      <clipPath id="ibTopClip"><polygon points="18,82 320,82 450,132 148,132"/></clipPath>
+      <g clipPath="url(#ibTopClip)">
+        {Array.from({length:18},(_,i)=><line key={i} x1={18+i*26} y1={78} x2={18+i*26-30} y2={138} stroke={YELLOW} strokeWidth="10" opacity="0.10"/>)}
+      </g>
+      <text x="234" y="112" textAnchor="middle" fontFamily="'Syncopate',sans-serif" fontWeight="700" fontSize="11" fill={WHITE2} letterSpacing="4" transform="skewX(-10)">Glass⏧Grasie</text>
+      <text x="234" y="126" textAnchor="middle" fontFamily="'JetBrains Mono',monospace" fontSize="8" fill={YELLOW} letterSpacing="1" transform="skewX(-10)">⚠ GLAS · FRAGILE ⚠</text>
+      {/* Front face */}
+      <polygon points="18,82 320,82 320,242 18,242" fill="url(#ibfg)" stroke="#2a2826" strokeWidth="1"/>
+      <polygon points="18,82 320,82 320,104 18,104" fill={YELLOW} opacity="0.9"/>
+      <text x="169" y="97" textAnchor="middle" fontFamily="'JetBrains Mono',monospace" fontWeight="700" fontSize="9" fill={INK} letterSpacing="2">▲ VOORZICHTIG · CAUTION · FRAGILE GLASS ▲</text>
+      <text x="169" y="135" textAnchor="middle" fontFamily="'Syncopate',sans-serif" fontWeight="700" fontSize="22" fill={WHITE2} letterSpacing="3">GLASS</text>
+      <text x="169" y="162" textAnchor="middle" fontFamily="'Syncopate',sans-serif" fontWeight="700" fontSize="32" fill={YELLOW}>⏧</text>
+      <text x="169" y="188" textAnchor="middle" fontFamily="'Syncopate',sans-serif" fontWeight="700" fontSize="22" fill={WHITE2} letterSpacing="3">GRASIE®</text>
+      <rect x="22" y="196" width="150" height="34" fill={INK2} stroke={INK3} strokeWidth="0.5"/>
+      <text x="30" y="208" fontFamily="'JetBrains Mono',monospace" fontSize="7" fill={YELLOW}>BATCH: VD-2025-0138</text>
+      <text x="30" y="220" fontFamily="'JetBrains Mono',monospace" fontSize="7" fill={LGREY}>GG-2025-0042 · MAT 3MM</text>
+      <rect x="180" y="196" width="136" height="34" fill={YELLOW}/>
+      <text x="248" y="210" textAnchor="middle" fontFamily="'JetBrains Mono',monospace" fontWeight="700" fontSize="10" fill={INK}>⚠ GLAS OBJECT</text>
+      <text x="248" y="223" textAnchor="middle" fontFamily="'JetBrains Mono',monospace" fontSize="7" fill={INK}>BREEKBAAR · FRAGILE</text>
+      <polygon points="18,230 320,230 320,242 18,242" fill={YELLOW} opacity="0.85"/>
+      <text x="169" y="238" textAnchor="middle" fontFamily="'JetBrains Mono',monospace" fontSize="7" fill={INK} letterSpacing="1">glassgrasie.com/cert/GG-2025-0042</text>
+    </svg>
+  </div>
+);
+
+const IndustrialFront = () => (
+  <div style={{width:'100%',height:'100%',background:INK,display:'flex',flexDirection:'column'}}>
+    <HazardBar h={16}/>
+    <div style={{background:INK,padding:'10px 14px 8px',borderBottom:`2px solid ${YELLOW}`}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
+        <div style={{fontFamily:S,fontWeight:700,fontSize:16,letterSpacing:'3px',color:WHITE2,lineHeight:1}}>GLASS<span style={{color:YELLOW}}>⏧</span>GRASIE®</div>
+        <WarnTri size={36}/>
+      </div>
+    </div>
+    <div style={{background:YELLOW,padding:'6px 14px'}}>
+      <div style={{fontFamily:M,fontWeight:700,fontSize:20,color:INK,letterSpacing:'2px'}}>⚠ GLAS · GLASS</div>
+    </div>
+    <div style={{background:INK2,padding:'4px 14px',borderBottom:`1px solid ${INK3}`,display:'flex',gap:12,alignItems:'center'}}>
+      {['VOORZICHTIG','CAUTION','HANDLE WITH CARE'].map((t,i)=>(
+        <React.Fragment key={t}>
+          {i>0 && <div style={{width:1,height:12,background:DGREY}}/>}
+          <div style={{fontFamily:M,fontWeight:700,fontSize:8,color:YELLOW,letterSpacing:'2px'}}>{t}</div>
+        </React.Fragment>
+      ))}
+    </div>
+    <div style={{flex:1,padding:'10px 14px',display:'flex',flexDirection:'column',gap:1}}>
+      <div style={{fontFamily:S,fontStyle:'italic',fontSize:13,color:WHITE2,marginBottom:6,lineHeight:1.2}}>Fragment Tie Bar<br/><span style={{fontSize:11,color:LGREY}}>Forest Floor · Run VD-2025-0138</span></div>
+      {[['SERIE','GG-2025-0042',true],['MATERIAAL','Bedrukt restglas 3mm',false],['BRON','Van Dijken Glas',false],['CO₂','0.087 kg offset',false],['BLOCKCHAIN','XRP · On-chain ✓',true]].map(([k,v,hi])=>(
+        <div key={k} style={{display:'flex',justifyContent:'space-between',padding:'4px 8px',background:hi?`${YELLOW}18`:INK2,borderBottom:`1px solid ${INK3}`}}>
+          <span style={{fontFamily:M,fontSize:7,color:LGREY,letterSpacing:'0.5px'}}>{k}</span>
+          <span style={{fontFamily:M,fontSize:hi?8:7,color:hi?YELLOW:WHITE2,fontWeight:hi?'700':'400'}}>{v}</span>
+        </div>
+      ))}
+      <div style={{marginTop:6}}><MiniBarcode value="GG-2025-0042" w={120} h={28}/></div>
+    </div>
+    <HazardBar h={16}/>
+  </div>
+);
+
+const IndustrialSide = () => (
+  <div style={{width:'100%',height:'100%',background:INK,display:'flex',flexDirection:'column'}}>
+    <HazardBar h={14}/>
+    <div style={{flex:1,padding:'8px 10px',display:'flex',flexDirection:'column',gap:6}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:`1px solid ${INK3}`,paddingBottom:6}}>
+        <div style={{fontFamily:S,fontWeight:700,fontSize:9,letterSpacing:'2px',color:WHITE2}}>G<span style={{color:YELLOW}}>⏧</span>G</div>
+        <WarnTri size={24}/>
+      </div>
+      {[['BATCH','VD-2025-0138'],['DIM','120×80×40mm'],['TEMP','+5°C–+40°C']].map(([k,v])=>(
+        <div key={k} style={{display:'flex',justifyContent:'space-between',padding:'4px 6px',background:INK2}}>
+          <span style={{fontFamily:M,fontSize:6,color:LGREY}}>{k}</span>
+          <span style={{fontFamily:M,fontSize:7,color:WHITE2}}>{v}</span>
+        </div>
+      ))}
+      <MiniBarcode value="VD-2025-0138" w={100} h={24}/>
+    </div>
+    <HazardBar h={14}/>
+  </div>
+);
+
+const IndustrialWarningLabel = () => (
+  <div style={{width:'100%',height:'100%',background:'#1a1818',display:'flex',alignItems:'center',justifyContent:'center',padding:14}}>
+    <div style={{width:220,border:`2px solid ${YELLOW}`}}>
+      <HazardBar h={12}/>
+      <div style={{background:INK,padding:'8px 12px'}}>
+        <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:6}}>
+          <WarnTri size={32}/>
+          <div>
+            <div style={{fontFamily:M,fontWeight:700,fontSize:12,color:YELLOW,letterSpacing:'2px'}}>⚠ GLAS</div>
+            <div style={{fontFamily:M,fontSize:8,color:WHITE2,letterSpacing:'1px'}}>FRAGILE GLASS OBJECT</div>
+          </div>
+        </div>
+        <div style={{fontFamily:M,fontSize:7,color:LGREY,lineHeight:1.9}}>
+          Niet gooien · Do not drop<br/>
+          Rechtop bewaren · Store upright
+        </div>
+        <div style={{marginTop:6}}><MiniBarcode value="GG-2025-0042" w={160} h={24}/></div>
+      </div>
+      <HazardBar h={12}/>
+    </div>
+  </div>
+);
+
+const IndustrialShippingLabel = () => (
+  <div style={{width:'100%',height:'100%',background:'#1a1818',display:'flex',alignItems:'center',justifyContent:'center',padding:12}}>
+    <div style={{width:260,background:WHITE2,border:'2px solid #333'}}>
+      <div style={{background:INK,padding:'7px 12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div style={{fontFamily:S,fontWeight:700,fontSize:9,letterSpacing:'3px',color:WHITE2}}>G<span style={{color:YELLOW}}>⏧</span>G®</div>
+        <WarnTri size={22}/>
+      </div>
+      <div style={{padding:'8px 12px'}}>
+        <div style={{fontFamily:M,fontSize:7,color:'#666',marginBottom:3}}>AFZENDER</div>
+        <div style={{fontFamily:M,fontSize:9,color:'#222',lineHeight:1.8,marginBottom:8}}>Glass⏧Grasie® · Rotterdam, NL</div>
+        <div style={{height:1,background:'#ddd',margin:'6px 0'}}/>
+        <div style={{fontFamily:M,fontSize:7,color:'#666',marginBottom:3}}>ONTVANGER</div>
+        <div style={{fontFamily:M,fontSize:9,color:'#222',lineHeight:1.8,marginBottom:8}}>[Naam] · [Adres] · [Stad]</div>
+        <MiniBarcode value="GG-ORD-2026-001" w={200} h={28}/>
+        <div style={{background:YELLOW,padding:'4px 8px',marginTop:6,display:'flex',gap:6,alignItems:'center'}}>
+          <WarnTri size={14}/>
+          <span style={{fontFamily:M,fontWeight:700,fontSize:7,color:INK,letterSpacing:'1px'}}>FRAGILE GLAS — BREEKBAAR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+
+// ── SECTION 10 — E-mailhandtekening ───────────────────────────────────────────────────────────────────────────
+const EmailSigLight = () => (
+  <div style={{width:'100%',height:'100%',background:'#ffffff',display:'flex',alignItems:'center',padding:'24px 32px',gap:28}}>
+    <div style={{width:1,height:100,background:GOLD,opacity:0.4,flexShrink:0}}/>
+    <div style={{display:'flex',flexDirection:'column',gap:10,flex:1}}>
+      <div>
+        <div style={{fontFamily:R,fontStyle:'italic',fontWeight:400,fontSize:22,color:'#1A1714',letterSpacing:'-0.02em',lineHeight:1.1}}>Sergio Dias</div>
+        <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginTop:4}}>Oprichter · Founder</div>
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:10}}>
+        <div style={{width:28,height:1,background:GOLD,opacity:0.5}}/>
+        <div style={{fontFamily:R,fontWeight:400,fontSize:14,color:'#1A1714',letterSpacing:'-0.05em'}}>Glass⏧Grasie<sup style={{fontSize:'0.5em',color:GOLD_HI,verticalAlign:'super'}}>®</sup></div>
+        <div style={{width:28,height:1,background:GOLD,opacity:0.5}}/>
+      </div>
+      <div style={{display:'flex',gap:20}}>
+        <div style={{fontFamily:M,fontSize:9,color:'#5A5044',lineHeight:1.9}}>orville@glassgrasie.com<br/>glassgrasie.com<br/>Rotterdam, NL</div>
+        <div style={{fontFamily:M,fontSize:9,color:'#8A8070',lineHeight:1.9}}>@glassgrasie<br/>Pod⏧Glassed<br/>+31 (0)6 — — — —</div>
+      </div>
+    </div>
+    <div style={{flexShrink:0,opacity:0.65}}><DiamondMark size={40} color={GOLD}/></div>
+  </div>
+);
+
+const EmailSigDark = () => (
+  <div style={{width:'100%',height:'100%',background:BG,display:'flex',alignItems:'center',padding:'24px 32px',gap:28}}>
+    <div style={{width:1,height:100,background:GOLD_HI,opacity:0.4,flexShrink:0}}/>
+    <div style={{display:'flex',flexDirection:'column',gap:10,flex:1}}>
+      <div>
+        <div style={{fontFamily:R,fontStyle:'italic',fontWeight:400,fontSize:22,color:CREAM,letterSpacing:'-0.02em',lineHeight:1.1}}>Sergio Dias</div>
+        <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginTop:4}}>Oprichter · Founder</div>
+      </div>
+      <div style={{display:'flex',alignItems:'center',gap:10}}>
+        <div style={{width:28,height:1,background:GOLD_HI,opacity:0.4}}/>
+        <div style={{fontFamily:R,fontWeight:400,fontSize:14,color:CREAM,letterSpacing:'-0.05em'}}>Glass⏧Grasie<sup style={{fontSize:'0.5em',color:GOLD_HI,verticalAlign:'super'}}>®</sup></div>
+        <div style={{width:28,height:1,background:GOLD_HI,opacity:0.4}}/>
+      </div>
+      <div style={{display:'flex',gap:20}}>
+        <div style={{fontFamily:M,fontSize:9,color:T3,lineHeight:1.9}}>orville@glassgrasie.com<br/>glassgrasie.com<br/>Rotterdam, NL</div>
+        <div style={{fontFamily:M,fontSize:9,color:T3,lineHeight:1.9}}>@glassgrasie<br/>Pod⏧Glassed<br/>+31 (0)6 — — — —</div>
+      </div>
+    </div>
+    <div style={{flexShrink:0,opacity:0.2}}><DiamondMark size={40} color={GOLD_HI}/></div>
+  </div>
+);
+
+const EmailSigMinimal = () => (
+  <div style={{width:'100%',height:'100%',background:'#ffffff',display:'flex',alignItems:'center',padding:'20px 32px',gap:16}}>
+    <DiamondMark size={20} color={GOLD}/>
+    <div style={{display:'flex',flexDirection:'column',gap:5}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+        <span style={{fontFamily:R,fontStyle:'italic',fontSize:18,color:'#1A1714',letterSpacing:'-0.02em'}}>Sergio Dias</span>
+        <span style={{fontFamily:R,fontSize:13,color:GOLD,letterSpacing:'-0.04em'}}>Glass⏧Grasie</span>
+      </div>
+      <div style={{fontFamily:M,fontSize:9,color:'#8A8070'}}>orville@glassgrasie.com · glassgrasie.com · Rotterdam, NL</div>
+    </div>
+  </div>
+);
+
+const EmailBanner = () => (
+  <div style={{width:'100%',height:'100%',background:BG,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px',position:'relative',overflow:'hidden'}}>
+    <div style={{position:'absolute',inset:0,opacity:0.04,backgroundImage:'linear-gradient(135deg, ' + GOLD_HI + ' 1px, transparent 1px)',backgroundSize:'24px 24px'}}/>
+    <div style={{display:'flex',alignItems:'center',gap:14,position:'relative'}}>
+      <DiamondMark size={18} color={GOLD_HI}/>
+      <div style={{width:1,height:28,background:RULE}}/>
+      <div style={{fontFamily:R,fontWeight:400,fontSize:16,color:CREAM,letterSpacing:'-0.05em'}}>Glass⏧Grasie<sup style={{fontSize:'0.5em',color:GOLD_HI,verticalAlign:'super'}}>®</sup></div>
+    </div>
+    <div style={{fontFamily:S,fontSize:5,letterSpacing:'3px',color:T3,textTransform:'uppercase',position:'relative'}}>Geconstrueerd glas · Rotterdam · glassgrasie.com</div>
+    <div style={{fontFamily:R,fontStyle:'italic',fontSize:12,color:T3,position:'relative'}}>"Elk stuk bestaat maar één keer."</div>
+  </div>
+);
+
+
+// ── Generieke e-mailhandtekening per persoon ─────────────────────────────────
+const EmailSigPerson = ({ name, title, email, dark=false, phone=null }) => {
+  const bg = dark ? BG : '#ffffff';
+  const nameColor = dark ? CREAM : '#1A1714';
+  const subColor = dark ? GOLD : GOLD;
+  const textColor = dark ? T3 : '#5A5044';
+  const lineColor = dark ? GOLD_HI : GOLD;
+  return (
+    <div style={{width:'100%',height:'100%',background:bg,display:'flex',alignItems:'center',padding:'24px 32px',gap:28}}>
+      <div style={{width:1,height:100,background:lineColor,opacity:0.45,flexShrink:0}}/>
+      <div style={{display:'flex',flexDirection:'column',gap:10,flex:1}}>
+        <div>
+          <div style={{fontFamily:R,fontStyle:'italic',fontWeight:400,fontSize:22,color:nameColor,letterSpacing:'-0.02em',lineHeight:1.1}}>{name}</div>
+          <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:subColor,textTransform:'uppercase',marginTop:4}}>{title}</div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <div style={{width:28,height:1,background:lineColor,opacity:0.45}}/>
+          <div style={{fontFamily:R,fontWeight:400,fontSize:14,color:nameColor,letterSpacing:'-0.05em'}}>Glass⏧Grasie<sup style={{fontSize:'0.5em',color:GOLD_HI,verticalAlign:'super'}}>®</sup></div>
+          <div style={{width:28,height:1,background:lineColor,opacity:0.45}}/>
+        </div>
+        <div style={{display:'flex',gap:20}}>
+          <div style={{fontFamily:M,fontSize:9,color:textColor,lineHeight:1.9}}>
+            {email}<br/>glassgrasie.com<br/>Rotterdam, NL
+          </div>
+          {phone && <div style={{fontFamily:M,fontSize:9,color:textColor,lineHeight:1.9}}>{phone}</div>}
+        </div>
+      </div>
+      <div style={{flexShrink:0,opacity:dark?0.2:0.25}}><DiamondMark size={36} color={GOLD}/></div>
+    </div>
+  );
+};
+
+// ── Gepersonaliseerde Beanie ─────────────────────────────────────────────────
+const NamedBeanie = ({ name, dark=true, accent=GOLD_HI }) => {
+  const bg = dark ? BG : '#D4C9B8';
+  const brimBg = dark ? BG2 : '#C4B9A8';
+  const fg = dark ? CREAM : BG;
+  const ribbing = dark ? RULE : 'rgba(0,0,0,0.08)';
+  return (
+    <div style={{width:'100%',height:'100%',background:'#e2e0dc',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{position:'relative',width:160,height:150}}>
+        <svg width={160} height={150} viewBox="0 0 160 150" style={{position:'absolute',inset:0}}>
+          {/* Body */}
+          <path d="M10,90 Q5,40 80,12 Q155,40 150,90 Z" fill={bg} stroke="rgba(0,0,0,0.12)" strokeWidth="1"/>
+          {/* Brim */}
+          <rect x="5" y="88" width="150" height="24" rx="4" fill={brimBg} stroke="rgba(0,0,0,0.1)" strokeWidth="1"/>
+          {/* Pom */}
+          <circle cx="80" cy="14" r="10" fill={accent} opacity="0.9"/>
+          <circle cx="80" cy="14" r="6" fill={accent}/>
+          {/* Ribbing */}
+          {[18,26,34,42,50,58].map(x=>(
+            <line key={x} x1={x} y1={88} x2={x-3} y2={112} stroke={ribbing} strokeWidth="1"/>
+          ))}
+          {/* Name on brim */}
+          <text x="80" y="104" textAnchor="middle"
+            fontFamily="'Cormorant Garamond',serif"
+            fontStyle="italic" fontWeight="400"
+            fontSize="13" fill={fg} letterSpacing="-0.5"
+            opacity="0.9">{name}</text>
+        </svg>
+        {/* G⏧G monogram op beanie body */}
+        <div style={{position:'absolute',top:42,left:0,right:0,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+          <div style={{fontFamily:S,fontWeight:700,fontSize:7,letterSpacing:'2px',color:fg,opacity:0.7}}>
+            G<span style={{color:accent}}>⏧</span>G
+          </div>
+          <DiamondMark size={10} color={accent}/>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── App ──────────────────────────────────────────────────────────────────────
+function App() {
+  return (
+    <DesignCanvas>
+      {/* ── 1. Business Cards ── */}
+      <DCSection id="bc" title="Visitekaartjes" subtitle="85 × 55mm · Voor- en achterzijde">
+        <DCArtboard id="front" label="Voorzijde — Donker" width={255} height={153}>
+          <BusinessCardFront/>
+        </DCArtboard>
+        <DCArtboard id="back" label="Achterzijde — Raster" width={255} height={153}>
+          <BusinessCardBack/>
+        </DCArtboard>
+        <DCArtboard id="gertjan" label="Gertjan — Voorzijde" width={255} height={153}>
+          <PersonCard name="Gertjan" title="Co-founder" email="gertjan@glassgrasie.com"/>
+        </DCArtboard>
+        <DCArtboard id="donny" label="Donny — Voorzijde" width={255} height={153}>
+          <PersonCard name="Donny" title="Co-founder" email="donny@glassgrasie.com"/>
+        </DCArtboard>
+        <DCArtboard id="generic" label="Generiek — Voorzijde" width={255} height={153}>
+          <PersonCard email="hallo@glassgrasie.com"/>
+        </DCArtboard>
+        {/* Zonder titel */}
+        <DCArtboard id="orville-notitle" label="Orville — Zonder titel" width={255} height={153}>
+          <PersonCard name="Orville Dias" email="orville@glassgrasie.com" phone="+31 6 8680 0505"/>
+        </DCArtboard>
+        <DCArtboard id="gertjan-notitle" label="Gertjan — Zonder titel" width={255} height={153}>
+          <PersonCard name="Gertjan van Dijken" email="gertjan@glassgrasie.com"/>
+        </DCArtboard>
+        <DCArtboard id="donny-notitle" label="Donny — Zonder titel" width={255} height={153}>
+          <PersonCard name="Donny Lakerveld" email="donny@glassgrasie.com"/>
+        </DCArtboard>
+        {/* Met Smelter titel */}
+        <DCArtboard id="orville-smelter" label="Orville — Smelter" width={255} height={153}>
+          <PersonCard name="Orville Dias" title="Smelter, Glass⏧Grasie® & Company" email="orville@glassgrasie.com" phone="+31 6 8680 0505" reg={true}/>
+        </DCArtboard>
+        <DCArtboard id="gertjan-smelter" label="Gertjan — Smelter" width={255} height={153}>
+          <PersonCard name="Gertjan van Dijken" title="Smelter, Glass⏧Grasie® & Company" email="gertjan@glassgrasie.com"/>
+        </DCArtboard>
+        <DCArtboard id="donny-smelter" label="Donny — Smelter" width={255} height={153}>
+          <PersonCard name="Donny Lakerveld" title="Smelter, Glass⏧Grasie® & Company" email="donny@glassgrasie.com"/>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 2. Stationery ── */}
+      <DCSection id="stat" title="Kantoordrukwerk" subtitle="Briefpapier · Factuur · Bestelbon">
+        <DCArtboard id="letter" label="A4 Briefpapier" width={210} height={297}>
+          <LetterheadA4/>
+        </DCArtboard>
+        <DCArtboard id="invoice" label="A4 Factuur" width={210} height={297}>
+          <InvoiceA4/>
+        </DCArtboard>
+        <DCArtboard id="order" label="A5 Bestelbon" width={210} height={148}>
+          <div style={{width:'100%',height:'100%',background:PAPER,display:'flex',flexDirection:'column'}}>
+            <div style={{background:BG,padding:'10px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <Wordmark size={8} dark={true}/>
+              <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase'}}>Bestelbon</div>
+            </div>
+            <div style={{height:1,background:GOLD,opacity:0.65}}/>
+            <div style={{flex:1,padding:'12px 16px',display:'flex',flexDirection:'column',gap:8}}>
+              <div style={{display:'flex',gap:16}}>
+                <div><Label color={GOLD} size={5}>Order nr</Label><div style={{fontFamily:M,fontSize:8,color:T4,marginTop:2}}>GG-ORD-2026-001</div></div>
+                <div><Label color={GOLD} size={5}>Datum</Label><div style={{fontFamily:M,fontSize:8,color:T4,marginTop:2}}>21-04-2026</div></div>
+              </div>
+              <div style={{height:1,background:'rgba(0,0,0,0.07)'}}/>
+              <div style={{fontFamily:R,fontSize:9,color:T4,lineHeight:1.7}}>
+                Fragment Tie Bar — Forest Floor · €145<br/>
+                Fragment Manchetknopen — Helder · €125
+              </div>
+              <div style={{marginTop:'auto',fontFamily:M,fontSize:8,color:BG,textAlign:'right'}}>Totaal: € 270,00</div>
+            </div>
+          </div>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 3. Print Formaten ── */}
+      <DCSection id="print" title="Print Formaten" subtitle="A1 t/m A6 · Poster · Folder · Kaart">
+        <DCArtboard id="a1" label="A1 Poster — 594×841mm" width={148} height={210}>
+          <PrintTemplate title="Geconstrueerd glas uit Rotterdam." subtitle="Premiummaterialen · Blockchain certified" size="A1"/>
+        </DCArtboard>
+        <DCArtboard id="a2" label="A2 Poster — 420×594mm" width={148} height={210}>
+          <PrintTemplate title="Elk stuk bestaat maar één keer." subtitle="Fragment Collection 2026" size="A2"/>
+        </DCArtboard>
+        <DCArtboard id="a3" label="A3 Brochure — 297×420mm" width={148} height={210}>
+          <PrintTemplate title="Wat anderen weggooien, bewaren wij." subtitle="Glass⏧Grasie® — Rotterdam" size="A3"/>
+        </DCArtboard>
+        <DCArtboard id="a4" label="A4 Brief — 210×297mm" width={148} height={210}>
+          <PrintTemplate title="Premium floatglas design." subtitle="B2B Architectuur · BREEAM-NL" size="A4" isLight={true}/>
+        </DCArtboard>
+        <DCArtboard id="a5" label="A5 Flyer — 148×210mm" width={105} height={148}>
+          <PrintTemplate title="Fragment collectie." subtitle="Sieraden · Woonacc. · Architectuur" size="A5"/>
+        </DCArtboard>
+        <DCArtboard id="a6" label="A6 Kaart — 105×148mm" width={105} height={148}>
+          <PrintTemplate title="Dank u wel." subtitle="glassgrasie.com" size="A6" isLight={true}/>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 4. Envelop ── */}
+      <DCSection id="env" title="Envelop" subtitle="C5 162×229mm · DL 110×220mm">
+        <DCArtboard id="c5" label="C5 Envelop — Voorzijde" width={229} height={162}>
+          <Envelope/>
+        </DCArtboard>
+        <DCArtboard id="dl" label="DL Envelop — Donker" width={220} height={110}>
+          <div style={{width:'100%',height:'100%',background:BG,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'12px 18px'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <Wordmark size={8} dark={true}/>
+              <div style={{width:28,height:18,border:`1px solid ${RULE}`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <Label color={T5} size={4}>stamp</Label>
+              </div>
+            </div>
+            <div style={{fontFamily:R,fontStyle:'italic',fontSize:11,color:CREAM,textAlign:'center'}}>Glass⏧Grasie® · Rotterdam, NL</div>
+            <div style={{fontFamily:M,fontSize:7,color:T5}}>glassgrasie.com</div>
+          </div>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 5. Stickers ── */}
+      <DCSection id="stk" title="Stickers" subtitle="Rond · Rechthoek · Certified · QR">
+        <DCArtboard id="s1" label="Sticker Rond ⌀60mm" width={120} height={120}>
+          <StickerRound/>
+        </DCArtboard>
+        <DCArtboard id="s2" label="Sticker Rechthoek 80×30mm" width={160} height={100}>
+          <StickerRect/>
+        </DCArtboard>
+        <DCArtboard id="s3" label="Sticker Certified ⌀60mm" width={120} height={120}>
+          <StickerCertified/>
+        </DCArtboard>
+        <DCArtboard id="s4" label="QR Sticker 40×40mm" width={120} height={120}>
+          <StickerQR/>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 6. Hangtag ── */}
+      <DCSection id="tag" title="Hangtag" subtitle="50×80mm · Voor- en achterzijde">
+        <DCArtboard id="tf" label="Hangtag Voorzijde — Donker" width={100} height={160}>
+          <HangTagFront/>
+        </DCArtboard>
+        <DCArtboard id="tb" label="Hangtag Achterzijde — Herkomst" width={100} height={160}>
+          <HangTagBack/>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 7. Apparel ── */}
+      <DCSection id="app" title="Kleding" subtitle="T-shirt · Hoodie · Beanie · Dark & Light">
+        <DCArtboard id="ts-d" label="T-shirt — Zwart" width={200} height={220}>
+          <Tshirt dark={true}/>
+        </DCArtboard>
+        <DCArtboard id="ts-l" label="T-shirt — Licht" width={200} height={220}>
+          <Tshirt dark={false}/>
+        </DCArtboard>
+        <DCArtboard id="hd-d" label="Hoodie — Zwart" width={200} height={220}>
+          <Hoodie dark={true}/>
+        </DCArtboard>
+        <DCArtboard id="hd-l" label="Hoodie — Crème" width={200} height={220}>
+          <Hoodie dark={false}/>
+        </DCArtboard>
+        <DCArtboard id="bn-d" label="Beanie — Zwart" width={160} height={150}>
+          <Beanie dark={true}/>
+        </DCArtboard>
+        <DCArtboard id="bn-l" label="Beanie — Crème" width={160} height={150}>
+          <Beanie dark={false}/>
+        </DCArtboard>
+
+        <DCArtboard id="beanie-orville" label="Beanie — Orville" width={200} height={160}>
+          <NamedBeanie name="Orville" dark={true}/>
+        </DCArtboard>
+        <DCArtboard id="beanie-gertjan" label="Beanie — Gertjan" width={200} height={160}>
+          <NamedBeanie name="Gertjan" dark={false}/>
+        </DCArtboard>
+        <DCArtboard id="beanie-donny" label="Beanie — Donny" width={200} height={160}>
+          <NamedBeanie name="Donny" dark={true} accent="#7A7A9B"/>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 8. Product Verpakking — Industrial ── */}
+      <DCSection id="pkg" title="Product Verpakking" subtitle="Industrial black box · Doos deksel · Inlegvak · Zijdepapier">
+        <DCArtboard id="box3d" label="Industrial Box — 3D Aanzicht" width={480} height={380}>
+          <IndustrialBox3D/>
+        </DCArtboard>
+        <DCArtboard id="boxfront" label="Voorzijde — 120×80mm" width={280} height={280}>
+          <IndustrialFront/>
+        </DCArtboard>
+        <DCArtboard id="boxside" label="Zijkant — 40×80mm" width={160} height={280}>
+          <IndustrialSide/>
+        </DCArtboard>
+        <DCArtboard id="lid" label="Doos Deksel (minimal)" width={240} height={200}>
+          <ProductBoxLid/>
+        </DCArtboard>
+        <DCArtboard id="inner" label="Doos Binnenkant" width={240} height={200}>
+          <ProductBoxInner/>
+        </DCArtboard>
+        <DCArtboard id="tissue" label="Zijdepapier Patroon" width={200} height={160}>
+          <TissuePaper/>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 9. Labels & Verzending ── */}
+      <DCSection id="labels" title="Labels & Stickers" subtitle="Warning · Verzending · QR · Hazard">
+        <DCArtboard id="warnlbl" label="Warning Label — 90×60mm" width={260} height={200}>
+          <IndustrialWarningLabel/>
+        </DCArtboard>
+        <DCArtboard id="shiplbl" label="Verzendlabel — 100×150mm" width={300} height={280}>
+          <IndustrialShippingLabel/>
+        </DCArtboard>
+      </DCSection>
+
+      {/* ── 10. E-mailhandtekening ── */}
+      <DCSection id="email" title="E-mailhandtekening" subtitle="Licht · Donker · Minimaal · Footer Banner">
+        <DCArtboard id="email-light" label="Handtekening — Licht" width={560} height={180}>
+          <EmailSigLight/>
+        </DCArtboard>
+        <DCArtboard id="email-dark" label="Handtekening — Donker" width={560} height={180}>
+          <EmailSigDark/>
+        </DCArtboard>
+        <DCArtboard id="email-minimal" label="Handtekening — Minimaal" width={560} height={110}>
+          <EmailSigMinimal/>
+        </DCArtboard>
+
+        <DCArtboard id="email-donny-light" label="Donny Lakerveld — Licht" width={560} height={180}>
+          <EmailSigPerson name="Donny Lakerveld" title="Co-founder" email="donny@glassgrasie.com" dark={false}/>
+        </DCArtboard>
+        <DCArtboard id="email-donny-dark" label="Donny Lakerveld — Donker" width={560} height={180}>
+          <EmailSigPerson name="Donny Lakerveld" title="Co-founder" email="donny@glassgrasie.com" dark={true}/>
+        </DCArtboard>
+        <DCArtboard id="email-gertjan-light" label="Gertjan van Dijken — Licht" width={560} height={180}>
+          <EmailSigPerson name="Gertjan van Dijken" title="Co-founder" email="gertjan@glassgrasie.com" dark={false}/>
+        </DCArtboard>
+        <DCArtboard id="email-gertjan-dark" label="Gertjan van Dijken — Donker" width={560} height={180}>
+          <EmailSigPerson name="Gertjan van Dijken" title="Co-founder" email="gertjan@glassgrasie.com" dark={true}/>
+        </DCArtboard>
+        <DCArtboard id="email-banner" label="E-mail Footer Banner 600×80px" width={600} height={80}>
+          <EmailBanner/>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
