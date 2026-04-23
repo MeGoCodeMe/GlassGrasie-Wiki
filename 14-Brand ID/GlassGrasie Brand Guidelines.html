@@ -1,0 +1,1162 @@
+<!DOCTYPE html><html lang="nl" style="--gold-hi: #C9A87C; --gold: #C9A87C; --bg: #0D0C0B; --bg2: #100F0D; --bg3: #0A0908; --rule: #1C1810; --text-1: #E8E2D8; --text-2: #D4C9B8; --text-3: #8A8070; --text-4: #5A5044; --text-5: #3A3020; --serif: 'Cormorant Garamond', Georgia, serif;"><head>
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Brand Guidelines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&amp;family=Syncopate:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:       #0D0C0B;
+  --bg2:      #100F0D;
+  --bg3:      #0A0908;
+  --rule:     #1C1810;
+  --gold:     #8B7355;
+  --gold-hi:  #C9A87C;
+  --gold-lo:  #4A3F30;
+  --text-1:   #E8E2D8;
+  --text-2:   #D4C9B8;
+  --text-3:   #8A8070;
+  --text-4:   #5A5044;
+  --text-5:   #3A3020;
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --sans:     'Syncopate', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Utility ─────────────────────────── */
+.rule-h { width: 100%; height: 0.5px; background: linear-gradient(90deg, transparent, var(--gold-lo) 20%, var(--gold) 50%, var(--gold-lo) 80%, transparent); }
+.rule-s { width: 100%; height: 0.5px; background: var(--rule); }
+.label  { font-family: var(--sans); font-size: 7px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); }
+.section-num { font-family: var(--sans); font-size: 7px; letter-spacing: 2px; color: var(--text-5); }
+
+/* ── Cover ───────────────────────────── */
+.cover {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: 64px 72px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg3);
+}
+.cover::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 80% 50%, rgba(139,115,85,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.cover-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.cover-badge { font-family: var(--sans); font-size: 7px; letter-spacing: 4px; color: var(--text-5); text-transform: uppercase; line-height: 1.8; text-align: right; }
+.cover-center { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 80px 0; }
+.cover-eyebrow { font-family: var(--sans); font-size: 7px; letter-spacing: 5px; color: var(--gold-lo); text-transform: uppercase; margin-bottom: 48px; }
+.cover-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 6vw, 80px);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  color: var(--text-1);
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+.cover-title em {
+  color: var(--gold-hi);
+  font-style: normal;
+}
+.cover-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-bottom: 56px;
+}
+.cover-desc {
+  max-width: 480px;
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text-4);
+}
+.cover-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+.cover-version { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--text-5); }
+.cover-glyph {
+  font-family: var(--sans); font-size: 7px; letter-spacing: 3px;
+  color: var(--text-5); text-align: right;
+}
+
+/* ── Page sections ───────────────────── */
+.page { padding: 80px 72px; border-bottom: 0.5px solid var(--rule); }
+.page-alt { background: var(--bg2); }
+.page-dark { background: var(--bg3); }
+
+.section-header { margin-bottom: 56px; }
+.section-header .label { margin-bottom: 16px; }
+.section-header h2 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(28px, 3.5vw, 44px);
+  line-height: 1.1;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+}
+.section-header p {
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--text-4);
+  max-width: 580px;
+  margin-top: 16px;
+}
+
+/* ── Manifesto ───────────────────────── */
+.manifesto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.manifesto-pull {
+  font-size: clamp(22px, 2.8vw, 34px);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--text-2);
+  letter-spacing: 0.01em;
+}
+.manifesto-pull em { color: var(--gold-hi); font-style: normal; }
+.manifesto-body { display: flex; flex-direction: column; gap: 32px; }
+.manifesto-block {}
+.manifesto-block h3 {
+  font-family: var(--sans);
+  font-size: 7px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.manifesto-block p {
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--text-3);
+}
+.manifesto-block p strong { color: var(--text-2); font-weight: 400; }
+
+/* ── Colour palette ──────────────────── */
+.palette-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--rule); margin-bottom: 48px; }
+.swatch { aspect-ratio: 1; display: flex; align-items: flex-end; padding: 14px 12px; }
+.swatch-info {}
+.swatch-name { font-family: var(--sans); font-size: 7px; letter-spacing: 2px; text-transform: uppercase; line-height: 1.6; }
+.swatch-hex  { font-family: var(--sans); font-size: 7px; letter-spacing: 1px; opacity: 0.6; }
+.palette-rule { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.palette-col h4 { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
+.palette-col p { font-size: 15px; line-height: 1.8; color: var(--text-4); }
+
+/* ── Typography ──────────────────────── */
+.type-specimens { display: flex; flex-direction: column; gap: 1px; background: var(--rule); margin-bottom: 48px; }
+.type-row { background: var(--bg); padding: 28px 32px; display: flex; align-items: baseline; gap: 32px; }
+.type-meta { width: 160px; flex-shrink: 0; }
+.type-meta .label { display: block; margin-bottom: 6px; }
+.type-meta span { font-family: var(--sans); font-size: 7px; letter-spacing: 1px; color: var(--text-5); display: block; line-height: 1.8; }
+.type-sample { flex: 1; }
+
+.type-rules { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--rule); }
+.type-rule-card { background: var(--bg); padding: 28px 24px; }
+.type-rule-card h4 { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
+.type-rule-card p, .type-rule-card li { font-size: 14px; line-height: 1.9; color: var(--text-4); }
+.type-rule-card ul { padding-left: 14px; }
+.type-rule-card li { margin-bottom: 4px; }
+
+/* ── Logo ────────────────────────────── */
+.logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); margin-bottom: 48px; }
+.logo-card { padding: 48px; display: flex; flex-direction: column; gap: 24px; }
+.logo-card.dark  { background: var(--bg3); }
+.logo-card.light { background: #F0EAE0; }
+.logo-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  line-height: 1.2;
+}
+.logo-display .gg { color: var(--text-1); }
+.logo-display .gg-light { color: var(--bg3); }
+.logo-display .glyph { color: var(--gold-hi); letter-spacing: 0.05em; }
+.logo-display .glyph-light { color: var(--gold); letter-spacing: 0.05em; }
+.logo-display sup { font-size: 0.45em; letter-spacing: 0; vertical-align: super; color: var(--gold); }
+.logo-display sup.light { color: var(--gold); }
+.logo-label { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--text-5); text-transform: uppercase; }
+.logo-label.light { color: #8B7355; }
+
+.logo-dont-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); }
+.logo-dont { background: var(--bg); padding: 24px 20px; }
+.logo-dont h4 { font-family: var(--sans); font-size: 6px; letter-spacing: 2px; color: #7A3030; text-transform: uppercase; margin-bottom: 12px; }
+.logo-dont p { font-size: 13px; line-height: 1.7; color: var(--text-5); }
+.logo-dont .example { font-family: var(--sans); font-size: 11px; letter-spacing: 3px; color: var(--text-5); margin-top: 10px; padding: 10px 14px; border: 0.5px solid var(--rule); opacity: 0.5; }
+
+/* ── Voice ───────────────────────────── */
+.voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); margin-bottom: 48px; }
+.voice-col { background: var(--bg); }
+.voice-col-header { padding: 20px 28px; border-bottom: 0.5px solid var(--rule); display: flex; align-items: center; gap: 12px; }
+.voice-col-header .dot { width: 6px; height: 6px; border-radius: 50%; }
+.voice-col-header span { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; text-transform: uppercase; }
+.voice-items { padding: 0; }
+.voice-item { padding: 20px 28px; border-bottom: 0.5px solid var(--rule); }
+.voice-item:last-child { border-bottom: none; }
+.voice-item p { font-size: 15px; line-height: 1.75; }
+.voice-item .context { font-family: var(--sans); font-size: 6px; letter-spacing: 2px; color: var(--text-5); text-transform: uppercase; margin-bottom: 8px; }
+
+.voice-pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); }
+.voice-pillar { background: var(--bg); padding: 28px 24px; }
+.voice-pillar h4 { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
+.voice-pillar p { font-size: 14px; line-height: 1.85; color: var(--text-4); }
+.voice-pillar em { color: var(--text-2); font-style: italic; }
+
+/* ── Visual language ──────────────────── */
+.vis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); margin-bottom: 48px; }
+.vis-card { background: var(--bg); padding: 36px 28px; }
+.vis-card h4 { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
+.vis-card p { font-size: 14px; line-height: 1.85; color: var(--text-4); }
+.vis-card p strong { color: var(--text-2); font-weight: 400; }
+
+/* ── Photography ─────────────────────── */
+.photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); }
+.photo-col { background: var(--bg); padding: 36px 32px; }
+.photo-col h4 { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 20px; }
+.photo-col ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.photo-col li { font-size: 15px; line-height: 1.7; color: var(--text-4); padding-left: 16px; position: relative; }
+.photo-col li::before { content: '—'; position: absolute; left: 0; color: var(--gold-lo); }
+.photo-col li strong { color: var(--text-2); font-weight: 400; }
+
+/* ── Applications ────────────────────── */
+.app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); margin-bottom: 48px; }
+.app-card { background: var(--bg); padding: 28px 24px; }
+.app-card h4 { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 14px; }
+.app-card ul { list-style: none; }
+.app-card li { font-family: var(--sans); font-size: 7px; letter-spacing: 1.5px; color: var(--text-5); text-transform: uppercase; padding: 8px 0; border-bottom: 0.5px solid var(--rule); display: flex; justify-content: space-between; }
+.app-card li span { color: var(--gold-lo); }
+
+/* ── Glyph breakdown ──────────────────── */
+.glyph-section { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.glyph-display {
+  text-align: center;
+  padding: 56px;
+  border: 0.5px solid var(--rule);
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+}
+.glyph-big { font-family: var(--sans); font-size: 120px; color: var(--gold-hi); letter-spacing: 0; line-height: 1; }
+.glyph-name { font-family: var(--sans); font-size: 7px; letter-spacing: 4px; color: var(--text-5); text-transform: uppercase; }
+.glyph-code { font-family: 'Courier New', monospace; font-size: 12px; color: var(--gold-lo); }
+.glyph-rules { display: flex; flex-direction: column; gap: 1px; background: var(--rule); }
+.glyph-rule { background: var(--bg); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.glyph-rule-key { font-family: var(--sans); font-size: 7px; letter-spacing: 2px; color: var(--text-5); text-transform: uppercase; flex-shrink: 0; }
+.glyph-rule-val { font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--text-3); text-align: right; }
+
+/* ── Back cover ──────────────────────── */
+.backcover {
+  min-height: 50vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 80px 72px;
+  text-align: center;
+  background: var(--bg3);
+  gap: 32px;
+}
+.backcover-title { font-family: var(--sans); font-size: clamp(16px, 2.5vw, 28px); font-weight: 700; letter-spacing: 10px; color: var(--text-1); }
+.backcover-title em { color: var(--gold-hi); font-style: normal; }
+.backcover-line { font-size: 18px; font-style: italic; font-weight: 300; color: var(--text-4); }
+.backcover-meta { font-family: var(--sans); font-size: 7px; letter-spacing: 3px; color: var(--text-5); text-transform: uppercase; line-height: 2.2; }
+
+/* ── Print ───────────────────────────── */
+@media print {
+  .cover, .page, .backcover { page-break-after: always; }
+  body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+
+@media (max-width: 768px) {
+  .page { padding: 48px 28px; }
+  .cover { padding: 40px 28px; }
+  .manifesto-grid, .logo-grid, .voice-grid, .glyph-section, .photo-grid { grid-template-columns: 1fr; gap: 40px; }
+  .palette-grid { grid-template-columns: repeat(3, 1fr); }
+  .logo-dont-grid, .type-rules { grid-template-columns: 1fr 1fr; }
+  .voice-pillars, .vis-grid, .app-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body style="cursor: crosshair; font-size: 14px;" data-cc-id="cc-1">
+
+<!-- ── COVER ─────────────────────────────────────────────── -->
+<div class="cover" data-cc-id="cc-5">
+  <div class="cover-top">
+    <div class="label">Merkinstructies</div>
+    <div class="cover-badge">
+      Rotterdam, NL<br>
+      Versie 1.0 · April 2026<br>
+      Vertrouwelijk
+    </div>
+  </div>
+
+  <div class="cover-center" data-cc-id="cc-3">
+    <div class="cover-eyebrow">Brand Guidelines · Merkgids</div>
+    <div class="cover-title" style="font-size: 73px; font-family: &quot;Cormorant Garamond&quot;, Georgia, serif; width: 867px; height: 76px;" data-cc-id="cc-4">Glass<em>⏧</em>Grasie<sup style="font-size: 0.35em; color: var(--gold-hi); vertical-align: super; letter-spacing: 0px; border-radius: 0px;" data-cc-id="cc-2">®</sup></div>
+    <div class="cover-sub">Geconstrueerd glas uit Rotterdam.</div>
+    <p class="cover-desc" style="font-size: 14px;">
+      Dit document is de enige bron van merkwaarheid voor Glass⏧Grasie. 
+      Gebruik het bij elk touchpoint — van social post tot verpakking, 
+      van NFT-certificaat tot architectuuraanvraag.
+    </p>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-version">v1.0 · Locked April 2026</div>
+    <div class="cover-glyph">
+      Vragen: sergio@glassgrasie.nl<br>
+      glassgrasie.nl
+    </div>
+  </div>
+</div>
+
+<div class="rule-h"></div>
+
+<!-- ── 01 · MANIFESTO ────────────────────────────────────── -->
+<div class="page">
+  <div class="section-header">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <div class="label">01 — Manifest</div>
+      <div class="section-num">Origin · Mission · Promise</div>
+    </div>
+    <h2>Wie wij zijn.</h2>
+  </div>
+
+  <div class="manifesto-grid">
+    <div>
+      <p class="manifesto-pull">
+        Glas. Glass. Grasie.<br>
+        <em>Eén woord</em> voor alles<br>
+        van bierfles tot brilglas.
+      </p>
+      <div style="margin-top:48px;padding-top:32px;border-top:0.5px solid var(--rule);">
+        <div class="label" style="margin-bottom:12px;">Tagline · NL</div>
+        <p style="font-size:19px;line-height:1.6;color:var(--text-3);font-style:italic;">Geconstrueerd glas uit Rotterdam.</p>
+        <div class="label" style="margin-top:20px;margin-bottom:12px;">Tagline · EN</div>
+        <p style="font-size:19px;line-height:1.6;color:var(--text-3);font-style:italic;">Constructed glass from Rotterdam.</p>
+      </div>
+    </div>
+
+    <div class="manifesto-body">
+      <div class="manifesto-block">
+        <h3>Herkomst · Origin</h3>
+        <p style="font-size: 14px;">
+          Van Dijken Glas gooit elke dag glas weg. <strong>Niet omdat het kapot is,</strong> maar omdat het niet past bij de volgende order. Bedrukt. Gecoat. Gekleurd. Precies het glas dat wij zoeken. Glass⏧Grasie® werd opgericht in Rotterdam om dit materiaal te redden — en er iets van te maken dat mensen willen bewaren.
+        </p>
+      </div>
+      <div class="rule-s"></div>
+      <div class="manifesto-block">
+        <h3>Missie · Mission</h3>
+        <p style="font-size: 14px;">
+          Glass⏧Grasie transformeert industrieel restfloatglas tot objecten die het verdienen om gezien te worden. <strong>Niet omdat het duurzaam is</strong> — hoewel dat klopt — maar omdat het mooi is, precies is gemaakt, en een verhaal draagt dat niemand anders kan vertellen. Wij leiden met design. Duurzaamheid is het bewijs eronder.
+        </p>
+      </div>
+      <div class="rule-s"></div>
+      <div class="manifesto-block">
+        <h3>Belofte · Promise</h3>
+        <p style="font-size: 14px;">
+          Elk Glass⏧Grasie-stuk is traceerbaar tot de productierun. Elk certificaat draagt een serienummer. <strong>Elk stuk bestaat maar één keer.</strong> Bedrukt restglas is per definitie niet reproduceerbaar. Wij garanderen de herkomst, de precisie, en het verhaal. Altijd.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 02 · COLOUR ────────────────────────────────────────── -->
+<div class="page page-alt">
+  <div class="section-header">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <div class="label">02 — Kleurgebruik</div>
+      <div class="section-num">Donkere basis · Gouden accenten</div>
+    </div>
+    <h2>Het palet.</h2>
+    <p style="font-size: 14px;">Minimalistische luxe. Nooit felle kleuren. Goud wordt spaarzaam ingezet — als accent, niet als achtergrond.</p>
+  </div>
+
+  <div class="palette-grid">
+    <div class="swatch" style="background:#0D0C0B;border:0.5px solid #1C1810;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#3A3020;">Nacht<br>Basis</div>
+        <div class="swatch-hex" style="color:#2A2218;">#0D0C0B</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#100F0D;border:0.5px solid #1C1810;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#3A3020;">Diep<br>Donker</div>
+        <div class="swatch-hex" style="color:#2A2218;">#100F0D</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#1C1810;border:0.5px solid #2A2218;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#3A3020;">Kader<br>Lijn</div>
+        <div class="swatch-hex" style="color:#2A2218;">#1C1810</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#4A3F30;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#8B7355;">Goud<br>Laag</div>
+        <div class="swatch-hex" style="color:#6A5A40;">#4A3F30</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#8B7355;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#E8E2D8;">Goud<br>Midden</div>
+        <div class="swatch-hex" style="color:#D4C9B8;">#8B7355</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#C9A87C;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#0D0C0B;">Goud<br>Hoog</div>
+        <div class="swatch-hex" style="color:#0D0C0B;">#C9A87C</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#E8E2D8;border:0.5px solid #D4C9B8;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#5A5044;">Tekst<br>Primair</div>
+        <div class="swatch-hex" style="color:#8A8070;">#E8E2D8</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#D4C9B8;border:0.5px solid #C4B9A8;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#5A5044;">Tekst<br>Secundair</div>
+        <div class="swatch-hex" style="color:#8A8070;">#D4C9B8</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#8A8070;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#E8E2D8;">Tekst<br>Tertiair</div>
+        <div class="swatch-hex" style="color:#D4C9B8;">#8A8070</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#5A5044;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#D4C9B8;">Tekst<br>Subtiel</div>
+        <div class="swatch-hex" style="color:#8A8070;">#5A5044</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:#F0EAE0;border:0.5px solid #D4C9B8;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#5A5044;">Licht<br>Achtergrond</div>
+        <div class="swatch-hex" style="color:#8A8070;">#F0EAE0</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:rgba(139,115,85,0.15);border:0.5px solid #2A2218;">
+      <div class="swatch-info">
+        <div class="swatch-name" style="color:#8B7355;">Goud<br>15% Alpha</div>
+        <div class="swatch-hex" style="color:#6A5A40;">rgba(139,115,85,0.15)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-rule">
+    <div class="palette-col">
+      <h4>Gebruik</h4>
+      <p>Gebruik <strong style="color:var(--text-2);">#C9A87C</strong> alleen voor prijzen, accenten en de ⏧-glyph. Nooit als achtergrondvlak. Wit is verboden in digitale uitingen — gebruik <strong style="color:var(--text-2);">#F0EAE0</strong> voor lichte toepassingen (print, packaging).</p>
+    </div>
+    <div class="palette-col">
+      <h4>Kleurhiërarchie</h4>
+      <p>Donkere achtergrond (90%) → Crèmetekst (8%) → Goud (2%). Het goud verdient zijn plek. Elke overmatig gebruik ondermijnt de exclusiviteit van het merk.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── 03 · TYPOGRAFIE ────────────────────────────────────── -->
+<div class="page page-dark">
+  <div class="section-header">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <div class="label">03 — Typografie</div>
+      <div class="section-num">Cormorant Garamond · Syncopate</div>
+    </div>
+    <h2>Het lettertype.</h2>
+    <p style="font-size: 14px;">Twee fonts. Niet meer. Cormorant Garamond voor alle tekst. Syncopate voor labels, eyebrows, en UI-elementen.</p>
+  </div>
+
+  <div class="type-specimens">
+    <div class="type-row">
+      <div class="type-meta">
+        <span class="label">Display</span>
+        <span>Cormorant Garamond</span>
+        <span>300 · Italic</span>
+        <span>48–96 pt</span>
+        <span>Tracking: −0.02em</span>
+      </div>
+      <div class="type-sample">
+        <p style="font-family:var(--serif);font-size:clamp(28px,4vw,56px);font-weight:300;font-style:italic;color:var(--text-1);letter-spacing:-0.02em;line-height:1.05;">Geconstrueerd glas.</p>
+      </div>
+    </div>
+    <div class="type-row" style="background:var(--bg2);">
+      <div class="type-meta">
+        <span class="label">Titel</span>
+        <span>Cormorant Garamond</span>
+        <span>400 · Regular</span>
+        <span>28–44 pt</span>
+        <span>Tracking: −0.01em</span>
+      </div>
+      <div class="type-sample">
+        <p style="font-family:var(--serif);font-size:clamp(22px,3vw,40px);font-weight:400;color:var(--text-2);letter-spacing:-0.01em;line-height:1.1;">Elk stuk vertelt een verhaal.</p>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <span class="label">Body</span>
+        <span>Cormorant Garamond</span>
+        <span>400 · Regular</span>
+        <span>16–24 pt</span>
+        <span>Leading: 1.85×</span>
+      </div>
+      <div class="type-sample">
+        <p style="font-family:var(--serif);font-size:18px;color:var(--text-4);line-height:1.85;max-width:520px;">Van Dijken Glas genereert snijresten die normaal afgevoerd worden. Glass⏧Grasie geeft dit materiaal een tweede leven met behoud van alle optische kwaliteiten.</p>
+      </div>
+    </div>
+    <div class="type-row" style="background:var(--bg2);">
+      <div class="type-meta">
+        <span class="label">Label / UI</span>
+        <span>Syncopate</span>
+        <span>400 · Uppercase</span>
+        <span>7–9 pt</span>
+        <span>Tracking: +4px</span>
+      </div>
+      <div class="type-sample">
+        <p style="font-family:var(--sans);font-size:8px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;">Certificaat van Herkomst · Certificate of Origin</p>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <span class="label">Merk / Brand</span>
+        <span>Syncopate Bold</span>
+        <span>700 · Uppercase</span>
+        <span>16–64 pt</span>
+        <span>Tracking: +8–12px</span>
+      </div>
+      <div class="type-sample">
+        <p style="font-family:var(--sans);font-size:clamp(16px,2.5vw,32px);font-weight:700;letter-spacing:10px;color:var(--text-1);">GLASS<span style="color:var(--gold-hi);letter-spacing:14px;"> ⏧ </span>GRASIE<sup style="font-size:0.4em;color:var(--gold-hi);letter-spacing:0;vertical-align:super;">®</sup></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="type-rules">
+    <div class="type-rule-card">
+      <h4>Lettergrootte</h4>
+      <ul>
+        <li>Display: 48–96 pt</li>
+        <li>Titels: 28–44 pt</li>
+        <li>Bodytekst: 16–24 pt</li>
+        <li>Bijschriften: 13–15 pt</li>
+        <li>Labels (Syncopate): 7–9 pt</li>
+        <li>Minimum printgrootte: 12 pt</li>
+      </ul>
+    </div>
+    <div class="type-rule-card">
+      <h4>Spatiëring</h4>
+      <ul>
+        <li>Tracking: 0em (normaal)</li>
+        <li>+0.05em rondom ⏧</li>
+        <li>Kerning: automatisch</li>
+        <li>Leading: 1.2× (titels)</li>
+        <li>Leading: 1.85× (body)</li>
+        <li>Syncopate: +3–5px tracking</li>
+      </ul>
+    </div>
+    <div class="type-rule-card">
+      <h4>Nooit</h4>
+      <ul>
+        <li>Geen cursief op labels</li>
+        <li>Geen onderstreping</li>
+        <li>Geen slagschaduw</li>
+        <li>Geen derde font toevoegen</li>
+        <li>Geen bold op bodytekst</li>
+        <li>Geen tekst op goud-achtergrond</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── 04 · LOGO ──────────────────────────────────────────── -->
+<div class="page">
+  <div class="section-header">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <div class="label">04 — Logo &amp; Woordmerk</div>
+      <div class="section-num">Cormorant Garamond · ⏧ glyph · ® superscript</div>
+    </div>
+    <h2>De naam.</h2>
+    <p style="font-size: 14px;">Het woordmerk is de primaire merkdrager. Geen losstaand logo-icoon. De naam IS het merk.</p>
+  </div>
+
+  <!-- Glyph section -->
+  <div class="glyph-section" style="margin-bottom:48px;">
+    <div class="glyph-display">
+      <div class="glyph-big">⏧</div>
+      <div class="glyph-name">De Scheidingsglyph</div>
+      <div class="glyph-code">U+23E7 · ELECTRICAL INTERSECTION</div>
+      <p style="font-size:14px;line-height:1.8;color:var(--text-4);max-width:260px;text-align:center;margin-top:8px;">
+        Visuele scheiding. Web3-native. Nooit vervangen door een streepje, slash, of spatie.
+      </p>
+    </div>
+    <div>
+      <div class="label" style="margin-bottom:16px;">Gebruik van ⏧</div>
+      <div class="glyph-rules">
+        <div class="glyph-rule">
+          <span class="glyph-rule-key">Ruimte links</span>
+          <span class="glyph-rule-val" style="font-size: 14px;">+0.05em extra spatiëring</span>
+        </div>
+        <div class="glyph-rule">
+          <span class="glyph-rule-key">Ruimte rechts</span>
+          <span class="glyph-rule-val" style="font-size: 14px;">+0.05em extra spatiëring</span>
+        </div>
+        <div class="glyph-rule">
+          <span class="glyph-rule-key">Kleur (donker)</span>
+          <span class="glyph-rule-val" style="font-size: 14px;">#C9A87C — Goud Hoog</span>
+        </div>
+        <div class="glyph-rule">
+          <span class="glyph-rule-key">Kleur (licht)</span>
+          <span class="glyph-rule-val" style="font-size: 14px;">#8B7355 — Goud Midden</span>
+        </div>
+        <div class="glyph-rule">
+          <span class="glyph-rule-key">® teken</span>
+          <span class="glyph-rule-val" style="font-size: 14px;">Superscript · 45% van fontgrootte</span>
+        </div>
+        <div class="glyph-rule">
+          <span class="glyph-rule-key">Fallback</span>
+          <span class="glyph-rule-val" style="font-size: 14px;">Glass⏧Grasie (nooit Glass-Grasie)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logo on dark / light -->
+  <div class="logo-grid" style="margin-bottom:32px;">
+    <div class="logo-card dark">
+      <div class="logo-display" style="font-size: 56px;">
+        <span class="gg">Glass</span><span class="glyph">⏧</span><span class="gg">Grasie</span><sup style="font-size:0.4em;color:var(--gold-hi);letter-spacing:0;vertical-align:super;">®</sup>
+      </div>
+      <div class="logo-label">Primair gebruik · Donkere achtergrond</div>
+    </div>
+    <div class="logo-card light">
+      <div class="logo-display" style="font-size: 56px;">
+        <span class="gg-light">Glass</span><span class="glyph-light">⏧</span><span class="gg-light">Grasie</span><sup style="font-size:0.4em;color:var(--gold);letter-spacing:0;vertical-align:super;">®</sup>
+      </div>
+      <div class="logo-label light">Secundair gebruik · Lichte achtergrond</div>
+    </div>
+  </div>
+
+  <!-- Don'ts -->
+  <div class="logo-dont-grid">
+    <div class="logo-dont">
+      <h4>Niet doen</h4>
+      <p>Geen koppelteken als vervanging voor ⏧</p>
+      <div class="example">GLASS-GRASIE</div>
+    </div>
+    <div class="logo-dont">
+      <h4>Niet doen</h4>
+      <p>Geen cursief op het woordmerk</p>
+      <div class="example" style="font-style:italic;">Glass⏧Grasie</div>
+    </div>
+    <div class="logo-dont">
+      <h4>Niet doen</h4>
+      <p>Geen kleurverandering van Glass of Grasie</p>
+      <div class="example" style="color:var(--gold);">Glass⏧Grasie</div>
+    </div>
+    <div class="logo-dont">
+      <h4>Niet doen</h4>
+      <p>Nooit zonder ® in formele uitingen</p>
+      <div class="example">Glass⏧Grasie</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 05 · TONE OF VOICE ──────────────────────────────────── -->
+<div class="page page-alt">
+  <div class="section-header">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <div class="label">05 — Tone of Voice</div>
+      <div class="section-num">Direct · Efficiënt · Speels · Surinaams geïnspireerd</div>
+    </div>
+    <h2>Hoe wij praten.</h2>
+    <p style="font-size: 14px;">Direct. Geen greenwashing. Geen corporate speak. Geen AI-proza. Wij leiden met het object — duurzaamheid is het bewijs eronder.</p>
+  </div>
+
+  <div class="voice-grid" style="margin-bottom:40px;">
+    <div class="voice-col">
+      <div class="voice-col-header">
+        <div class="dot" style="background:#4A7A4A;"></div>
+        <span style="color:#4A7A4A;">Wel zeggen</span>
+      </div>
+      <div class="voice-items">
+        <div class="voice-item">
+          <div class="context">Product intro</div>
+          <p style="color:var(--text-2);">"Watergesneden uit restfloatglas dat anders in de container belandde. Nu hangt het om jouw nek."</p>
+        </div>
+        <div class="voice-item">
+          <div class="context">Herkomst</div>
+          <p style="color:var(--text-2);">"Dit glas draagt een serienummer. Elk stuk bestaat maar één keer."</p>
+        </div>
+        <div class="voice-item">
+          <div class="context">B2B pitch</div>
+          <p style="color:var(--text-2);">"Geen standaard materiaal. Wij leveren een verhaal dat uw opdrachtgever niet ergens anders kan bestellen."</p>
+        </div>
+        <div class="voice-item">
+          <div class="context">Social caption</div>
+          <p style="color:var(--text-2);">"Glas. Glass. Grasie. Eén woord voor alles van bierfles tot brilglas."</p>
+        </div>
+      </div>
+    </div>
+    <div class="voice-col">
+      <div class="voice-col-header">
+        <div class="dot" style="background:#7A3030;"></div>
+        <span style="color:#7A3030;">Niet zeggen</span>
+      </div>
+      <div class="voice-items">
+        <div class="voice-item">
+          <div class="context">Vermijd</div>
+          <p style="color:var(--text-5);">"Duurzaam geproduceerde sieraden gemaakt van gerecyclede materialen voor een bewustere wereld."</p>
+        </div>
+        <div class="voice-item">
+          <div class="context">Vermijd</div>
+          <p style="color:var(--text-5);">"Onze missie is een bijdrage te leveren aan een circulaire economie."</p>
+        </div>
+        <div class="voice-item">
+          <div class="context">Vermijd</div>
+          <p style="color:var(--text-5);">"Premium kwaliteit handgemaakte glasobjecten voor de bewuste consument."</p>
+        </div>
+        <div class="voice-item">
+          <div class="context">Vermijd</div>
+          <p style="color:var(--text-5);">"Eco-friendly. Sustainable. Conscious. Green."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="voice-pillars">
+    <div class="voice-pillar">
+      <h4>Direct</h4>
+      <p>Korte zinnen. Geen omwegen. Zeg wat je bedoelt. <em>"Watergesneden."</em> Niet: <em>"vervaardigd via een geavanceerd waterjet-snijproces."</em></p>
+    </div>
+    <div class="voice-pillar">
+      <h4>Efficiënt</h4>
+      <p>Geen woord teveel. Elke zin werkt. Verwijder elk adjectief dat ook bij een concurrent past.</p>
+    </div>
+    <div class="voice-pillar">
+      <h4>Speels</h4>
+      <p>Wij nemen ons vak serieus, maar onszelf niet altijd. Woordspel rond <em>glas / Glass / Grasie</em> is welkom.</p>
+    </div>
+    <div class="voice-pillar">
+      <h4>Trots</h4>
+      <p>Rotterdam. Van Dijken. WAZER. Benoem de herkomst. Wees specifiek. <em>"Rotterdam"</em> niet <em>"Nederland."</em></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── 06 · VISUELE TAAL ───────────────────────────────────── -->
+<div class="page page-dark">
+  <div class="section-header">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <div class="label">06 — Visuele Taal</div>
+      <div class="section-num">Glasscherven · Lichtbreking · Precisie</div>
+    </div>
+    <h2>Hoe wij eruitzien.</h2>
+  </div>
+
+  <div class="vis-grid" style="margin-bottom:48px;">
+    <div class="vis-card">
+      <h4>Textuur &amp; Materie</h4>
+      <p>Glasscherven als grafisch element. Onregelmatige polygonen die licht breken. <strong>Nooit rond, nooit zacht.</strong> De esthetiek van geconstrueerd glas: hoeken, kanten, precisie.</p>
+    </div>
+    <div class="vis-card">
+      <h4>Licht &amp; Schaduw</h4>
+      <p>Licht breekt door glas heen. Radiaal verlopende lichten vanuit een centraal punt. <strong>Goud is altijd licht, nooit verf.</strong> Reflecties zijn welkom. Schaduwen zijn diep en warm.</p>
+    </div>
+    <div class="vis-card">
+      <h4>Compositie</h4>
+      <p>Asymmetrisch. Links zware typografie, rechts wit (negatieve ruimte of object). <strong>Nooit gecentreerde lay-out</strong> op productpagina's. Één focuspunt per frame.</p>
+    </div>
+    <div class="vis-card">
+      <h4>Geometrie</h4>
+      <p>De diamantvorm (◆) als secundair merkelement. Gebruikt als scheiding, bullet, en in het certificaat. <strong>Niet overmatig</strong> — maximaal twee per pagina.</p>
+    </div>
+    <div class="vis-card">
+      <h4>Rastersysteem</h4>
+      <p>1px-lijnen in <strong>#1C1810</strong> scheiden secties. Nooit dikke randen of schaduwen als kaders. Het raster is de structuur — subtiel, functioneel, altijd aanwezig.</p>
+    </div>
+    <div class="vis-card">
+      <h4>Animatie</h4>
+      <p>Traag en intentioneel. Glasscherven drijven, roteer langzaam, vangen licht. <strong>Geen snelle snijbewegingen.</strong> Easing: easeOutCubic. Nooit lineair. Ken-Burns op beelden.</p>
+    </div>
+  </div>
+
+  <!-- Photography brief -->
+  <div class="section-header">
+    <div class="label" style="margin-bottom:12px;">Fotografie voor externe medewerkers</div>
+  </div>
+  <div class="photo-grid">
+    <div class="photo-col">
+      <h4>Producten fotograferen</h4>
+      <ul>
+        <li><strong>Achtergrond:</strong> Donker arduin, zwart marmer of mat zwart papier. Nooit wit, nooit neutraal grijs.</li>
+        <li><strong>Licht:</strong> Eén primaire lichtbron zijdelings. Laat glasreflecties zichtbaar zijn.</li>
+        <li><strong>Hoek:</strong> Licht van boven (30°–45°) voor sieraden. Frontaal voor architectuurpanelen.</li>
+        <li><strong>Scherpte:</strong> Scherptediepte bewust onscherp bij sieraden. Architectuurpanelen volledig scherp.</li>
+        <li><strong>Kleur:</strong> Warme tint (K 3200–4000). Nooit koele flash zonder correctie.</li>
+        <li><strong>Formaat:</strong> RAW + JPEG. Minimaal 5000px langste zijde.</li>
+      </ul>
+    </div>
+    <div class="photo-col">
+      <h4>Context &amp; Sfeer</h4>
+      <ul>
+        <li><strong>Studio vs. context:</strong> 60% studiofoto's (product puur), 40% contextfoto's (in gebruik, in ruimte).</li>
+        <li><strong>Handen:</strong> Donkere huidskleur heeft voorkeur — weerspiegelt de Rotterdam-roots van het merk.</li>
+        <li><strong>Ruimtes:</strong> Industrieel-minimalistische interieurs. Beton, staal, oud hout. Geen witte showrooms.</li>
+        <li><strong>Certificaat:</strong> Altijd één shot inclusief het certificaat naast het product.</li>
+        <li><strong>Nooit:</strong> Witte achtergrond, heldere kleuren op kleding, stockfoto-esthetiek.</li>
+        <li><strong>Masker:</strong> Producten altijd vrijgesteld (PNG met alfa) aanleveren.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── 07 · TOEPASSINGEN ──────────────────────────────────── -->
+<div class="page">
+  <div class="section-header">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <div class="label">07 — Toepassingen</div>
+      <div class="section-num">Digital · Print · NFT · Packaging</div>
+    </div>
+    <h2>Waar het merk leeft.</h2>
+  </div>
+
+  <div class="app-grid" style="margin-bottom:48px;">
+    <div class="app-card">
+      <h4>Digitaal</h4>
+      <ul>
+        <li>Website header <span>#0D0C0B basis</span></li>
+        <li>Social banners <span>2048×1080px</span></li>
+        <li>Instagram posts <span>1:1 · 1080px</span></li>
+        <li>Reels / TikTok <span>9:16 · 1080×1920</span></li>
+        <li>YouTube banner <span>2560×1440px</span></li>
+        <li>Email header <span>600px breed</span></li>
+        <li>Profielfoto <span>⏧ glyph centraal</span></li>
+      </ul>
+    </div>
+    <div class="app-card">
+      <h4>Print &amp; Packaging</h4>
+      <ul>
+        <li>Verpakking <span>#F0EAE0 kraft</span></li>
+        <li>Kaartje <span>85×55mm · 300gsm</span></li>
+        <li>Certificaat <span>A5 · 170gsm mat</span></li>
+        <li>Factuur <span>A4 · digitaal PDF</span></li>
+        <li>B2B brochure <span>A4 liggend</span></li>
+        <li>QR-sticker <span>25×25mm</span></li>
+        <li>Hangtag <span>50×80mm · gestanst</span></li>
+      </ul>
+    </div>
+    <div class="app-card">
+      <h4>NFT Certificaat</h4>
+      <ul>
+        <li>Formaat <span>1:1 · 3000×3000px</span></li>
+        <li>Achtergrond <span>#0D0C0B</span></li>
+        <li>Woordmerk <span>Syncopate Bold</span></li>
+        <li>Serienummer <span>Monospace</span></li>
+        <li>Glyph ⏧ <span>Centraal decoratief</span></li>
+        <li>Datum + bron <span>Cormorant Italic</span></li>
+        <li>Kader <span>1px #4A3F30 goud</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hashtag & social handles -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);">
+    <div style="background:var(--bg);padding:32px;">
+      <div class="label" style="margin-bottom:20px;">Vaste hashtags</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#GlassGrasie</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#GeconstrueerdGlas</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#Rotterdam</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#SustainableDesign</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#CircularGlass</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#GlasSieraden</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#BlueCity</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#VanDijkenGlas</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#WazerCNC</span>
+        <span style="font-family:var(--sans);font-size:8px;letter-spacing:1.5px;color:var(--text-4);border:0.5px solid var(--rule);padding:6px 12px;">#NFTArt</span>
+      </div>
+      <div style="margin-top:16px;font-family:var(--sans);font-size:7px;color:var(--text-5);letter-spacing:2px;">GEBRUIK ALTIJD #GlassGrasie ALS EERSTE</div>
+    </div>
+    <div style="background:var(--bg);padding:32px;">
+      <div class="label" style="margin-bottom:20px;">Social handles</div>
+      <div style="display:flex;flex-direction:column;gap:1px;background:var(--rule);">
+        <div style="background:var(--bg2);padding:12px 16px;display:flex;justify-content:space-between;"><span style="font-family:var(--sans);font-size:7px;letter-spacing:2px;color:var(--text-5);text-transform:uppercase;">Instagram</span><span style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--text-3);">@glassgrasie</span></div>
+        <div style="background:var(--bg2);padding:12px 16px;display:flex;justify-content:space-between;"><span style="font-family:var(--sans);font-size:7px;letter-spacing:2px;color:var(--text-5);text-transform:uppercase;">TikTok</span><span style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--text-3);">@glassgrasie</span></div>
+        <div style="background:var(--bg2);padding:12px 16px;display:flex;justify-content:space-between;"><span style="font-family:var(--sans);font-size:7px;letter-spacing:2px;color:var(--text-5);text-transform:uppercase;">YouTube</span><span style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--text-3);">@glassgrasie</span></div>
+        <div style="background:var(--bg2);padding:12px 16px;display:flex;justify-content:space-between;"><span style="font-family:var(--sans);font-size:7px;letter-spacing:2px;color:var(--text-5);text-transform:uppercase;">LinkedIn</span><span style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--text-3);">Glass⏧Grasie®</span></div>
+        <div style="background:var(--bg2);padding:12px 16px;display:flex;justify-content:space-between;"><span style="font-family:var(--sans);font-size:7px;letter-spacing:2px;color:var(--text-5);text-transform:uppercase;">Discord</span><span style="font-family:var(--serif);font-style:italic;font-size:14px;color:var(--text-3);">discord.gg/glassgrasie</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BACK COVER ─────────────────────────────────────────── -->
+<div class="rule-h"></div>
+<div class="backcover">
+  <div style="font-family:var(--sans);font-size:7px;letter-spacing:5px;color:var(--text-5);text-transform:uppercase;margin-bottom:8px;">
+    Brand Guidelines v1.0
+  </div>
+  <div class="backcover-title">
+    GLASS<em>⏧</em>GRASIE<sup style="font-size:0.35em;color:var(--gold-hi);vertical-align:super;letter-spacing:0;">®</sup>
+  </div>
+  <div class="backcover-line" style="font-size: 14px;">Geconstrueerd glas uit Rotterdam.</div>
+  <div style="width:56px;height:0.5px;background:var(--gold-lo);"></div>
+  <div class="backcover-meta">
+    Rotterdam, NL · Est. 2025<br>
+    glassgrasie.nl · sergio@glassgrasie.nl<br>
+    Vragen over dit document: Sergio Dias<br>
+    Volgende revisie: Oktober 2026
+  </div>
+  <div style="margin-top:8px;">
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <polygon points="16,2 30,16 16,30 2,16" fill="none" stroke="#4A3F30" stroke-width="1"></polygon>
+      <polygon points="16,7 25,16 16,25 7,16" fill="#4A3F30" opacity="0.3"></polygon>
+    </svg>
+  </div>
+</div>
+
+<script>
+// ── Tweaks ───────────────────────────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentGold": "#B8C4A0",
+  "bodySize": 17,
+  "logoSize": 68,
+  "darkMode": false,
+  "fontSerif": "Cormorant Garamond"
+}/*EDITMODE-END*/;
+
+(function() {
+  // Persist
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('gg-guidelines-tweaks') || '{}'); } catch {}
+  const T = Object.assign({}, TWEAK_DEFAULTS, saved);
+
+  function applyTweaks() {
+    const root = document.documentElement;
+
+    // Accent gold
+    root.style.setProperty('--gold-hi', T.accentGold);
+    // Derive --gold from accentGold (slightly desaturated)
+    root.style.setProperty('--gold', T.accentGold);
+
+    // Body font size
+    document.querySelectorAll('.manifesto-block p, .cover-desc, .section-header p, .photo-col p, .glyph-rule-val, .backcover-line').forEach(el => {
+      el.style.fontSize = T.bodySize + 'px';
+    });
+
+    // Logo size
+    document.querySelectorAll('.logo-display').forEach(el => {
+      el.style.fontSize = T.logoSize + 'px';
+    });
+    document.querySelectorAll('.cover-title').forEach(el => {
+      el.style.fontSize = Math.round(T.logoSize * 1.3) + 'px';
+    });
+
+    // Dark/light mode
+    if (!T.darkMode) {
+      root.style.setProperty('--bg',     '#F5F0E8');
+      root.style.setProperty('--bg2',    '#EDE8DE');
+      root.style.setProperty('--bg3',    '#FAF7F2');
+      root.style.setProperty('--rule',   '#D4C9B8');
+      root.style.setProperty('--text-1', '#1A1714');
+      root.style.setProperty('--text-2', '#2C2820');
+      root.style.setProperty('--text-3', '#5A5044');
+      root.style.setProperty('--text-4', '#8A8070');
+      root.style.setProperty('--text-5', '#C4B9A8');
+    } else {
+      root.style.setProperty('--bg',     '#0D0C0B');
+      root.style.setProperty('--bg2',    '#100F0D');
+      root.style.setProperty('--bg3',    '#0A0908');
+      root.style.setProperty('--rule',   '#1C1810');
+      root.style.setProperty('--text-1', '#E8E2D8');
+      root.style.setProperty('--text-2', '#D4C9B8');
+      root.style.setProperty('--text-3', '#8A8070');
+      root.style.setProperty('--text-4', '#5A5044');
+      root.style.setProperty('--text-5', '#3A3020');
+    }
+
+    // Serif font
+    const serifVal = `'${T.fontSerif}', Georgia, serif`;
+    root.style.setProperty('--serif', serifVal);
+    document.querySelectorAll('.cover-title').forEach(el => {
+      el.style.fontFamily = serifVal;
+    });
+  }
+
+  function saveAndApply() {
+    try { localStorage.setItem('gg-guidelines-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { ...T } }, '*');
+  }
+
+  // ── Panel HTML ─────────────────────────────────────────────────────────────
+  const panel = document.createElement('div');
+  panel.id = 'gg-tweaks';
+  panel.style.cssText = `
+    display:none; position:fixed; bottom:24px; right:24px; z-index:9999;
+    width:260px; background:#0A0908; border:1px solid #2C2418;
+    font-family:'Cormorant Garamond',serif; color:#E8E2D8;
+    box-shadow:0 8px 40px rgba(0,0,0,0.7);
+  `;
+  panel.innerHTML = `
+    <div style="padding:16px 20px 12px;border-bottom:1px solid #1C1810;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:4px;color:#C9A87C;text-transform:uppercase;">Tweaks</span>
+      <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:2px;color:#3A3020;">Glass⏧Grasie</span>
+    </div>
+    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:18px;">
+
+      <!-- Accent gold -->
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Accent goud</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${[
+            {label:'Warm',  val:'#C9A87C'},
+            {label:'Koel',  val:'#B8C4A0'},
+            {label:'Zilver',val:'#A8B0C0'},
+            {label:'Brons', val:'#A8784C'},
+          ].map(o => `<button data-gold="${o.val}" style="padding:4px 10px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid ${o.val};background:transparent;color:${o.val};cursor:pointer;text-transform:uppercase;">${o.label}</button>`).join('')}
+        </div>
+      </div>
+
+      <!-- Body text size -->
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Bodytekst <span id="tw-size-val">${T.bodySize}</span>px</label>
+        <input id="tw-size" type="range" min="13" max="20" step="1" value="${T.bodySize}"
+          style="width:100%;accent-color:#C9A87C;cursor:pointer;">
+      </div>
+
+      <!-- Logo size -->
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Logo grootte <span id="tw-logo-val">${T.logoSize}</span>px</label>
+        <input id="tw-logo" type="range" min="28" max="96" step="4" value="${T.logoSize}"
+          style="width:100%;accent-color:#C9A87C;cursor:pointer;">
+      </div>
+
+      <!-- Serif font -->
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Lettertype koppen</label>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          ${['Cormorant Garamond','Playfair Display','Georgia'].map(f =>
+            `<button data-font="${f}" style="padding:6px 10px;font-family:'${f}',serif;font-size:14px;letter-spacing:-0.02em;border:1px solid #1C1810;background:transparent;color:#E8E2D8;cursor:pointer;text-align:left;">${f}</button>`
+          ).join('')}
+        </div>
+      </div>
+
+      <!-- Dark/Light mode -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid #1C1810;">
+        <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;">Donkere modus</span>
+        <button id="tw-mode" style="padding:5px 14px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #C9A87C;background:transparent;color:#C9A87C;cursor:pointer;text-transform:uppercase;">${T.darkMode ? 'Aan' : 'Uit'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(panel);
+
+  // ── Event wiring ───────────────────────────────────────────────────────────
+  panel.querySelectorAll('[data-gold]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      T.accentGold = btn.dataset.gold;
+      saveAndApply();
+    });
+  });
+
+  panel.querySelector('#tw-size').addEventListener('input', e => {
+    T.bodySize = +e.target.value;
+    panel.querySelector('#tw-size-val').textContent = T.bodySize;
+    saveAndApply();
+  });
+
+  panel.querySelector('#tw-logo').addEventListener('input', e => {
+    T.logoSize = +e.target.value;
+    panel.querySelector('#tw-logo-val').textContent = T.logoSize;
+    saveAndApply();
+  });
+
+  panel.querySelectorAll('[data-font]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      T.fontSerif = btn.dataset.font;
+      // Load Playfair if needed
+      if (T.fontSerif === 'Playfair Display' && !document.querySelector('link[href*="Playfair"]')) {
+        const l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,300&display=swap';
+        document.head.appendChild(l);
+      }
+      saveAndApply();
+    });
+  });
+
+  panel.querySelector('#tw-mode').addEventListener('click', () => {
+    T.darkMode = !T.darkMode;
+    panel.querySelector('#tw-mode').textContent = T.darkMode ? 'Aan' : 'Uit';
+    saveAndApply();
+  });
+
+  // ── Host protocol ──────────────────────────────────────────────────────────
+  window.addEventListener('message', e => {
+    if (e.data?.type === '__activate_edit_mode')   panel.style.display = 'block';
+    if (e.data?.type === '__deactivate_edit_mode') panel.style.display = 'none';
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+  // Apply on load
+  applyTweaks();
+})();
+</script><div id="gg-tweaks" style="display: block; position: fixed; bottom: 24px; right: 24px; z-index: 9999; width: 260px; background: rgb(10, 9, 8); border: 1px solid rgb(44, 36, 24); font-family: &quot;Cormorant Garamond&quot;, serif; color: rgb(232, 226, 216); box-shadow: rgba(0, 0, 0, 0.7) 0px 8px 40px;">
+    <div style="padding:16px 20px 12px;border-bottom:1px solid #1C1810;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:4px;color:#C9A87C;text-transform:uppercase;">Tweaks</span>
+      <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:2px;color:#3A3020;">Glass⏧Grasie</span>
+    </div>
+    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:18px;">
+
+      <!-- Accent gold -->
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Accent goud</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button data-gold="#C9A87C" style="padding:4px 10px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #C9A87C;background:transparent;color:#C9A87C;cursor:pointer;text-transform:uppercase;">Warm</button><button data-gold="#B8C4A0" style="padding:4px 10px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #B8C4A0;background:transparent;color:#B8C4A0;cursor:pointer;text-transform:uppercase;">Koel</button><button data-gold="#A8B0C0" style="padding:4px 10px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #A8B0C0;background:transparent;color:#A8B0C0;cursor:pointer;text-transform:uppercase;">Zilver</button><button data-gold="#A8784C" style="padding:4px 10px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #A8784C;background:transparent;color:#A8784C;cursor:pointer;text-transform:uppercase;">Brons</button>
+        </div>
+      </div>
+
+      <!-- Body text size -->
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Bodytekst <span id="tw-size-val">14</span>px</label>
+        <input id="tw-size" type="range" min="13" max="20" step="1" value="14" style="width:100%;accent-color:#C9A87C;cursor:pointer;">
+      </div>
+
+      <!-- Logo size -->
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Logo grootte <span id="tw-logo-val">56</span>px</label>
+        <input id="tw-logo" type="range" min="28" max="96" step="4" value="56" style="width:100%;accent-color:#C9A87C;cursor:pointer;">
+      </div>
+
+      <!-- Serif font -->
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Lettertype koppen</label>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <button data-font="Cormorant Garamond" style="padding:6px 10px;font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:-0.02em;border:1px solid #1C1810;background:transparent;color:#E8E2D8;cursor:pointer;text-align:left;">Cormorant Garamond</button><button data-font="Playfair Display" style="padding:6px 10px;font-family:'Playfair Display',serif;font-size:14px;letter-spacing:-0.02em;border:1px solid #1C1810;background:transparent;color:#E8E2D8;cursor:pointer;text-align:left;">Playfair Display</button><button data-font="Georgia" style="padding:6px 10px;font-family:'Georgia',serif;font-size:14px;letter-spacing:-0.02em;border:1px solid #1C1810;background:transparent;color:#E8E2D8;cursor:pointer;text-align:left;">Georgia</button>
+        </div>
+      </div>
+
+      <!-- Dark/Light mode -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid #1C1810;">
+        <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;">Donkere modus</span>
+        <button id="tw-mode" style="padding:5px 14px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #C9A87C;background:transparent;color:#C9A87C;cursor:pointer;text-transform:uppercase;">Aan</button>
+      </div>
+    </div>
+  </div>
+
+
+
+</body></html>
