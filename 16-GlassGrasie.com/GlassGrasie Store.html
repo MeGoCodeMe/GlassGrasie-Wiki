@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Geconstrueerd glas uit Rotterdam</title>
+<meta name="description" content="Premium hand-cut glass art from 100% recycled float glass. Blockchain verified. NFT certified. Rotterdam.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body { background: #0D0C0B; color: #E8E2D8; -webkit-font-smoothing: antialiased; font-family: 'Cormorant Garamond', Georgia, serif; }
+  #root { min-height: 100vh; }
+  ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-thumb { background: #2A2218; }
+  input, textarea, select { font-family: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const SERIF = "'Cormorant Garamond', Georgia, serif";
+const SANS  = "'Syncopate', sans-serif";
+const MONO  = "'JetBrains Mono', ui-monospace, monospace";
+const BG    = '#0D0C0B';
+const BG2   = '#100F0D';
+const BG3   = '#0A0908';
+const RULE  = '#1C1810';
+const GOLD  = '#8B7355';
+const GOLD_HI = '#C9A87C';
+const CREAM = '#E8E2D8';
+const T2    = '#D4C9B8';
+const T3    = '#8A8070';
+const T4    = '#5A5044';
+const T5    = '#3A3020';
+
+// ── Products ──────────────────────────────────────────────────────────────
+const PRODUCTS = [
+  {
+    id: 'GG-001', slug: 'fragment-tie-bar-matte',
+    name: 'Fragment Tie Bar', variant: 'Matte Coat',
+    category: 'Sieraden', categoryEN: 'Jewellery',
+    price: 85, priceDisplay: '€ 85',
+    edition: 'Permanent',
+    material: 'Helder float 4mm · PVD matte zwart',
+    materialEN: 'Clear float 4mm · PVD matte black',
+    run: 'GG-PERM-001', source: 'Van Dijken Glas, Waddinxveen',
+    date: 'April 2026', serial: 'GG-2026-0001',
+    ri: '1.52', freq: '440 Hz', synergy: 112,
+    desc: 'De tie bar zit op borsthoogte. Het is het eerste punt van visueel contact in een staand gesprek. Float glas op 4mm toont de glasrand als aparte laag — coating voegt kleur toe zonder het glas te verbergen.',
+    descEN: 'The tie bar sits at eye level in a standing conversation. Float glass at 4mm reveals the glass edge as a separate layer — coating adds colour without concealing the glass.',
+    tags: ['Float 4mm','PVD coating','Goud-vermeil clip','±55mm'],
+    accent: '#C9A87C',
+    gradient: 'linear-gradient(150deg, #1A1208 0%, #0A0908 100%)',
+  },
+  {
+    id: 'GG-002', slug: 'fragment-tie-bar-printed',
+    name: 'Fragment Tie Bar', variant: 'Forest Floor',
+    category: 'Sieraden', categoryEN: 'Jewellery',
+    price: 145, priceDisplay: '€ 145',
+    edition: 'Beperkt — Run 001',
+    material: 'Bedrukt restfloatglas · Run VD-2025-0138',
+    materialEN: 'Printed float glass offcut · Run VD-2025-0138',
+    run: 'VD-2025-0138', source: 'Van Dijken Glas, Waddinxveen',
+    date: 'Maart 2025', serial: 'GG-2025-0042',
+    ri: '1.52', freq: '380 Hz', synergy: 134,
+    desc: 'Hetzelfde motief als de actieve pendant- en oorbellenrun — de tie bar als derde stuk van een setgeheel. Bedrukt restglas Van Dijken. Niet reproduceerbaar per definitie.',
+    descEN: 'Same motif as the active pendant and earring run — the tie bar as the third piece of a complete set. Printed Van Dijken offcut. Non-reproducible by definition.',
+    tags: ['Bedrukt restglas','Run VD-2025-0138','Limited edition','Set compleet'],
+    accent: '#7A9B6A',
+    gradient: 'linear-gradient(150deg, #0A1208 0%, #080A06 100%)',
+  },
+  {
+    id: 'GG-003', slug: 'fragment-manchetknopen',
+    name: 'Fragment Manchetknopen', variant: 'Helder float',
+    category: 'Sieraden', categoryEN: 'Jewellery',
+    price: 125, priceDisplay: '€ 125',
+    edition: 'Permanent',
+    material: 'Helder float 5mm · goud-vermeil instelling · set van 2',
+    materialEN: 'Clear float 5mm · gold-vermeil setting · set of 2',
+    run: 'GG-PERM-002', source: 'Van Dijken Glas, Waddinxveen',
+    date: 'April 2026', serial: 'GG-2026-0003',
+    ri: '1.52', freq: '528 Hz', synergy: 108,
+    desc: 'Vijf millimeter helder float. Watergesneden op millimeternauwkeurigheid door WAZER Desktop. De glasrand aan de zijkant zichtbaar als het sieraad draait.',
+    descEN: 'Five millimetre clear float. Waterjet-cut to millimetre precision by WAZER Desktop. Glass edge visible as the cufflink turns.',
+    tags: ['Float 5mm','WAZER snijwerk','Set van 2','Goud-vermeil'],
+    accent: GOLD_HI,
+    gradient: 'linear-gradient(150deg, #1A1810 0%, #0C0B08 100%)',
+  },
+  {
+    id: 'GG-004', slug: 'kaarsenhouder-helder',
+    name: 'Kaarsenhouder', variant: 'Helder Float Series',
+    category: 'Woonaccessoires', categoryEN: 'Home Objects',
+    price: 95, priceDisplay: '€ 95',
+    edition: 'Permanente collectie',
+    material: 'Helder float 8mm · waterjet-gesneden · gepolijste randen',
+    materialEN: 'Clear float 8mm · waterjet-cut · polished edges',
+    run: 'GG-PERM-010', source: 'Van Dijken Glas, Waddinxveen',
+    date: 'April 2026', serial: 'GG-2026-0010',
+    ri: '1.52', freq: '396 Hz', synergy: 98,
+    desc: 'Acht millimeter helder float. Geometrische doorsnede, waterjet-gesneden. Elke hoek gepolijst — het licht kaatst langs de randen terug de ruimte in.',
+    descEN: 'Eight millimetre clear float. Geometric cross-section, waterjet-cut. Every edge polished — light bounces along the edges back into the room.',
+    tags: ['Float 8mm','Geometrisch','Gepolijst','Woonaccessoire'],
+    accent: '#9B8A5A',
+    gradient: 'linear-gradient(150deg, #181610 0%, #0C0B08 100%)',
+  },
+  {
+    id: 'GG-005', slug: 'wandpaneel-forest-floor',
+    name: 'Wandpaneel', variant: 'Forest Floor — B2B',
+    category: 'Architectuur', categoryEN: 'Architecture',
+    price: 480, priceDisplay: '€ 480 / m²',
+    edition: 'Run-gebonden · minimaal 2m²',
+    material: 'Bedrukt restfloatglas · Run VD-2025-0138 · 6mm',
+    materialEN: 'Printed float glass offcut · Run VD-2025-0138 · 6mm',
+    run: 'VD-2025-0138', source: 'Van Dijken Glas, Waddinxveen',
+    date: 'Maart 2025', serial: 'GG-2025-B001',
+    ri: '1.52', freq: '285 Hz', synergy: 142,
+    desc: 'Dezelfde productierun als de Fragment-sieradenlijn. Het wandpaneel draagt het verhaal van de gehele batch — van Waddinxveen naar uw wand. BREEAM-NL geschikt. Madaster-registratie op aanvraag.',
+    descEN: 'Same production run as the Fragment jewellery line. The wall panel carries the story of the entire batch — from Waddinxveen to your wall. BREEAM-NL eligible. Madaster registration on request.',
+    tags: ['6mm bedrukt','BREEAM-NL','Madaster','B2B'],
+    accent: '#6A9B8A',
+    gradient: 'linear-gradient(150deg, #081210 0%, #060908 100%)',
+  },
+  {
+    id: 'GG-006', slug: 'fragment-oorbellen-forest',
+    name: 'Fragment Oorbellen', variant: 'Forest Floor',
+    category: 'Sieraden', categoryEN: 'Jewellery',
+    price: 75, priceDisplay: '€ 75 / set',
+    edition: 'Beperkt — Run 001',
+    material: 'Bedrukt restfloatglas · Run VD-2025-0138 · 3mm',
+    materialEN: 'Printed float glass offcut · Run VD-2025-0138 · 3mm',
+    run: 'VD-2025-0138', source: 'Van Dijken Glas, Waddinxveen',
+    date: 'Maart 2025', serial: 'GG-2025-0018',
+    ri: '1.52', freq: '432 Hz', synergy: 128,
+    desc: 'Drie millimeter bedrukt restglas. Hetzelfde motief als de tie bar en pendant van Run 001. Als set draagt u de volledige Forest Floor-collectie.',
+    descEN: 'Three millimetre printed offcut. Same motif as the tie bar and pendant from Run 001. As a set you wear the complete Forest Floor collection.',
+    tags: ['3mm bedrukt','Run 001','Set compleet','Limited'],
+    accent: '#7A9B6A',
+    gradient: 'linear-gradient(150deg, #0A1208 0%, #080A06 100%)',
+  },
+];
+
+// ── QR generator (SVG-based) ───────────────────────────────────────────────
+function QRPlaceholder({ value, size = 80 }) {
+  // Simple deterministic dot pattern as placeholder
+  const seed = value.split('').reduce((a,c) => a + c.charCodeAt(0), 0);
+  const cells = 11;
+  const cell = size / cells;
+  const dots = [];
+  for (let r = 0; r < cells; r++) {
+    for (let c = 0; c < cells; c++) {
+      const h = ((seed * (r+1) * (c+1) * 31) % 97);
+      // Position detection squares
+      const inCorner = (r<3&&c<3)||(r<3&&c>=cells-3)||(r>=cells-3&&c<3);
+      const on = inCorner || h > 48;
+      if (on) dots.push({ r, c });
+    }
+  }
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <rect width={size} height={size} fill="#F0EAE0"/>
+      {dots.map(({r,c},i) => (
+        <rect key={i} x={c*cell+0.5} y={r*cell+0.5}
+          width={cell-1} height={cell-1} fill="#0D0C0B"/>
+      ))}
+    </svg>
+  );
+}
+
+// ── Glass shard decoration ─────────────────────────────────────────────────
+function ShardDeco({ color = GOLD, opacity = 0.08, size = 200 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" style={{position:'absolute',pointerEvents:'none'}}>
+      <polygon points="10,80 45,5 95,25 80,95" fill={color} opacity={opacity}/>
+      <polygon points="10,80 45,5 95,25 80,95" fill="url(#shardGrad)" opacity={0.6}/>
+      <defs>
+        <linearGradient id="shardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.15"/>
+          <stop offset="100%" stopColor="white" stopOpacity="0"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+// ── Navbar ─────────────────────────────────────────────────────────────────
+function Navbar({ view, setView, cart, setView: _ }) {
+  const total = cart.reduce((a,i) => a+i.qty, 0);
+  return (
+    <nav style={{
+      position:'sticky', top:0, zIndex:100,
+      background:'rgba(13,12,11,0.96)', backdropFilter:'blur(12px)',
+      borderBottom:`1px solid ${RULE}`,
+      padding:'0 40px', height:60,
+      display:'flex', alignItems:'center', justifyContent:'space-between',
+    }}>
+      <button onClick={() => setView('home')} style={{
+        background:'none', border:'none', cursor:'pointer', padding:0,
+        fontFamily:'"Cormorant Garamond",Georgia,serif', fontWeight:400, fontSize:22, letterSpacing:'-0.05em', color:CREAM,
+      }}>
+        Glass⏧Grasie<sup style={{fontSize:'0.45em',color:GOLD_HI,verticalAlign:'super',letterSpacing:0}}>®</sup>
+      </button>
+
+      <div style={{display:'flex', gap:32, alignItems:'center'}}>
+        {[['catalogue','Collectie'],['about','Verhaal']].map(([v,l]) => (
+          <button key={v} onClick={() => setView(v)} style={{
+            background:'none', border:'none', cursor:'pointer',
+            fontFamily:SANS, fontSize:7, letterSpacing:'3px', textTransform:'uppercase',
+            color: view===v ? GOLD_HI : T3,
+            borderBottom: view===v ? `1px solid ${GOLD_HI}` : '1px solid transparent',
+            paddingBottom:2, transition:'color 150ms',
+          }}>{l}</button>
+        ))}
+        <button onClick={() => setView('checkout')} style={{
+          background:'none', border:'none', cursor:'pointer', position:'relative',
+          fontFamily:SANS, fontSize:7, letterSpacing:'3px', textTransform:'uppercase',
+          color: view==='checkout' ? GOLD_HI : T3,
+        }}>
+          Winkelwagen
+          {total > 0 && <span style={{
+            position:'absolute', top:-8, right:-12,
+            background:GOLD, color:BG, borderRadius:'50%',
+            width:16, height:16, display:'flex', alignItems:'center', justifyContent:'center',
+            fontFamily:MONO, fontSize:9, fontWeight:700,
+          }}>{total}</span>}
+        </button>
+      </div>
+    </nav>
+  );
+}
+
+// ── Hero ───────────────────────────────────────────────────────────────────
+function Hero({ setView }) {
+  return (
+    <div style={{
+      minHeight:'92vh', display:'flex', flexDirection:'column',
+      justifyContent:'center', position:'relative', overflow:'hidden',
+      background:`radial-gradient(ellipse 70% 60% at 60% 50%, #1C1810 0%, ${BG3} 65%)`,
+      padding:'0 72px',
+    }}>
+      {/* Shard decorations */}
+      <div style={{position:'absolute',right:80,top:60,opacity:0.7}}>
+        <ShardDeco color={GOLD} opacity={0.09} size={280}/>
+      </div>
+      <div style={{position:'absolute',right:260,bottom:100,opacity:0.5}}>
+        <ShardDeco color='#7A9B6A' opacity={0.07} size={180}/>
+      </div>
+      <div style={{position:'absolute',left:40,bottom:80,opacity:0.4}}>
+        <ShardDeco color={GOLD} opacity={0.06} size={140}/>
+      </div>
+
+      <div style={{maxWidth:780, position:'relative', zIndex:1}}>
+        <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'5px',color:T3,
+          textTransform:'uppercase',marginBottom:48}}>
+          Rotterdam, NL · Est. 2025
+        </div>
+
+        <h1 style={{
+          fontFamily:SERIF, fontSize:'clamp(42px, 6vw, 88px)',
+          fontWeight:300, fontStyle:'italic', color:CREAM,
+          lineHeight:1.05, letterSpacing:'-0.02em', marginBottom:32,
+          textWrap:'balance',
+        }}>
+          Wat anderen weggooien,<br/>
+          <span style={{color:GOLD_HI}}>bewaren wij.</span>
+        </h1>
+
+        <p style={{fontFamily:SERIF,fontSize:20,color:T3,lineHeight:1.85,
+          maxWidth:520,marginBottom:48,fontWeight:300}}>
+          Industrieel restfloatglas van Van Dijken Glas — waterjet-gesneden,
+          traceerbaar tot de productierun, niet reproduceerbaar per definitie.
+        </p>
+
+        <div style={{display:'flex',gap:16,alignItems:'center',flexWrap:'wrap'}}>
+          <button onClick={() => setView('catalogue')} style={{
+            fontFamily:SANS, fontSize:8, letterSpacing:'4px', textTransform:'uppercase',
+            padding:'16px 36px', background:GOLD, color:BG3, border:'none',
+            cursor:'pointer', transition:'all 150ms',
+          }}>
+            Bekijk collectie
+          </button>
+          <button onClick={() => setView('about')} style={{
+            fontFamily:SANS, fontSize:8, letterSpacing:'4px', textTransform:'uppercase',
+            padding:'16px 36px', background:'transparent',
+            color:T3, border:`1px solid ${RULE}`, cursor:'pointer', transition:'all 150ms',
+          }}>
+            Het verhaal
+          </button>
+        </div>
+      </div>
+
+      {/* Trust strip */}
+      <div style={{
+        position:'absolute', bottom:0, left:0, right:0,
+        borderTop:`1px solid ${RULE}`, padding:'16px 72px',
+        display:'flex', gap:48, alignItems:'center',
+        background:'rgba(13,12,11,0.6)',
+      }}>
+        {[
+          ['Traceerbaar','Elk stuk tot de productierun'],
+          ['NFT Certificaat','Auto-issuance bij aankoop'],
+          ['Blockchain verified','Materiaalreis zichtbaar'],
+          ['BREEAM-NL','Architectuurpanelen geschikt'],
+        ].map(([t,s]) => (
+          <div key={t}>
+            <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+              textTransform:'uppercase',marginBottom:4}}>{t}</div>
+            <div style={{fontFamily:SERIF,fontSize:13,color:T4,fontStyle:'italic'}}>{s}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Product card ───────────────────────────────────────────────────────────
+function ProductCard({ p, onSelect, onAddToCart }) {
+  const [hov, setHov] = React.useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: hov ? '#120F0C' : BG2,
+        border:`1px solid ${hov ? '#2A2218' : RULE}`,
+        cursor:'pointer', transition:'all 180ms',
+        display:'flex', flexDirection:'column',
+      }}
+    >
+      {/* Product visual placeholder */}
+      <div onClick={() => onSelect(p)} style={{
+        height:260, background:p.gradient, position:'relative',
+        overflow:'hidden', flexShrink:0,
+        display:'flex', alignItems:'center', justifyContent:'center',
+      }}>
+        <div style={{position:'absolute',inset:0,opacity:0.85}}>
+          <ShardDeco color={p.accent} opacity={0.28} size={300}/>
+        </div>
+        <div style={{
+          width:180, height:180,
+          position:'relative', zIndex:1,
+          display:'flex', alignItems:'center', justifyContent:'center',
+        }}>
+          {/* Glass shard visual */}
+          <svg width={180} height={180} viewBox="0 0 180 180" style={{position:'absolute',inset:0}}>
+            <defs>
+              <linearGradient id={`pg${p.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor={p.accent} stopOpacity="0.35"/>
+                <stop offset="100%" stopColor={p.accent} stopOpacity="0.05"/>
+              </linearGradient>
+              <linearGradient id={`pg2${p.id}`} x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="white" stopOpacity="0.18"/>
+                <stop offset="100%" stopColor="white" stopOpacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="90,12 158,52 158,128 90,168 22,128 22,52"
+              fill={`url(#pg${p.id})`} stroke={p.accent} strokeWidth="0.8" strokeOpacity="0.5"/>
+            <polygon points="90,12 158,52 158,128 90,168 22,128 22,52"
+              fill={`url(#pg2${p.id})`}/>
+            <polygon points="90,38 134,62 134,118 90,142 46,118 46,62"
+              fill="none" stroke={p.accent} strokeWidth="0.5" strokeOpacity="0.3"/>
+            <line x1="22" y1="52" x2="158" y2="128" stroke={p.accent} strokeWidth="0.4" strokeOpacity="0.2"/>
+            <line x1="158" y1="52" x2="22" y2="128" stroke={p.accent} strokeWidth="0.4" strokeOpacity="0.2"/>
+          </svg>
+          <div style={{
+            position:'relative',zIndex:2,
+            fontFamily:MONO,fontSize:7,color:p.accent,letterSpacing:'0.12em',
+            opacity:0.7,textTransform:'uppercase',textAlign:'center',lineHeight:1.8,
+          }}>
+            {p.category}<br/>
+            <span style={{fontSize:6,opacity:0.6}}>{p.id}</span>
+          </div>
+        </div>
+        {p.edition.includes('Beperkt') && (
+          <div style={{
+            position:'absolute',top:12,left:12,
+            fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+            color:BG3,background:GOLD,padding:'4px 8px',
+            textTransform:'uppercase',
+          }}>Limited</div>
+        )}
+        <div style={{
+          position:'absolute',top:12,right:12,
+          fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,
+          textTransform:'uppercase',
+        }}>{p.id}</div>
+      </div>
+
+      <div style={{padding:'20px 22px 18px',flex:1,display:'flex',flexDirection:'column',gap:10}}>
+        <div>
+          <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:p.accent,
+            textTransform:'uppercase',marginBottom:6}}>{p.category}</div>
+          <div onClick={() => onSelect(p)} style={{
+            fontFamily:SERIF,fontSize:22,color:CREAM,fontWeight:400,
+            lineHeight:1.1,letterSpacing:'-0.01em',marginBottom:2,
+          }}>{p.name}</div>
+          <div style={{fontFamily:SERIF,fontSize:14,color:T4,fontStyle:'italic'}}>{p.variant}</div>
+        </div>
+
+        <div style={{fontFamily:SERIF,fontSize:11,color:T4,lineHeight:1.7,flex:1,
+          display:'-webkit-box',WebkitLineClamp:3,WebkitBoxOrient:'vertical',overflow:'hidden'}}>
+          {p.desc}
+        </div>
+
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',
+          paddingTop:12,borderTop:`1px solid ${RULE}`}}>
+          <div style={{fontFamily:SERIF,fontSize:22,color:p.accent,fontWeight:300}}>{p.priceDisplay}</div>
+          <button onClick={() => onAddToCart(p)} style={{
+            fontFamily:SANS,fontSize:7,letterSpacing:'2.5px',textTransform:'uppercase',
+            padding:'9px 18px',background:'transparent',
+            border:`1px solid ${GOLD}66`,color:GOLD_HI,
+            transition:'all 150ms',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = `${GOLD}18`; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}>
+            In wagen
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Catalogue ──────────────────────────────────────────────────────────────
+function Catalogue({ onSelect, onAddToCart }) {
+  const [filter, setFilter] = React.useState('Alle');
+  const cats = ['Alle','Sieraden','Woonaccessoires','Architectuur'];
+  const filtered = filter === 'Alle' ? PRODUCTS : PRODUCTS.filter(p => p.category === filter);
+
+  return (
+    <div style={{padding:'64px 40px', background:BG3, minHeight:'100vh'}}>
+      <div style={{maxWidth:1200,margin:'0 auto'}}>
+        {/* Header */}
+        <div style={{marginBottom:52}}>
+          <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'5px',color:GOLD,
+            textTransform:'uppercase',marginBottom:16}}>De Collectie · The Collection</div>
+          <h2 style={{fontFamily:SERIF,fontSize:'clamp(28px,4vw,52px)',fontWeight:300,
+            color:CREAM,letterSpacing:'-0.02em',lineHeight:1.1}}>
+            Elk stuk bestaat maar één keer.
+          </h2>
+        </div>
+
+        {/* Filter */}
+        <div style={{display:'flex',gap:4,marginBottom:40,flexWrap:'wrap'}}>
+          {cats.map(c => (
+            <button key={c} onClick={() => setFilter(c)} style={{
+              fontFamily:SANS,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',
+              padding:'8px 18px',border:'1px solid',cursor:'pointer',transition:'all 150ms',
+              borderColor: filter===c ? `${GOLD}88` : RULE,
+              background: filter===c ? `${GOLD}18` : 'transparent',
+              color: filter===c ? GOLD_HI : T4,
+            }}>{c}</button>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div style={{
+          display:'grid',
+          gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))',
+          gap:1, background:RULE,
+        }}>
+          {filtered.map(p => (
+            <ProductCard key={p.id} p={p} onSelect={onSelect} onAddToCart={onAddToCart}/>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Product detail ─────────────────────────────────────────────────────────
+function ProductDetail({ p, onBack, onAddToCart }) {
+  const [tab, setTab] = React.useState('detail');
+  const [added, setAdded] = React.useState(false);
+
+  const handleAdd = () => {
+    onAddToCart(p);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1800);
+  };
+
+  return (
+    <div style={{minHeight:'100vh',background:BG3,padding:'48px 40px'}}>
+      <div style={{maxWidth:1100,margin:'0 auto'}}>
+        {/* Breadcrumb */}
+        <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:40}}>
+          <button onClick={onBack} style={{background:'none',border:'none',cursor:'pointer',
+            fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:T3,textTransform:'uppercase'}}>
+            ← Collectie
+          </button>
+          <span style={{color:T5}}>·</span>
+          <span style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',color:T3,
+            textTransform:'uppercase'}}>{p.category}</span>
+          <span style={{color:T5}}>·</span>
+          <span style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',color:GOLD,
+            textTransform:'uppercase'}}>{p.name}</span>
+        </div>
+
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:64,alignItems:'start'}}>
+          {/* Left — visual */}
+          <div>
+            <div style={{
+              aspectRatio:'4/3', background:p.gradient,
+              border:`1px solid ${RULE}`, position:'relative',
+              overflow:'hidden', marginBottom:16,
+              display:'flex',alignItems:'center',justifyContent:'center',
+            }}>
+              <div style={{position:'absolute',inset:0,opacity:0.8}}>
+                <ShardDeco color={p.accent} opacity={0.22} size={400}/>
+              </div>
+              <div style={{
+                width:180,height:180,
+                background:`repeating-linear-gradient(135deg,${p.accent}12 0 12px,transparent 12px 24px)`,
+                border:`1px solid ${p.accent}44`,
+                display:'flex',alignItems:'center',justifyContent:'center',
+                fontFamily:MONO,fontSize:9,color:`${p.accent}55`,letterSpacing:'0.1em',
+                position:'relative',zIndex:1,
+              }}>PRODUCT SHOT</div>
+              {p.edition.includes('Beperkt') && (
+                <div style={{position:'absolute',top:16,left:16,
+                  fontFamily:SANS,fontSize:7,letterSpacing:'2px',
+                  color:BG3,background:GOLD,padding:'5px 10px',textTransform:'uppercase'}}>
+                  Limited Edition
+                </div>
+              )}
+            </div>
+
+            {/* Material spec strip */}
+            <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+              {[
+                ['Materiaal',p.material],['Herkomst',p.source],
+                ['Refractive Index',p.ri],['Frequentie',p.freq],
+                ['Synergy Index',`${p.synergy}/150`],
+              ].map(([k,v]) => (
+                <div key={k} style={{background:BG2,padding:'10px 16px',
+                  display:'flex',justifyContent:'space-between',alignItems:'center',gap:12}}>
+                  <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+                    color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+                  <span style={{fontFamily:SERIF,fontStyle:'italic',fontSize:14,
+                    color:T2,textAlign:'right'}}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — info */}
+          <div>
+            <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'4px',color:p.accent,
+              textTransform:'uppercase',marginBottom:12}}>{p.category}</div>
+            <h1 style={{fontFamily:SERIF,fontSize:'clamp(28px,3.5vw,48px)',fontWeight:400,
+              color:CREAM,letterSpacing:'-0.02em',lineHeight:1.05,marginBottom:6}}>{p.name}</h1>
+            <div style={{fontFamily:SERIF,fontSize:18,color:T4,fontStyle:'italic',
+              marginBottom:24}}>{p.variant}</div>
+
+            <div style={{fontFamily:SERIF,fontSize:18,color:p.accent,fontWeight:300,
+              marginBottom:24}}>{p.priceDisplay}</div>
+
+            <p style={{fontFamily:SERIF,fontSize:16,color:T3,lineHeight:1.85,
+              marginBottom:8}}>{p.desc}</p>
+            <p style={{fontFamily:SERIF,fontSize:13,color:T5,lineHeight:1.75,
+              fontStyle:'italic',marginBottom:32}}>{p.descEN}</p>
+
+            {/* Tags */}
+            <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:32}}>
+              {p.tags.map(t => (
+                <span key={t} style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+                  color:p.accent,border:`1px solid ${p.accent}44`,
+                  padding:'4px 10px',textTransform:'uppercase'}}>{t}</span>
+              ))}
+            </div>
+
+            {/* Add to cart */}
+            <button onClick={handleAdd} style={{
+              width:'100%',padding:'16px',marginBottom:12,
+              fontFamily:SANS,fontSize:8,letterSpacing:'4px',textTransform:'uppercase',
+              background: added ? `${GOLD}33` : GOLD,
+              color: added ? GOLD_HI : BG3,
+              border:`1px solid ${GOLD}`,cursor:'pointer',transition:'all 250ms',
+            }}>
+              {added ? '✓ Toegevoegd' : 'In winkelwagen'}
+            </button>
+            <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,
+              textAlign:'center',textTransform:'uppercase'}}>
+              NFT Certificaat inbegrepen · Blockchain verified
+            </div>
+
+            {/* Tabs */}
+            <div style={{marginTop:40,borderTop:`1px solid ${RULE}`,paddingTop:32}}>
+              <div style={{display:'flex',gap:0,marginBottom:24,borderBottom:`1px solid ${RULE}`}}>
+                {[['detail','Herkomst'],['cert','Certificaat'],['b2b','B2B Info']].map(([id,label]) => (
+                  <button key={id} onClick={() => setTab(id)} style={{
+                    fontFamily:SANS,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',
+                    padding:'10px 20px',background:'none',border:'none',cursor:'pointer',
+                    color: tab===id ? GOLD_HI : T4,
+                    borderBottom: tab===id ? `2px solid ${GOLD_HI}` : '2px solid transparent',
+                    marginBottom:-1,transition:'color 150ms',
+                  }}>{label}</button>
+                ))}
+              </div>
+
+              {tab==='detail' && (
+                <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+                  {[
+                    ['Productierun',p.run],['Bron',p.source],
+                    ['Datum',p.date],['Serienummer',p.serial],
+                    ['Editie',p.edition],
+                  ].map(([k,v]) => (
+                    <div key={k} style={{background:BG,padding:'12px 16px',
+                      display:'flex',justifyContent:'space-between',gap:12}}>
+                      <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+                        color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+                      <span style={{fontFamily:MONO,fontSize:11,color:T2,
+                        textAlign:'right'}}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {tab==='cert' && (
+                <div>
+                  <div style={{border:`1px solid ${GOLD}22`,padding:'24px',
+                    background:'rgba(139,115,85,0.04)',marginBottom:16}}>
+                    <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:GOLD,
+                      textTransform:'uppercase',marginBottom:14}}>
+                      Certificaat van Herkomst · Certificate of Origin
+                    </div>
+                    <div style={{fontFamily:MONO,fontSize:11,color:T3,lineHeight:2.1}}>
+                      <div>Materiaal: {p.material}</div>
+                      <div>Bron: {p.source}</div>
+                      <div>Productierun: {p.run}</div>
+                      <div>Serie: {p.serial}</div>
+                      <div>Datum: {p.date}</div>
+                    </div>
+                    <div style={{marginTop:16,paddingTop:14,borderTop:`1px solid ${RULE}`,
+                      fontFamily:SERIF,fontSize:18,color:GOLD,fontStyle:'italic'}}>
+                      Glass⏧Grasie®
+                    </div>
+                  </div>
+                  <div style={{display:'flex',gap:16,alignItems:'center'}}>
+                    <QRPlaceholder value={p.serial} size={72}/>
+                    <div>
+                      <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,
+                        textTransform:'uppercase',marginBottom:6}}>Scan voor blockchain record</div>
+                      <div style={{fontFamily:MONO,fontSize:10,color:T4}}>glassgrasie.nl/cert/{p.serial}</div>
+                      <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'1.5px',color:GOLD,
+                        textTransform:'uppercase',marginTop:8}}>NFT auto-issued bij aankoop</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {tab==='b2b' && (
+                <div style={{fontFamily:SERIF,fontSize:14,color:T3,lineHeight:1.85}}>
+                  <p style={{marginBottom:16}}>Voor architecten, interieurontwerpers en vastgoedontwikkelaars: dit product is beschikbaar in projectvolumes met BREEAM-NL documentatie, Madaster-registratie, en een volledige materiaalpaspoort.</p>
+                  <p style={{fontStyle:'italic',color:T4,marginBottom:20}}>For architects, interior designers and property developers: this product is available in project volumes with full BREEAM-NL documentation and Madaster registration.</p>
+                  <button style={{
+                    fontFamily:SANS,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',
+                    padding:'12px 24px',background:'transparent',
+                    border:`1px solid ${GOLD}44`,color:GOLD,cursor:'pointer',
+                  }}>B2B aanvraag starten →</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Checkout ───────────────────────────────────────────────────────────────
+function Checkout({ cart, onUpdateQty, onRemove }) {
+  const [payMethod, setPayMethod] = React.useState('stripe');
+  const [step, setStep] = React.useState('cart');
+  const [form, setForm] = React.useState({ name:'',email:'',address:'',city:'',country:'NL' });
+  const subtotal = cart.reduce((a,i) => a + i.price * i.qty, 0);
+  const shipping = subtotal >= 200 ? 0 : 9.95;
+  const total = subtotal + shipping;
+
+  if (cart.length === 0) return (
+    <div style={{minHeight:'80vh',display:'flex',flexDirection:'column',
+      alignItems:'center',justifyContent:'center',gap:24,padding:'48px'}}>
+      <div style={{fontFamily:SERIF,fontSize:32,color:T4,fontStyle:'italic'}}>
+        Uw winkelwagen is leeg.
+      </div>
+      <div style={{fontFamily:SERIF,fontSize:15,color:T5,fontStyle:'italic'}}>
+        Your cart is empty.
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{minHeight:'100vh',background:BG3,padding:'48px 40px'}}>
+      <div style={{maxWidth:1000,margin:'0 auto'}}>
+        <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'5px',color:GOLD,
+          textTransform:'uppercase',marginBottom:48}}>
+          {step==='cart' ? 'Winkelwagen' : step==='address' ? 'Bezorgadres' : 'Betaling'}
+        </div>
+
+        {step==='cart' && (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 380px',gap:40}}>
+            {/* Cart items */}
+            <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+              {cart.map(item => (
+                <div key={item.id} style={{background:BG2,padding:'20px 20px',
+                  display:'flex',gap:20,alignItems:'center'}}>
+                  <div style={{
+                    width:64,height:64,background:item.gradient,flexShrink:0,
+                    display:'flex',alignItems:'center',justifyContent:'center',
+                    border:`1px solid ${RULE}`,
+                  }}>
+                    <ShardDeco color={item.accent} opacity={0.3} size={64}/>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontFamily:SERIF,fontSize:17,color:CREAM,marginBottom:2}}>{item.name}</div>
+                    <div style={{fontFamily:SERIF,fontSize:13,color:T4,fontStyle:'italic',marginBottom:4}}>{item.variant}</div>
+                    <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{item.id}</div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:10}}>
+                    <button onClick={() => onUpdateQty(item.id, item.qty-1)}
+                      style={{width:28,height:28,background:BG,border:`1px solid ${RULE}`,
+                        color:T3,fontFamily:MONO,fontSize:16,cursor:'pointer',
+                        display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
+                    <span style={{fontFamily:MONO,fontSize:13,color:CREAM,width:20,textAlign:'center'}}>{item.qty}</span>
+                    <button onClick={() => onUpdateQty(item.id, item.qty+1)}
+                      style={{width:28,height:28,background:BG,border:`1px solid ${RULE}`,
+                        color:T3,fontFamily:MONO,fontSize:16,cursor:'pointer',
+                        display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
+                  </div>
+                  <div style={{fontFamily:SERIF,fontSize:18,color:item.accent,width:70,textAlign:'right'}}>
+                    € {(item.price * item.qty).toFixed(0)}
+                  </div>
+                  <button onClick={() => onRemove(item.id)} style={{
+                    background:'none',border:'none',cursor:'pointer',
+                    fontFamily:MONO,fontSize:16,color:T5,padding:'4px',
+                  }}>×</button>
+                </div>
+              ))}
+            </div>
+
+            {/* Summary */}
+            <div style={{background:BG2,border:`1px solid ${RULE}`,padding:'28px 24px',
+              alignSelf:'start'}}>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:20}}>Overzicht</div>
+              <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:24}}>
+                {[
+                  ['Subtotaal', `€ ${subtotal.toFixed(2)}`],
+                  ['Verzending', shipping===0 ? 'Gratis' : `€ ${shipping.toFixed(2)}`],
+                  ['NFT Certificaat', 'Inbegrepen'],
+                ].map(([k,v]) => (
+                  <div key={k} style={{display:'flex',justifyContent:'space-between'}}>
+                    <span style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{k}</span>
+                    <span style={{fontFamily:SERIF,fontSize:15,color:T2}}>{v}</span>
+                  </div>
+                ))}
+                <div style={{borderTop:`1px solid ${RULE}`,paddingTop:12,
+                  display:'flex',justifyContent:'space-between'}}>
+                  <span style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',color:GOLD,textTransform:'uppercase'}}>Totaal</span>
+                  <span style={{fontFamily:SERIF,fontSize:22,color:GOLD_HI}}>€ {total.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Payment method */}
+              <div style={{marginBottom:20}}>
+                <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',color:T3,
+                  textTransform:'uppercase',marginBottom:12}}>Betaalmethode</div>
+                <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                  {[
+                    ['stripe','💳  Stripe — iDEAL · Card · Apple Pay'],
+                    ['ripple','⬡  Ripple XRP — crypto · ISO 20022'],
+                  ].map(([m,label]) => (
+                    <button key={m} onClick={() => setPayMethod(m)} style={{
+                      fontFamily:SANS,fontSize:7,letterSpacing:'1.5px',
+                      padding:'10px 14px',cursor:'pointer',textAlign:'left',
+                      border:`1px solid ${payMethod===m ? GOLD : RULE}`,
+                      background: payMethod===m ? `${GOLD}0F` : 'transparent',
+                      color: payMethod===m ? GOLD_HI : T4,
+                      transition:'all 150ms',
+                    }}>{label}</button>
+                  ))}
+                </div>
+                {payMethod==='ripple' && (
+                  <div style={{marginTop:8,padding:'10px 12px',background:'rgba(106,154,138,0.08)',
+                    border:'1px solid rgba(106,154,138,0.2)'}}>
+                    <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:'#6A9B8A',
+                      textTransform:'uppercase',marginBottom:4}}>XRP Wallet verbinding vereist</div>
+                    <div style={{fontFamily:SERIF,fontSize:12,color:T4,fontStyle:'italic'}}>
+                      Loyalty tokens + DAO toegang inbegrepen bij XRP betaling.
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button onClick={() => setStep('address')} style={{
+                width:'100%',padding:'14px',
+                fontFamily:SANS,fontSize:8,letterSpacing:'4px',textTransform:'uppercase',
+                background:GOLD,color:BG3,border:'none',cursor:'pointer',
+              }}>
+                Naar bezorgadres →
+              </button>
+
+              <div style={{marginTop:12,fontFamily:SANS,fontSize:6,letterSpacing:'1.5px',
+                color:T5,textAlign:'center',textTransform:'uppercase',lineHeight:1.8}}>
+                NFT cert · Blockchain verified · Gratis verzending vanaf €200
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step==='address' && (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 380px',gap:40}}>
+            <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+              {[
+                {key:'name',label:'Naam',placeholder:'Volledige naam'},
+                {key:'email',label:'E-mail',placeholder:'naam@voorbeeld.nl',type:'email'},
+                {key:'address',label:'Adres',placeholder:'Straat en huisnummer'},
+                {key:'city',label:'Stad',placeholder:'Rotterdam'},
+              ].map(f => (
+                <div key={f.key} style={{background:BG2,padding:'16px 20px'}}>
+                  <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:T3,
+                    textTransform:'uppercase',marginBottom:8}}>{f.label}</div>
+                  <input
+                    type={f.type||'text'} placeholder={f.placeholder}
+                    value={form[f.key]}
+                    onChange={e => setForm({...form,[f.key]:e.target.value})}
+                    style={{
+                      width:'100%',background:'transparent',border:'none',
+                      borderBottom:`1px solid ${RULE}`,padding:'8px 0',
+                      fontFamily:SERIF,fontSize:16,color:CREAM,outline:'none',
+                      '::placeholder':{color:T5},
+                    }}/>
+                </div>
+              ))}
+            </div>
+            <div style={{background:BG2,border:`1px solid ${RULE}`,padding:'28px 24px',
+              alignSelf:'start',display:'flex',flexDirection:'column',gap:16}}>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase'}}>Betaling via</div>
+              <div style={{fontFamily:SERIF,fontSize:16,color:T2}}>
+                {payMethod==='stripe' ? '💳 Stripe' : '⬡ Ripple XRP'}
+              </div>
+              <div style={{fontFamily:SERIF,fontSize:22,color:GOLD_HI}}>€ {total.toFixed(2)}</div>
+              <button onClick={() => setStep('payment')} style={{
+                width:'100%',padding:'14px',marginTop:8,
+                fontFamily:SANS,fontSize:8,letterSpacing:'4px',textTransform:'uppercase',
+                background:GOLD,color:BG3,border:'none',cursor:'pointer',
+              }}>
+                Naar betaling →
+              </button>
+              <button onClick={() => setStep('cart')} style={{
+                width:'100%',padding:'10px',
+                fontFamily:SANS,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',
+                background:'transparent',color:T4,border:`1px solid ${RULE}`,cursor:'pointer',
+              }}>← Terug</button>
+            </div>
+          </div>
+        )}
+
+        {step==='payment' && (
+          <div style={{maxWidth:560,margin:'0 auto',textAlign:'center',
+            display:'flex',flexDirection:'column',alignItems:'center',gap:24}}>
+            <div style={{
+              width:64,height:64,borderRadius:'50%',
+              border:`2px solid ${GOLD}`,display:'flex',alignItems:'center',
+              justifyContent:'center',marginBottom:8,
+            }}>
+              {payMethod==='stripe'
+                ? <span style={{fontSize:28}}>💳</span>
+                : <span style={{fontFamily:MONO,fontSize:24,color:GOLD}}>⬡</span>}
+            </div>
+            <div style={{fontFamily:SERIF,fontSize:28,color:CREAM,fontStyle:'italic'}}>
+              {payMethod==='stripe' ? 'Stripe checkout' : 'Ripple XRP betaling'}
+            </div>
+            <p style={{fontFamily:SERIF,fontSize:15,color:T4,lineHeight:1.8,maxWidth:400}}>
+              {payMethod==='stripe'
+                ? 'In productie: Stripe live mode + volledige checkout flow. Momenteel in test mode — beta-klanten kunnen aanvragen via e-mail.'
+                : 'In productie: Ripple/XRP ISO 20022 wallet koppeling. AFM/DNB VASP beoordeling loopt. Loyalty tokens + DAO toegang inbegrepen.'}
+            </p>
+            <div style={{padding:'16px 24px',border:`1px solid ${GOLD}33`,
+              background:`${GOLD}08`,width:'100%'}}>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:8}}>Beta toegang</div>
+              <div style={{fontFamily:SERIF,fontSize:14,color:T3,fontStyle:'italic'}}>
+                hallo@glassgrasie.nl · vermeld uw serienummer
+              </div>
+            </div>
+            <button onClick={() => setStep('cart')} style={{
+              fontFamily:SANS,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',
+              padding:'12px 24px',background:'transparent',
+              color:T4,border:`1px solid ${RULE}`,cursor:'pointer',
+            }}>← Terug naar winkelwagen</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── About ──────────────────────────────────────────────────────────────────
+function About() {
+  return (
+    <div style={{minHeight:'100vh',background:BG,padding:'80px 72px'}}>
+      <div style={{maxWidth:900,margin:'0 auto'}}>
+        <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'5px',color:GOLD,
+          textTransform:'uppercase',marginBottom:56}}>Het verhaal · The story</div>
+
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:80}}>
+          <div>
+            <h2 style={{fontFamily:SERIF,fontStyle:'italic',fontWeight:300,
+              fontSize:'clamp(28px,3.5vw,48px)',color:CREAM,lineHeight:1.1,
+              letterSpacing:'-0.02em',marginBottom:40}}>
+              Glas. Glass. Grasie.<br/>
+              <span style={{color:GOLD_HI}}>Eén woord.</span>
+            </h2>
+            <p style={{fontFamily:SERIF,fontSize:16,color:T3,lineHeight:1.9,marginBottom:24}}>
+              Van Dijken Glas gooit elke dag glas weg. Niet omdat het kapot is, maar omdat het niet past bij de volgende order. Bedrukt. Gecoat. Gekleurd. Precies het glas dat wij zoeken.
+            </p>
+            <p style={{fontFamily:SERIF,fontSize:16,color:T3,lineHeight:1.9,marginBottom:24}}>
+              Glass⏧Grasie werd opgericht in Rotterdam om dit materiaal te redden — en er iets van te maken dat mensen willen bewaren.
+            </p>
+            <p style={{fontFamily:SERIF,fontSize:16,color:T3,lineHeight:1.9}}>
+              Niet omdat het duurzaam is — hoewel dat klopt — maar omdat het mooi is, precies is gemaakt, en een verhaal draagt dat niemand anders kan vertellen.
+            </p>
+          </div>
+
+          <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+            {[
+              ['Materiaalkosten','~€0 — restfloatglas','goud'],
+              ['WAZER Desktop','Waterjet op mm-nauwkeurigheid','zilver'],
+              ['Van Dijken Glas','Partner Waddinxveen · Est. 1933','zilver'],
+              ['Startinvestering','€630 excl. WAZER','goud'],
+              ['WBSO voordeel','€23.975 aftrek jaar 1','groen'],
+              ['BlueCity Rotterdam','Circulair ecosysteem · buur','zilver'],
+              ['Omzetdoel jaar 1','€32.500 – €52.500','groen'],
+            ].map(([k,v,c]) => (
+              <div key={k} style={{background:BG2,padding:'14px 18px',
+                display:'flex',justifyContent:'space-between',alignItems:'center',gap:12}}>
+                <span style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',
+                  color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+                <span style={{fontFamily:SERIF,fontStyle:'italic',fontSize:14,
+                  color: c==='goud' ? GOLD_HI : c==='groen' ? '#7A9B6A' : T2,
+                  textAlign:'right'}}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────
+function Footer({ setView }) {
+  return (
+    <footer style={{background:BG3,borderTop:`1px solid ${RULE}`,padding:'48px 72px 32px'}}>
+      <div style={{maxWidth:1100,margin:'0 auto'}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:40,marginBottom:48}}>
+          <div>
+            <div style={{fontFamily:SANS,fontWeight:700,fontSize:10,letterSpacing:'5px',
+              color:CREAM,marginBottom:16}}>
+              GLASS<span style={{color:GOLD_HI}}>⏧</span>GRASIE<sup style={{fontSize:'0.45em',color:GOLD_HI,verticalAlign:'super',letterSpacing:0}}>®</sup>
+            </div>
+            <p style={{fontFamily:SERIF,fontSize:13,color:T5,lineHeight:1.8,fontStyle:'italic'}}>
+              Geconstrueerd glas uit Rotterdam.
+            </p>
+          </div>
+          <div>
+            <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+              textTransform:'uppercase',marginBottom:14}}>Collectie</div>
+            {['Sieraden','Woonaccessoires','Architectuur'].map(c => (
+              <div key={c} style={{fontFamily:SERIF,fontSize:14,color:T4,
+                marginBottom:8,cursor:'pointer',fontStyle:'italic'}}>{c}</div>
+            ))}
+          </div>
+          <div>
+            <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+              textTransform:'uppercase',marginBottom:14}}>Informatie</div>
+            {['Het verhaal','B2B aanvragen','Certificaten','Blockchain'].map(c => (
+              <div key={c} style={{fontFamily:SERIF,fontSize:14,color:T4,
+                marginBottom:8,cursor:'pointer',fontStyle:'italic'}}>{c}</div>
+            ))}
+          </div>
+          <div>
+            <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+              textTransform:'uppercase',marginBottom:14}}>Contact</div>
+            <div style={{fontFamily:MONO,fontSize:11,color:T4,lineHeight:2}}>
+              <div>hallo@glassgrasie.nl</div>
+              <div>glassgrasie.nl</div>
+              <div>@glassgrasie</div>
+              <div>Rotterdam, NL</div>
+            </div>
+          </div>
+        </div>
+        <div style={{borderTop:`1px solid ${RULE}`,paddingTop:20,
+          display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase'}}>
+            © 2025–2026 Glass⏧Grasie® Rotterdam — Alle rechten voorbehouden
+          </div>
+          <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>
+            Blockchain verified · NFT certified · BREEAM-NL eligible
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ── App ────────────────────────────────────────────────────────────────────
+function App() {
+  const [view, setView]       = React.useState(() =>
+    localStorage.getItem('gg-store-view') || 'home');
+  const [product, setProduct] = React.useState(null);
+  const [cart, setCart]       = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('gg-store-cart') || '[]'); } catch { return []; }
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('gg-store-view', view);
+  }, [view]);
+
+  React.useEffect(() => {
+    localStorage.setItem('gg-store-cart', JSON.stringify(cart));
+  }, [cart]);
+
+  const addToCart = (p) => {
+    setCart(prev => {
+      const ex = prev.find(i => i.id === p.id);
+      if (ex) return prev.map(i => i.id===p.id ? {...i,qty:i.qty+1} : i);
+      return [...prev, {...p, qty:1}];
+    });
+  };
+
+  const updateQty = (id, qty) => {
+    if (qty <= 0) setCart(prev => prev.filter(i => i.id !== id));
+    else setCart(prev => prev.map(i => i.id===id ? {...i,qty} : i));
+  };
+
+  const handleSelectProduct = (p) => {
+    setProduct(p);
+    setView('product');
+    window.scrollTo({ top: 0 });
+  };
+
+  return (
+    <div>
+      <Navbar view={view} setView={setView} cart={cart}/>
+      {view === 'home' && (
+        <>
+          <Hero setView={setView}/>
+          <Catalogue onSelect={handleSelectProduct} onAddToCart={addToCart}/>
+        </>
+      )}
+      {view === 'catalogue' && (
+        <Catalogue onSelect={handleSelectProduct} onAddToCart={addToCart}/>
+      )}
+      {view === 'product' && product && (
+        <ProductDetail p={product} onBack={() => setView('catalogue')} onAddToCart={addToCart}/>
+      )}
+      {view === 'checkout' && (
+        <Checkout cart={cart} onUpdateQty={updateQty} onRemove={(id) => setCart(prev => prev.filter(i=>i.id!==id))}/>
+      )}
+      {view === 'about' && <About/>}
+      <Footer setView={setView}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+
+<script>
+// ── Store Tweaks ──────────────────────────────────────────────────────────────
+const STORE_TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "cardHeight": 180,
+  "accentMode": "brand",
+  "showSku": true,
+  "contrastBoost": false
+}/*EDITMODE-END*/;
+
+(function() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('gg-store-tweaks') || '{}'); } catch {}
+  const T = Object.assign({}, STORE_TWEAK_DEFAULTS, saved);
+
+  function applyTweaks() {
+    // Card height
+    document.querySelectorAll('[data-product-img]').forEach(el => {
+      el.style.height = T.cardHeight + 'px';
+    });
+    // Contrast boost: ensure text is readable
+    if (T.contrastBoost) {
+      document.querySelectorAll('[data-product-desc]').forEach(el => {
+        el.style.opacity = '1';
+        el.style.color = '#D4C9B8';
+      });
+    }
+  }
+
+  const panel = document.createElement('div');
+  panel.id = 'store-tweaks';
+  panel.style.cssText = 'display:none;position:fixed;bottom:24px;right:24px;z-index:9999;width:240px;background:#0A0908;border:1px solid #2C2418;font-family:\'Cormorant Garamond\',serif;color:#E8E2D8;box-shadow:0 8px 40px rgba(0,0,0,0.7);';
+  panel.innerHTML = `
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #1C1810;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:4px;color:#C9A87C;text-transform:uppercase;">Tweaks</span>
+      <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:2px;color:#3A3020;">Store</span>
+    </div>
+    <div style="padding:16px 18px;display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Productkaart hoogte <span id="st-h-val">${T.cardHeight}</span>px</label>
+        <input id="st-height" type="range" min="180" max="400" step="20" value="${T.cardHeight}" style="width:100%;accent-color:#C9A87C;cursor:pointer;">
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid #1C1810;">
+        <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;">Contrast boost</span>
+        <button id="st-contrast" style="padding:5px 12px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #C9A87C;background:transparent;color:#C9A87C;cursor:pointer;text-transform:uppercase;">${T.contrastBoost ? 'Aan' : 'Uit'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(panel);
+
+  panel.querySelector('#st-height').addEventListener('input', e => {
+    T.cardHeight = +e.target.value;
+    panel.querySelector('#st-h-val').textContent = T.cardHeight;
+    try { localStorage.setItem('gg-store-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: T }, '*');
+  });
+
+  panel.querySelector('#st-contrast').addEventListener('click', () => {
+    T.contrastBoost = !T.contrastBoost;
+    panel.querySelector('#st-contrast').textContent = T.contrastBoost ? 'Aan' : 'Uit';
+    try { localStorage.setItem('gg-store-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: T }, '*');
+  });
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === '__activate_edit_mode')   panel.style.display = 'block';
+    if (e.data?.type === '__deactivate_edit_mode') panel.style.display = 'none';
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+  // Apply on load (after React renders)
+  setTimeout(applyTweaks, 800);
+})();
+</script>
+
+</body>
+</html>
