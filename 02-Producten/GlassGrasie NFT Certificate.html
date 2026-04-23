@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Certificaat van Herkomst</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    /* NFT Certificate readability boost */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    body { -webkit-font-smoothing: antialiased; }
+    /* Ensure tab content text is readable */
+    [style*="color: #8A8070"], [style*="color:#8A8070"] { color: #B0A898 !important; }
+    /* Key-value rows */
+    .cert-key { color: #A89E90 !important; }
+  </style>
+  <style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { background:#090806; }
+  body { background:#090806; color:#E8E2D8; -webkit-font-smoothing:antialiased;
+    font-family:'Cormorant Garamond',Georgia,serif; min-height:100vh; }
+  #root { min-height:100vh; }
+  ::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:#2A2218; }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+  @keyframes scanLine { 0%{transform:translateY(-100%)} 100%{transform:translateY(400%)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  @keyframes chainGrow { from{height:0;opacity:0} to{opacity:1} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const SERIF = "'Cormorant Garamond',Georgia,serif";
+const SANS  = "'Syncopate',sans-serif";
+const MONO  = "'JetBrains Mono',ui-monospace,monospace";
+const BG    = '#090806';
+const BG2   = '#0D0C0B';
+const BG3   = '#100F0D';
+const RULE  = '#1C1810';
+const GOLD  = '#8B7355';
+const GOLD_HI = '#C9A87C';
+const CREAM = '#E8E2D8';
+const T2    = '#D4C9B8';
+const T3    = '#A89E90';
+const T4    = '#8A8070';
+const T5    = '#6A6058';
+const GREEN = '#5A9A6A';
+
+// ── Sample certificate data (would come from blockchain query) ──────────────
+const CERT_DATA = {
+  // NFT
+  tokenId: '0x7F3A...B2C9',
+  txHash:  '0xd8f4a2e1b3c5...9a7f',
+  chain:   'XRP Ledger',
+  mintDate:'2026-04-21T09:14:33Z',
+  // Product
+  serial:  'GG-2026-0042',
+  name:    'Fragment Tie Bar',
+  variant: 'Forest Floor',
+  category:'Sieraden',
+  price:   145,
+  // Batch
+  batchId: 'VD-2025-0138',
+  source:  'Van Dijken Glas, Waddinxveen',
+  material:'Bedrukt restfloatglas',
+  thickness:'3mm',
+  cutDate: '2025-03-14T07:22:00Z',
+  dimensions:'55 × 12mm',
+  qualityGrade:'A',
+  glassWeightKg: 0.041,
+  carbonOffsetKg: 0.087,
+  operator:'Sergio Dias',
+  // Design
+  designFile:'gg-fragment-tiebar-v3.dxf',
+  cncProgram:'wazer-prog-142.gcw',
+  cuttingTime:'4m 12s',
+  // Frequencies
+  ri: '1.52',
+  freq:'380 Hz',
+  synergyIndex:134,
+  harmonyScore:88,
+  // NFT image
+  ipfsHash:'QmX7f3kL9...nR4tY',
+};
+
+// ── Hash display ──────────────────────────────────────────────────────────────
+function HashTag({ hash, label }) {
+  const [copied, setCopied] = React.useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(hash).catch(()=>{});
+    setCopied(true); setTimeout(()=>setCopied(false),1800);
+  };
+  return (
+    <div style={{display:'flex',alignItems:'center',gap:10}}>
+      <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase',flexShrink:0}}>{label}</span>
+      <div onClick={copy} style={{
+        flex:1,fontFamily:MONO,fontSize:10,color:copied?GREEN:GOLD,
+        padding:'6px 10px',background:'rgba(139,115,85,0.06)',
+        border:`1px solid ${copied?GREEN:RULE}`,cursor:'pointer',
+        overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
+        transition:'all 200ms',
+      }}>
+        {copied ? '✓ Gekopieerd' : hash}
+      </div>
+    </div>
+  );
+}
+
+// ── Blockchain chain visualization ────────────────────────────────────────────
+function BlockchainChain({ c }) {
+  const steps = [
+    { icon:'⬡', label:'Wazer CNC cut', sub:`${c.cutDate.slice(0,10)} · ${c.cuttingTime}`, color:'#7A9B6A', done:true },
+    { icon:'📋', label:'Batch logged', sub:`ID: ${c.batchId} · ${c.glassWeightKg}kg glas`, color:GOLD_HI, done:true },
+    { icon:'#', label:'Hash gegenereerd', sub:`${c.txHash.slice(0,20)}...`, color:'#7A7A9B', done:true },
+    { icon:'⬡', label:'XRP Ledger mint', sub:`Token ${c.tokenId} · ${c.mintDate.slice(0,10)}`, color:'#6A9B8A', done:true },
+    { icon:'🔗', label:'QR gekoppeld', sub:`glassgrasie.nl/cert/${c.serial}`, color:GOLD, done:true },
+    { icon:'📦', label:'Product verzonden', sub:'NFT certificaat email verstuurd', color:GREEN, done:false },
+  ];
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:0}}>
+      {steps.map((s,i) => (
+        <div key={i} style={{display:'flex',gap:16,alignItems:'flex-start',
+          animation:`fadeUp 400ms ${i*80}ms both`}}>
+          {/* Line */}
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0,width:32}}>
+            <div style={{
+              width:32,height:32,borderRadius:'50%',
+              background: s.done ? `${s.color}22` : 'rgba(255,255,255,0.03)',
+              border:`1px solid ${s.done ? s.color : RULE}`,
+              display:'flex',alignItems:'center',justifyContent:'center',
+              fontFamily:MONO,fontSize:13,color:s.done?s.color:T5,
+            }}>{s.done?'✓':'○'}</div>
+            {i < steps.length-1 && (
+              <div style={{width:1,flex:1,minHeight:24,
+                background:s.done?`${s.color}44`:RULE,
+                animation:'chainGrow 300ms ease'}}/>
+            )}
+          </div>
+          {/* Content */}
+          <div style={{paddingBottom:20,paddingTop:4}}>
+            <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',
+              color:s.done?s.color:T3,textTransform:'uppercase',marginBottom:3}}>{s.label}</div>
+            <div style={{fontFamily:MONO,fontSize:10,color:s.done?T2:T5,lineHeight:1.6}}>{s.sub}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── NFT Card visual ────────────────────────────────────────────────────────────
+function NFTCard({ c }) {
+  const [glow, setGlow] = React.useState(0);
+  React.useEffect(() => {
+    const t = setInterval(() => setGlow(g => (g+1)%360), 16);
+    return () => clearInterval(t);
+  }, []);
+  const glowColor = `hsl(${glow * 0.2 + 30}, 45%, 55%)`;
+
+  return (
+    <div style={{
+      width:340, flexShrink:0,
+      border:`1px solid rgba(201,168,124,0.3)`,
+      background:`radial-gradient(ellipse 80% 70% at 50% 40%, rgba(201,168,124,0.06) 0%, ${BG2} 70%)`,
+      padding:'32px 28px',
+      position:'relative', overflow:'hidden',
+      boxShadow:`0 0 40px rgba(201,168,124,0.08)`,
+    }}>
+      {/* Scan line effect */}
+      <div style={{
+        position:'absolute',left:0,right:0,height:2,
+        background:`linear-gradient(to right, transparent, ${GOLD_HI}44, transparent)`,
+        animation:'scanLine 3s linear infinite',
+        pointerEvents:'none',
+      }}/>
+
+      {/* Corner glyphs */}
+      {[[0,0],[0,'auto'],['auto',0],['auto','auto']].map(([t,r,b,l],i) => (
+        <div key={i} style={{
+          position:'absolute',
+          top: i<2?8:'auto', bottom: i>=2?8:'auto',
+          left: i%2===0?8:'auto', right: i%2===1?8:'auto',
+          fontFamily:MONO,fontSize:9,color:`rgba(201,168,124,0.25)`,
+        }}>◇</div>
+      ))}
+
+      {/* NFT visual placeholder */}
+      <div style={{
+        width:'100%',aspectRatio:'1',
+        background:`linear-gradient(135deg, #1A1208 0%, #0A1808 50%, #08101A 100%)`,
+        border:`1px solid rgba(201,168,124,0.15)`,
+        marginBottom:24,
+        display:'flex',alignItems:'center',justifyContent:'center',
+        position:'relative',overflow:'hidden',
+      }}>
+        {/* Cymatics pattern suggestion */}
+        <svg viewBox="0 0 200 200" width="160" height="160" style={{opacity:0.5}}>
+          {[0,1,2,3,4].map(i => (
+            <ellipse key={i} cx="100" cy="100"
+              rx={30+i*18} ry={20+i*12}
+              fill="none" stroke={GOLD_HI} strokeWidth="0.5"
+              opacity={0.6-i*0.1}
+              transform={`rotate(${i*36} 100 100)`}/>
+          ))}
+          <circle cx="100" cy="100" r="4" fill={GOLD_HI} opacity="0.8"/>
+        </svg>
+        <div style={{
+          position:'absolute',bottom:10,left:10,right:10,
+          fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+          color:'rgba(201,168,124,0.4)',textTransform:'uppercase',textAlign:'center',
+        }}>Cymatics Signature · {c.freq}</div>
+      </div>
+
+      {/* Token info */}
+      <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:GOLD,
+        textTransform:'uppercase',marginBottom:10}}>NFT Certificaat</div>
+      <div style={{fontFamily:SERIF,fontSize:24,color:CREAM,fontWeight:400,
+        lineHeight:1.1,letterSpacing:'-0.01em',marginBottom:4}}>
+        {c.name}
+      </div>
+      <div style={{fontFamily:SERIF,fontSize:14,color:T3,fontStyle:'italic',marginBottom:20}}>
+        {c.variant}
+      </div>
+
+      <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE,marginBottom:20}}>
+        {[
+          ['Token ID',c.tokenId],
+          ['Chain',c.chain],
+          ['Gemint op',c.mintDate.slice(0,10)],
+          ['IPFS',`ipfs://${c.ipfsHash}`],
+        ].map(([k,v]) => (
+          <div key={k} style={{background:BG2,padding:'8px 12px',
+            display:'flex',justifyContent:'space-between',gap:8}}>
+            <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+              color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+            <span style={{fontFamily:MONO,fontSize:9,color:T3,
+              textAlign:'right',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
+              maxWidth:160}}>{v}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Metrics */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1,background:RULE}}>
+        {[
+          ['Synergy','134/150',GOLD_HI],
+          ['Harmony','88/100','#7A9B6A'],
+          ['RI','1.52',T2],
+          ['Freq',c.freq,T2],
+        ].map(([k,v,c]) => (
+          <div key={k} style={{background:BG2,padding:'10px 12px',textAlign:'center'}}>
+            <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+              color:T3,textTransform:'uppercase',marginBottom:4}}>{k}</div>
+            <div style={{fontFamily:SERIF,fontSize:18,color:c,fontWeight:300}}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Signature */}
+      <div style={{marginTop:20,paddingTop:16,borderTop:`1px solid ${RULE}`,
+        display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div style={{fontFamily:SERIF,fontSize:18,color:GOLD,fontStyle:'italic'}}>
+          Glass⏧Grasie®
+        </div>
+        <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+          color:T3,textTransform:'uppercase',textAlign:'right',lineHeight:1.8}}>
+          Rotterdam, NL<br/>Est. 2025
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Batch data table ───────────────────────────────────────────────────────────
+function BatchTable({ c }) {
+  const rows = [
+    ['Batch ID', c.batchId, GOLD_HI],
+    ['Materiaal', c.material, T2],
+    ['Dikte', c.thickness, T2],
+    ['Bron', c.source, T2],
+    ['Snijdatum', c.cutDate.slice(0,10), T2],
+    ['Afmetingen', c.dimensions, T2],
+    ['Gewicht glas', `${c.glassWeightKg} kg`, T2],
+    ['Kwaliteitsklasse', c.qualityGrade, GREEN],
+    ['Ontwerper', c.operator, T2],
+    ['DXF bestand', c.designFile, T3],
+    ['CNC programma', c.cncProgram, T3],
+    ['Snijtijd', c.cuttingTime, T2],
+    ['CO₂ offset', `${c.carbonOffsetKg} kg`, '#7A9B6A'],
+  ];
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+      {rows.map(([k,v,c]) => (
+        <div key={k} style={{background:BG2,padding:'11px 16px',
+          display:'flex',justifyContent:'space-between',alignItems:'center',gap:12}}>
+          <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+            color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+          <span style={{fontFamily:MONO,fontSize:10,color:c||T2,
+            textAlign:'right'}}>{v}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── QR placeholder ─────────────────────────────────────────────────────────────
+function QRCode({ serial, size=120 }) {
+  const seed = serial.split('').reduce((a,c) => a+c.charCodeAt(0),0);
+  const n = 13;
+  const cell = size/n;
+  const dots = [];
+  for (let r=0;r<n;r++) for (let c=0;c<n;c++) {
+    const corner = (r<4&&c<4)||(r<4&&c>=n-4)||(r>=n-4&&c<4);
+    const on = corner || ((seed*(r+1)*(c+1)*37)%97 > 46);
+    if (on) dots.push({r,c});
+  }
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <rect width={size} height={size} fill="#F0EAE0"/>
+      {dots.map(({r,c},i) => (
+        <rect key={i} x={c*cell+0.5} y={r*cell+0.5}
+          width={cell-1} height={cell-1} fill="#090806"/>
+      ))}
+    </svg>
+  );
+}
+
+// ── Main page ──────────────────────────────────────────────────────────────────
+function App() {
+  const [tab, setTab] = React.useState('cert');
+  const c = CERT_DATA;
+
+  return (
+    <div style={{minHeight:'100vh',background:BG}}>
+
+      {/* Top bar */}
+      <div style={{borderBottom:`1px solid ${RULE}`,padding:'14px 40px',
+        display:'flex',alignItems:'center',justifyContent:'space-between',
+        background:'rgba(9,8,6,0.95)',position:'sticky',top:0,zIndex:10,
+        backdropFilter:'blur(12px)'}}>
+        <div style={{fontFamily:'Cormorant Garamond',fontSize:22,letterSpacing:'-0.05em',color:CREAM}}>Glass⏧Grasie<sup style={{fontSize:'0.55em',color:GOLD_HI,verticalAlign:'super',letterSpacing:0}}>®</sup>
+        </div>
+        <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'4px',color:T3,textTransform:'uppercase'}}>
+          Certificaat van Herkomst · Certificate of Origin
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <div style={{width:6,height:6,borderRadius:'50%',background:GREEN,
+            animation:'pulse 2s infinite'}}/>
+          <span style={{fontFamily:MONO,fontSize:9,color:GREEN}}>BLOCKCHAIN VERIFIED</span>
+        </div>
+      </div>
+
+      {/* Hero */}
+      <div style={{
+        padding:'56px 40px 48px',
+        background:`radial-gradient(ellipse 70% 60% at 50% 60%, rgba(201,168,124,0.07) 0%, ${BG} 65%)`,
+        borderBottom:`1px solid ${RULE}`,
+        display:'flex',gap:48,alignItems:'flex-start',flexWrap:'wrap',
+      }}>
+        <NFTCard c={c}/>
+
+        <div style={{flex:1,minWidth:280}}>
+          <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'4px',color:GOLD,
+            textTransform:'uppercase',marginBottom:16}}>Serienummer</div>
+          <div style={{fontFamily:MONO,fontSize:28,color:GOLD_HI,letterSpacing:'0.05em',
+            marginBottom:8}}>{c.serial}</div>
+          <div style={{fontFamily:SERIF,fontSize:36,color:CREAM,fontWeight:400,
+            letterSpacing:'-0.02em',lineHeight:1.05,marginBottom:4}}>{c.name}</div>
+          <div style={{fontFamily:SERIF,fontSize:20,color:T3,fontStyle:'italic',
+            marginBottom:32}}>{c.variant}</div>
+
+          <p style={{fontFamily:SERIF,fontSize:16,color:T3,lineHeight:1.85,
+            maxWidth:520,marginBottom:32}}>
+            Dit stuk is waterjet-gesneden uit bedrukt restfloatglas van Van Dijken Glas in Waddinxveen op {c.cutDate.slice(0,10)}. Het bestaat maar één keer. De productierun {c.batchId} is niet reproduceerbaar.
+          </p>
+
+          {/* Key facts */}
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1,
+            background:RULE,marginBottom:32,maxWidth:520}}>
+            {[
+              ['Glas gered',`${c.glassWeightKg} kg`,GOLD_HI],
+              ['CO₂ offset',`${c.carbonOffsetKg} kg`,'#7A9B6A'],
+              ['Kwaliteit',c.qualityGrade,GREEN],
+              ['Editie','Beperkt',GOLD],
+            ].map(([k,v,col]) => (
+              <div key={k} style={{background:BG2,padding:'14px 16px'}}>
+                <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+                  color:T3,textTransform:'uppercase',marginBottom:6}}>{k}</div>
+                <div style={{fontFamily:SERIF,fontSize:22,color:col,fontWeight:300}}>{v}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* QR + scan prompt */}
+          <div style={{display:'flex',gap:24,alignItems:'flex-start'}}>
+            <div style={{padding:8,background:'#F0EAE0',border:`1px solid ${RULE}`}}>
+              <QRCode serial={c.serial} size={100}/>
+            </div>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:8}}>Scan voor blockchain record</div>
+              <div style={{fontFamily:MONO,fontSize:11,color:T3,lineHeight:1.8}}>
+                glassgrasie.nl/cert/{c.serial}<br/>
+                {c.chain} · Token {c.tokenId}
+              </div>
+              <div style={{marginTop:12,fontFamily:SANS,fontSize:6,letterSpacing:'1.5px',
+                color:GREEN,textTransform:'uppercase'}}>✓ Geverifieerd op {c.mintDate.slice(0,10)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{borderBottom:`1px solid ${RULE}`,
+        display:'flex',gap:0,padding:'0 40px',
+        background:BG2,position:'sticky',top:60,zIndex:9}}>
+        {[
+          ['cert','Certificaat'],
+          ['batch','Batch Data'],
+          ['chain','Blockchain Trail'],
+          ['nft','NFT Details'],
+        ].map(([id,label]) => (
+          <button key={id} onClick={() => setTab(id)} style={{
+            fontFamily:SANS,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',
+            padding:'14px 20px',background:'none',border:'none',cursor:'pointer',
+            color: tab===id ? GOLD_HI : T4,
+            borderBottom: tab===id ? `2px solid ${GOLD_HI}` : '2px solid transparent',
+            transition:'color 150ms',
+          }}>{label}</button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div style={{padding:'48px 40px',maxWidth:1100,margin:'0 auto'}}>
+
+        {tab==='cert' && (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:48}}>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:20}}>Certificaat van Herkomst</div>
+              {/* Formal cert layout */}
+              <div style={{
+                border:`1px solid rgba(201,168,124,0.25)`,
+                padding:'36px 32px',
+                background:'rgba(201,168,124,0.03)',
+                position:'relative',
+              }}>
+                {/* Corner decorations */}
+                {['top:8px;left:8px','top:8px;right:8px','bottom:8px;left:8px','bottom:8px;right:8px'].map((pos,i) => (
+                  <div key={i} style={{position:'absolute',...Object.fromEntries(pos.split(';').map(p=>p.split(':'))),
+                    fontFamily:MONO,fontSize:10,color:'rgba(201,168,124,0.2)'}}>◇</div>
+                ))}
+
+                <div style={{textAlign:'center',marginBottom:28}}>
+                  <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'5px',color:GOLD,
+                    textTransform:'uppercase',marginBottom:12}}>
+                    Glass⏧Grasie® · Rotterdam
+                  </div>
+                  <div style={{width:48,height:1,background:`rgba(201,168,124,0.3)`,margin:'0 auto 16px'}}/>
+                  <div style={{fontFamily:SERIF,fontStyle:'italic',fontSize:28,color:CREAM,
+                    fontWeight:300,lineHeight:1.1}}>
+                    Certificaat van Herkomst
+                  </div>
+                  <div style={{fontFamily:SERIF,fontStyle:'italic',fontSize:15,color:T3,marginTop:6}}>
+                    Certificate of Origin
+                  </div>
+                </div>
+
+                <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE,marginBottom:24}}>
+                  {[
+                    ['Dit certifieert dat / This certifies that',''],
+                    ['Product',`${c.name} — ${c.variant}`],
+                    ['Serienummer',c.serial],
+                    ['Materiaal',`${c.material}, ${c.thickness}`],
+                    ['Productierun',c.batchId],
+                    ['Bron',c.source],
+                    ['Snijdatum',c.cutDate.slice(0,10)],
+                    ['Kwaliteitsklasse',c.qualityGrade],
+                    ['Glas gered',`${c.glassWeightKg} kg restfloatglas`],
+                    ['CO₂ offset',`${c.carbonOffsetKg} kg`],
+                  ].map(([k,v],i) => i===0 ? (
+                    <div key={k} style={{background:BG3,padding:'10px 16px'}}>
+                      <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+                        color:T3,textTransform:'uppercase'}}>{k}</span>
+                    </div>
+                  ) : (
+                    <div key={k} style={{background:BG2,padding:'10px 16px',
+                      display:'flex',justifyContent:'space-between',gap:12}}>
+                      <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+                        color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+                      <span style={{fontFamily:SERIF,fontStyle:'italic',fontSize:14,
+                        color:T2,textAlign:'right'}}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{textAlign:'center'}}>
+                  <div style={{fontFamily:SERIF,fontSize:22,color:GOLD,fontStyle:'italic',marginBottom:4}}>
+                    Glass⏧Grasie®
+                  </div>
+                  <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:T3,
+                    textTransform:'uppercase'}}>Rotterdam, NL · {c.mintDate.slice(0,10)}</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:20}}>Duurzaamheidsverklaring</div>
+              <div style={{fontFamily:SERIF,fontSize:16,color:T3,lineHeight:1.9,marginBottom:24}}>
+                Dit product is gemaakt van industrieel restfloatglas dat anders als afval zou zijn afgevoerd. Door gebruik van dit materiaal is <strong style={{color:CREAM,fontWeight:400}}>{c.glassWeightKg} kg glas gered</strong> van de grondstoffenstroom en zijn <strong style={{color:'#7A9B6A',fontWeight:400}}>{c.carbonOffsetKg} kg CO₂</strong> offset berekend op basis van vermeden productie van primair float glas.
+              </div>
+              <div style={{fontFamily:SERIF,fontSize:14,color:T3,fontStyle:'italic',
+                lineHeight:1.8,marginBottom:32}}>
+                This product is made from industrial float glass offcut that would otherwise have been disposed of as waste. By using this material, {c.glassWeightKg} kg of glass has been diverted from waste streams and {c.carbonOffsetKg} kg CO₂ offset calculated.
+              </div>
+              {/* Hashes */}
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                <HashTag hash={c.txHash} label="TX Hash"/>
+                <HashTag hash={`ipfs://${c.ipfsHash}`} label="IPFS"/>
+                <HashTag hash={c.tokenId} label="Token ID"/>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab==='batch' && (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:48}}>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:20}}>Batch Data — {c.batchId}</div>
+              <BatchTable c={c}/>
+            </div>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:20}}>Materiaalreis</div>
+              <div style={{fontFamily:SERIF,fontSize:15,color:T3,lineHeight:1.9,marginBottom:24}}>
+                Run {c.batchId} begon als een afgekeurde printplaat bij Van Dijken Glas in Waddinxveen — bedrukt met het Forest Floor-motief voor een order die niet doorging. In plaats van afgevoerd te worden als industrieel glasafval, werd het materiaal overgedragen aan Glass⏧Grasie® onder de exclusiviteitsovereenkomst.
+              </div>
+              <div style={{fontFamily:SERIF,fontSize:14,color:T3,fontStyle:'italic',lineHeight:1.8}}>
+                Run {c.batchId} started as a rejected print plate at Van Dijken Glas — printed with the Forest Floor motif for an order that was cancelled. Instead of being disposed of as industrial glass waste, the material was transferred to Glass⏧Grasie® under the exclusivity agreement.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab==='chain' && (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:64}}>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:24}}>Blockchain Audit Trail</div>
+              <BlockchainChain c={c}/>
+            </div>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:20}}>Verificatie</div>
+              <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:32}}>
+                <HashTag hash={c.txHash} label="TX Hash"/>
+                <HashTag hash={c.tokenId} label="Token ID"/>
+                <HashTag hash={`ipfs://${c.ipfsHash}`} label="IPFS NFT"/>
+              </div>
+              <div style={{padding:'20px',border:`1px solid rgba(90,154,106,0.25)`,
+                background:'rgba(90,154,106,0.04)'}}>
+                <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:GREEN,
+                    animation:'pulse 2s infinite'}}/>
+                  <span style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',
+                    color:GREEN,textTransform:'uppercase'}}>Geverifieerd</span>
+                </div>
+                <div style={{fontFamily:SERIF,fontSize:14,color:T3,lineHeight:1.8}}>
+                  Dit certificaat is geregistreerd op het XRP Ledger en is onveranderlijk. De hash van de batch data komt overeen met het on-chain record.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab==='nft' && (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:48}}>
+            <div style={{display:'flex',justifyContent:'center'}}>
+              <NFTCard c={c}/>
+            </div>
+            <div>
+              <div style={{fontFamily:SANS,fontSize:7,letterSpacing:'3px',color:GOLD,
+                textTransform:'uppercase',marginBottom:20}}>NFT Metadata</div>
+              <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE,marginBottom:28}}>
+                {[
+                  ['Naam',`${c.name} — ${c.variant}`],
+                  ['Token ID',c.tokenId],
+                  ['Chain',c.chain],
+                  ['Contract','glassgrasie.xrp'],
+                  ['Gemint',c.mintDate.replace('T',' ').slice(0,19)],
+                  ['IPFS',c.ipfsHash],
+                  ['Royalties','5% secundaire verkoop'],
+                  ['Eigendom','Overdraagbaar · XRP wallet'],
+                ].map(([k,v]) => (
+                  <div key={k} style={{background:BG2,padding:'11px 16px',
+                    display:'flex',justifyContent:'space-between',gap:12}}>
+                    <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+                      color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+                    <span style={{fontFamily:MONO,fontSize:10,color:T2,textAlign:'right'}}>{v}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{fontFamily:SERIF,fontSize:14,color:T3,lineHeight:1.85}}>
+                Het NFT certificaat wordt automatisch gemint bij aankoop en verstuurd naar het opgegeven wallet-adres. Het certificaat is onlosmakelijk verbonden aan het fysieke object via het serienummer en batch hash.
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div style={{borderTop:`1px solid ${RULE}`,padding:'24px 40px',
+        display:'flex',justifyContent:'space-between',alignItems:'center',
+        background:BG2,flexWrap:'wrap',gap:12}}>
+        <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase'}}>
+          © 2026 Glass⏧Grasie® Rotterdam
+        </div>
+        <div style={{fontFamily:MONO,fontSize:9,color:T3}}>
+          glassgrasie.nl/cert/{c.serial}
+        </div>
+        <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>
+          XRP Ledger · IPFS · Blockchain verified
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+
+<script>
+const NFT_TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentBrightness": 100,
+  "cardScale": 100,
+  "darkMode": true,
+  "showBlockchain": true
+}/*EDITMODE-END*/;
+
+(function() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('gg-nft-tweaks') || '{}'); } catch {}
+  const T = Object.assign({}, NFT_TWEAK_DEFAULTS, saved);
+
+  function applyTweaks() {
+    const root = document.documentElement;
+    // Accent brightness filter
+    document.querySelectorAll('[data-nft-card]').forEach(el => {
+      el.style.filter = T.accentBrightness !== 100 ? `brightness(${T.accentBrightness/100})` : '';
+    });
+    // Card scale
+    document.querySelectorAll('[data-nft-card]').forEach(el => {
+      el.style.transform = T.cardScale !== 100 ? `scale(${T.cardScale/100})` : '';
+      el.style.transformOrigin = 'top left';
+    });
+    // Blockchain badge
+    const badge = document.querySelector('[data-blockchain-badge]');
+    if (badge) badge.style.display = T.showBlockchain ? '' : 'none';
+    // Dark/light
+    if (!T.darkMode) {
+      root.style.setProperty('background','#F0EAE0');
+      document.body.style.background = '#F0EAE0';
+    } else {
+      document.body.style.background = '';
+    }
+  }
+
+  const panel = document.createElement('div');
+  panel.id = 'nft-tweaks';
+  panel.style.cssText = 'display:none;position:fixed;bottom:24px;right:24px;z-index:9999;width:250px;background:#0A0908;border:1px solid #2C2418;font-family:\'Cormorant Garamond\',serif;color:#E8E2D8;box-shadow:0 8px 40px rgba(0,0,0,0.7);';
+  panel.innerHTML = `
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #1C1810;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:4px;color:#C9A87C;text-transform:uppercase;">Tweaks</span>
+      <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:2px;color:#5A5044;">NFT Certificaat</span>
+    </div>
+    <div style="padding:16px 18px;display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Accent helderheid <span id="nft-bright-val">${T.accentBrightness}</span>%</label>
+        <input id="nft-bright" type="range" min="60" max="160" step="5" value="${T.accentBrightness}" style="width:100%;accent-color:#C9A87C;cursor:pointer;">
+      </div>
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Kaart schaal <span id="nft-scale-val">${T.cardScale}</span>%</label>
+        <input id="nft-scale" type="range" min="70" max="130" step="5" value="${T.cardScale}" style="width:100%;accent-color:#C9A87C;cursor:pointer;">
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid #1C1810;">
+        <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;">Blockchain badge</span>
+        <button id="nft-chain" style="padding:5px 12px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #C9A87C;background:transparent;color:#C9A87C;cursor:pointer;text-transform:uppercase;">${T.showBlockchain ? 'Aan':'Uit'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(panel);
+
+  panel.querySelector('#nft-bright').addEventListener('input', e => {
+    T.accentBrightness = +e.target.value;
+    panel.querySelector('#nft-bright-val').textContent = T.accentBrightness;
+    try { localStorage.setItem('gg-nft-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: T }, '*');
+  });
+  panel.querySelector('#nft-scale').addEventListener('input', e => {
+    T.cardScale = +e.target.value;
+    panel.querySelector('#nft-scale-val').textContent = T.cardScale;
+    try { localStorage.setItem('gg-nft-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: T }, '*');
+  });
+  panel.querySelector('#nft-chain').addEventListener('click', () => {
+    T.showBlockchain = !T.showBlockchain;
+    panel.querySelector('#nft-chain').textContent = T.showBlockchain ? 'Aan' : 'Uit';
+    try { localStorage.setItem('gg-nft-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: T }, '*');
+  });
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === '__activate_edit_mode')   panel.style.display = 'block';
+    if (e.data?.type === '__deactivate_edit_mode') panel.style.display = 'none';
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+  setTimeout(applyTweaks, 600);
+})();
+</script>
+</body>
+</html>
