@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Pod⏧Glassed Show Art</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body, #root { width:100%; height:100%; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel">
+
+const S = "'Syncopate',sans-serif";
+const R = "'Cormorant Garamond',Georgia,serif";
+const M = "'JetBrains Mono',ui-monospace,monospace";
+const BG = '#0D0C0B'; const BG2 = '#100F0D'; const BG3 = '#0A0908';
+const GOLD = '#8B7355'; const GOLD_HI = '#C9A87C'; const CREAM = '#E8E2D8';
+const T3 = '#8A8070'; const T4 = '#5A5044'; const T5 = '#3A3020';
+
+// ── Shared visual primitives ─────────────────────────────────────────────────
+const ShardBg = ({ count=6, color=GOLD_HI, maxOpacity=0.10 }) => (
+  <>
+    {Array.from({length:count},(_,i) => {
+      const shapes = ['10,85 48,5 95,22 80,95','20,5 95,30 72,98 0,70','5,70 42,0 100,25 85,100','15,90 52,8 98,30 75,95','0,50 38,2 100,35 90,95','10,80 55,0 100,28 78,92'];
+      const xs = [5,55,25,70,40,80], ys = [5,10,55,40,20,65], sz = [80,110,70,90,60,100];
+      const rots = [15,-10,25,-20,8,-35];
+      return (
+        <div key={i} style={{position:'absolute',left:`${xs[i]}%`,top:`${ys[i]}%`,width:sz[i],height:sz[i],transform:`rotate(${rots[i]}deg)`,opacity:maxOpacity*(0.5+0.5*(i/count)),pointerEvents:'none'}}>
+          <svg viewBox="0 0 100 100" width={sz[i]} height={sz[i]}>
+            <polygon points={shapes[i%shapes.length]} fill={color} opacity="0.9"/>
+            <polygon points={shapes[i%shapes.length]} fill="url(#gl)" opacity="0.4"/>
+            <defs><linearGradient id="gl" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="white" stopOpacity="0.3"/><stop offset="100%" stopColor="white" stopOpacity="0"/></linearGradient></defs>
+          </svg>
+        </div>
+      );
+    })}
+  </>
+);
+
+const WaveForm = ({ w=240, h=36, color=GOLD_HI, opacity=0.5 }) => (
+  <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    {Array.from({length:40},(_,i) => {
+      const x = (i/39)*w;
+      const ht = (0.3 + 0.7*Math.abs(Math.sin(i*0.7 + 1.2))) * h;
+      return <rect key={i} x={x-1} y={(h-ht)/2} width={2} height={ht} fill={color} opacity={opacity * (0.5+0.5*(i/39))}/>;
+    })}
+  </svg>
+);
+
+const DiamondMark = ({ size=32, color=GOLD_HI }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32">
+    <polygon points="16,2 30,16 16,30 2,16" fill="none" stroke={color} strokeWidth="1.4"/>
+    <polygon points="16,6 26,16 16,26 6,16" fill={color} opacity="0.18"/>
+  </svg>
+);
+
+// ── Podcast Cover — Square 3000×3000px ──────────────────────────────────────
+const PodcastCover = () => (
+  <div style={{width:'100%',height:'100%',background:`radial-gradient(ellipse 75% 65% at 50% 55%, #1C1810 0%, ${BG3} 68%)`,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:0}}>
+    <ShardBg count={8} color={GOLD_HI} maxOpacity={0.10}/>
+    {/* Grid overlay */}
+    <div style={{position:'absolute',inset:0,backgroundImage:`linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px)`,backgroundSize:'40px 40px'}}/>
+    <div style={{position:'relative',zIndex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:20,padding:'0 40px'}}>
+      <DiamondMark size={52} color={GOLD_HI}/>
+      <div style={{textAlign:'center'}}>
+        <div style={{fontFamily:S,fontWeight:700,fontSize:36,letterSpacing:'12px',color:CREAM,lineHeight:1.1}}>
+          POD<span style={{color:GOLD_HI}}>⏧</span>GLASSED
+        </div>
+        <div style={{fontFamily:R,fontStyle:'italic',fontWeight:300,fontSize:16,color:T3,letterSpacing:'4px',marginTop:8}}>
+          by Glass⏧Grasie®
+        </div>
+      </div>
+      <WaveForm w={200} h={28} color={GOLD_HI} opacity={0.55}/>
+      <div style={{fontFamily:S,fontSize:7,letterSpacing:'5px',color:T3,textTransform:'uppercase',textAlign:'center',lineHeight:2}}>
+        Sustainable design<br/>Material innovation<br/>Rotterdam
+      </div>
+    </div>
+    {/* Corner marks */}
+    {['top:12px;left:12px','top:12px;right:12px','bottom:12px;left:12px','bottom:12px;right:12px'].map((pos,i)=>(
+      <div key={i} style={{position:'absolute',...Object.fromEntries(pos.split(';').map(p=>p.split(':'))),fontFamily:M,fontSize:9,color:`rgba(201,168,124,0.18)`}}>◇</div>
+    ))}
+  </div>
+);
+
+// ── YouTube Channel Banner — 2560×1440px ─────────────────────────────────────
+const YTBanner = () => (
+  <div style={{width:'100%',height:'100%',background:`linear-gradient(135deg, ${BG3} 0%, #1C1810 50%, ${BG3} 100%)`,position:'relative',overflow:'hidden',display:'flex',alignItems:'center'}}>
+    <ShardBg count={10} color={GOLD_HI} maxOpacity={0.08}/>
+    {/* Left brand */}
+    <div style={{position:'relative',zIndex:1,padding:'0 40px',flex:1}}>
+      <div style={{fontFamily:'Cormorant Garamond',fontSize:26,letterSpacing:'-0.05em',color:CREAM,marginBottom:6}}>Glass⏧Grasie<sup style={{fontSize:'0.55em',color:GOLD_HI,verticalAlign:'super',letterSpacing:0}}>®</sup>
+      </div>
+      <div style={{fontFamily:R,fontStyle:'italic',fontSize:13,color:T3,marginBottom:16,letterSpacing:'2px'}}>
+        Geconstrueerd glas uit Rotterdam
+      </div>
+      <div style={{display:'flex',gap:16,alignItems:'center'}}>
+        <WaveForm w={120} h={20} color={GOLD_HI} opacity={0.5}/>
+        <div style={{fontFamily:S,fontWeight:700,fontSize:14,letterSpacing:'6px',color:CREAM}}>
+          POD<span style={{color:GOLD_HI}}>⏧</span>GLASSED
+        </div>
+      </div>
+    </div>
+    {/* Right schedule */}
+    <div style={{position:'relative',zIndex:1,padding:'0 36px',textAlign:'right',flexShrink:0}}>
+      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:12}}>Elke week nieuw</div>
+      {[['Maandag','Pod⏧Glassed Episode'],['Donderdag','Studio Diary'],['Vrijdag','Product Spotlight']].map(([day,type])=>(
+        <div key={day} style={{marginBottom:8,textAlign:'right'}}>
+          <div style={{fontFamily:S,fontSize:7,letterSpacing:'2px',color:GOLD_HI,textTransform:'uppercase'}}>{day}</div>
+          <div style={{fontFamily:R,fontStyle:'italic',fontSize:11,color:T3}}>{type}</div>
+        </div>
+      ))}
+      <div style={{marginTop:12,fontFamily:M,fontSize:8,color:T5}}>glassgrasie.nl</div>
+    </div>
+  </div>
+);
+
+// ── Episode Thumbnail Template ───────────────────────────────────────────────
+const EpisodeThumb = ({ ep=1, title="Restglas als kunststof", guest="Sergio Dias", dark=true }) => (
+  <div style={{width:'100%',height:'100%',background:dark?`radial-gradient(ellipse 70% 60% at 55% 55%, #1C1810 0%, ${BG3} 65%)`:'#F0EAE0',position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'20px 22px'}}>
+    {dark && <ShardBg count={5} color={GOLD_HI} maxOpacity={0.09}/>}
+    {/* Top bar */}
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',position:'relative',zIndex:1}}>
+      <div style={{fontFamily:S,fontWeight:700,fontSize:10,letterSpacing:'4px',color:dark?CREAM:BG}}>
+        POD<span style={{color:GOLD_HI}}>⏧</span>GLASSED
+      </div>
+      <div style={{fontFamily:S,fontWeight:700,fontSize:9,letterSpacing:'3px',color:GOLD_HI}}>
+        EP.{String(ep).padStart(2,'0')}
+      </div>
+    </div>
+    {/* Main content */}
+    <div style={{position:'relative',zIndex:1}}>
+      <WaveForm w={160} h={22} color={GOLD_HI} opacity={0.5}/>
+      <div style={{fontFamily:R,fontStyle:'italic',fontWeight:300,fontSize:22,color:dark?CREAM:BG,lineHeight:1.1,marginTop:10,marginBottom:6,maxWidth:'85%'}}>
+        {title}
+      </div>
+      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:dark?GOLD:T4,textTransform:'uppercase'}}>{guest}</div>
+    </div>
+    {/* Bottom */}
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',position:'relative',zIndex:1}}>
+      <div style={{fontFamily:M,fontSize:7,color:dark?T5:'rgba(0,0,0,0.3)'}}>glassgrasie.nl</div>
+      <DiamondMark size={16} color={GOLD_HI}/>
+    </div>
+  </div>
+);
+
+// ── Profile Picture 98×98 ────────────────────────────────────────────────────
+const ProfilePic = () => (
+  <div style={{width:'100%',height:'100%',background:`radial-gradient(circle, #1C1810 0%, ${BG3} 100%)`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
+    <ShardBg count={4} color={GOLD_HI} maxOpacity={0.08}/>
+    <div style={{position:'relative',zIndex:1,textAlign:'center'}}>
+      <DiamondMark size={40} color={GOLD_HI}/>
+      <div style={{fontFamily:S,fontWeight:700,fontSize:8,letterSpacing:'3px',color:CREAM,marginTop:4}}>G<span style={{color:GOLD_HI}}>⏧</span>G</div>
+    </div>
+  </div>
+);
+
+// ── Instagram Post ────────────────────────────────────────────────────────────
+const InstaPost = ({ type='episode' }) => (
+  <div style={{width:'100%',height:'100%',background:`radial-gradient(ellipse 70% 65% at 50% 45%, #1A1410 0%, ${BG3} 65%)`,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16,padding:'24px'}}>
+    <ShardBg count={6} color={GOLD_HI} maxOpacity={0.09}/>
+    <div style={{position:'relative',zIndex:1,textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:14}}>
+      <DiamondMark size={36} color={GOLD_HI}/>
+      <div style={{fontFamily:S,fontWeight:700,fontSize:16,letterSpacing:'6px',color:CREAM}}>
+        POD<span style={{color:GOLD_HI}}>⏧</span>GLASSED
+      </div>
+      {type==='episode' && <>
+        <WaveForm w={160} h={24} color={GOLD_HI} opacity={0.55}/>
+        <div style={{fontFamily:R,fontStyle:'italic',fontSize:20,color:CREAM,lineHeight:1.2,maxWidth:260,textAlign:'center'}}>
+          Ep.01 — Restglas als kunststof
+        </div>
+        <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase'}}>Nu beschikbaar · Spotify · Apple · YouTube</div>
+      </>}
+      {type==='quote' && <>
+        <div style={{fontFamily:R,fontStyle:'italic',fontSize:18,color:CREAM,lineHeight:1.4,maxWidth:260,textAlign:'center'}}>
+          "Elk stuk vertelt een verhaal dat niemand anders kan vertellen."
+        </div>
+        <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase'}}>Glass⏧Grasie® · Rotterdam</div>
+      </>}
+    </div>
+  </div>
+);
+
+// ── Spotify Canvas (vertical 9:16) ───────────────────────────────────────────
+const SpotifyCanvas = () => (
+  <div style={{width:'100%',height:'100%',background:`linear-gradient(170deg, ${BG3} 0%, #1C1810 40%, ${BG3} 100%)`,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'space-between',padding:'24px 20px'}}>
+    <ShardBg count={7} color={GOLD_HI} maxOpacity={0.12}/>
+    <div style={{position:'relative',zIndex:1,textAlign:'center'}}>
+      <div style={{fontFamily:S,fontWeight:700,fontSize:13,letterSpacing:'5px',color:CREAM}}>
+        POD<span style={{color:GOLD_HI}}>⏧</span>GLASSED
+      </div>
+      <div style={{fontFamily:R,fontStyle:'italic',fontSize:9,color:T4,marginTop:4}}>by Glass⏧Grasie®</div>
+    </div>
+    <div style={{position:'relative',zIndex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:14}}>
+      <DiamondMark size={48} color={GOLD_HI}/>
+      <WaveForm w={120} h={32} color={GOLD_HI} opacity={0.6}/>
+    </div>
+    <div style={{position:'relative',zIndex:1,textAlign:'center'}}>
+      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:4}}>Nu speelt</div>
+      <div style={{fontFamily:R,fontStyle:'italic',fontSize:14,color:CREAM}}>Geconstrueerd glas</div>
+      <div style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,marginTop:4,textTransform:'uppercase'}}>glassgrasie.nl</div>
+    </div>
+  </div>
+);
+
+// ── Email Header ──────────────────────────────────────────────────────────────
+const EmailHeader = () => (
+  <div style={{width:'100%',height:'100%',background:BG,display:'flex',flexDirection:'column'}}>
+    <div style={{height:3,background:`linear-gradient(to right, transparent, ${GOLD}, transparent)`}}/>
+    <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 28px'}}>
+      <div style={{display:'flex',alignItems:'center',gap:14}}>
+        <DiamondMark size={22} color={GOLD_HI}/>
+        <div>
+          <div style={{fontFamily:S,fontWeight:700,fontSize:9,letterSpacing:'4px',color:CREAM}}>
+            POD<span style={{color:GOLD_HI}}>⏧</span>GLASSED
+          </div>
+          <div style={{fontFamily:R,fontStyle:'italic',fontSize:10,color:T4}}>by Glass⏧Grasie®</div>
+        </div>
+      </div>
+      <WaveForm w={80} h={18} color={GOLD} opacity={0.4}/>
+    </div>
+    <div style={{height:1,background:GOLD,opacity:0.25}}/>
+  </div>
+);
+
+// App
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="podcast" title="Podcast Cover Art" subtitle="3000×3000px · Spotify · Apple · YouTube Music">
+        <DCArtboard id="cover-main" label="Cover — Donker (Primair)" width={300} height={300}>
+          <PodcastCover/>
+        </DCArtboard>
+        <DCArtboard id="profile" label="Profielfoto 98×98px" width={150} height={150}>
+          <ProfilePic/>
+        </DCArtboard>
+        <DCArtboard id="spotify-canvas" label="Spotify Canvas 9:16" width={140} height={248}>
+          <SpotifyCanvas/>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="youtube" title="YouTube Kanaal" subtitle="Banner · Thumbnail templates · Community posts">
+        <DCArtboard id="yt-banner" label="Channel Banner — 2560×1440px" width={400} height={225}>
+          <YTBanner/>
+        </DCArtboard>
+        <DCArtboard id="thumb-1" label="Thumbnail — Donker" width={320} height={180}>
+          <EpisodeThumb ep={1} title="Restglas als kunststof" guest="Sergio Dias"/>
+        </DCArtboard>
+        <DCArtboard id="thumb-2" label="Thumbnail — Licht" width={320} height={180}>
+          <EpisodeThumb ep={2} title="WAZER: precisie in de studio" guest="Sergio Dias" dark={false}/>
+        </DCArtboard>
+        <DCArtboard id="thumb-3" label="Thumbnail — Studio Diary" width={320} height={180}>
+          <EpisodeThumb ep={3} title="Fragment: Van glas tot sieraad" guest="Studio Diary" dark={true}/>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="social" title="Social Media" subtitle="Instagram 1:1 · Stories 9:16 · Community posts">
+        <DCArtboard id="insta-ep" label="Instagram — Episode Drop" width={280} height={280}>
+          <InstaPost type="episode"/>
+        </DCArtboard>
+        <DCArtboard id="insta-quote" label="Instagram — Quote" width={280} height={280}>
+          <InstaPost type="quote"/>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="email" title="Email Newsletter Header" subtitle="600px breed · Weekly podcast drop">
+        <DCArtboard id="email-hdr" label="Email Header — 600×120px" width={400} height={80}>
+          <EmailHeader/>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
