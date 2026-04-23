@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Merchandise Lookbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:#090806; color:#E8E2D8; font-family:'Cormorant Garamond',Georgia,serif; -webkit-font-smoothing:antialiased; }
+#root {}
+::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:#2A2218; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const S="'Syncopate',sans-serif", R="'Cormorant Garamond',Georgia,serif", M="'JetBrains Mono',ui-monospace,monospace";
+const BG='#090806',BG2='#0D0C0B',BG3='#100F0D',RULE='#1C1810';
+const GOLD='#8B7355',GH='#C9A87C',CREAM='#E8E2D8',T3='#8A8070',T4='#5A5044',T5='#3A3020';
+
+const Shard = ({x,y,sz,rot,color,op}) => (
+  <div style={{position:'absolute',left:x,top:y,width:sz,height:sz,transform:`rotate(${rot}deg)`,opacity:op,pointerEvents:'none'}}>
+    <svg viewBox="0 0 100 100" width={sz} height={sz}>
+      <polygon points="10,90 45,5 95,22 78,95" fill={color} opacity="0.9"/>
+      <defs><linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="white" stopOpacity="0.25"/><stop offset="100%" stopColor="white" stopOpacity="0"/></linearGradient></defs>
+      <polygon points="10,90 45,5 95,22 78,95" fill="url(#sg2)" opacity="0.5"/>
+    </svg>
+  </div>
+);
+
+// ── Apparel illustrations ─────────────────────────────────────────────────────
+function TshirtIllustration({ bg='#090806', fg='#E8E2D8', accent='#C9A87C', print, size=280 }) {
+  const sc = size/280;
+  return (
+    <svg width={size} height={size*1.15} viewBox="0 0 280 322" style={{display:'block',overflow:'visible'}}>
+      {/* Shadow */}
+      <ellipse cx={140} cy={315} rx={80} ry={8} fill="rgba(0,0,0,0.25)"/>
+      {/* T-shirt body */}
+      <path d="M70,10 L30,32 L5,25 L15,85 L45,76 L45,295 L235,295 L235,76 L265,85 L275,25 L250,32 L210,10 Q175,-8 140,12 Q105,-8 70,10Z"
+        fill={bg} stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+      {/* Collar shadow */}
+      <path d="M140,12 Q160,28 175,18 Q155,35 140,35 Q125,35 105,18 Q120,28 140,12Z" fill="rgba(0,0,0,0.15)"/>
+      {/* Sleeve fold lines */}
+      <line x1={45} y1={65} x2={15} y2={55} stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>
+      <line x1={235} y1={65} x2={265} y2={55} stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>
+      {/* Hem */}
+      <line x1={45} y1={293} x2={235} y2={293} stroke="rgba(255,255,255,0.06)" strokeWidth="1"/>
+      {/* Print area */}
+      {print === 'wordmark' && <>
+        <text x={140} y={155} textAnchor="middle" fontFamily={S} fontWeight="700" fontSize={14} letterSpacing="5" fill={fg} opacity="0.95">GLASS</text>
+        <text x={140} y={175} textAnchor="middle" fontFamily={S} fontWeight="700" fontSize={14} letterSpacing="5" fill={fg} opacity="0.95">
+          <tspan fill={accent}>⏧</tspan>GRASIE
+        </text>
+        <polygon points="140,192 147,200 140,208 133,200" fill="none" stroke={accent} strokeWidth="1.2" opacity="0.7"/>
+        <text x={140} y={220} textAnchor="middle" fontFamily={S} fontSize={6} letterSpacing="3" fill={CREAM}>ROTTERDAM · EST. 2025</text>
+      </>}
+      {print === 'glyph' && <>
+        <polygon points="140,130 165,155 140,180 115,155" fill="none" stroke={accent} strokeWidth="2.5"/>
+        <polygon points="140,140 157,155 140,170 123,155" fill={accent} opacity="0.15"/>
+        <text x={140} y={195} textAnchor="middle" fontFamily={S} fontSize={6} letterSpacing="3" fill={CREAM}>G⏧G</text>
+      </>}
+      {print === 'back' && <>
+        <text x={140} y={165} textAnchor="middle" fontFamily={R} fontStyle="italic" fontWeight="300" fontSize={18} fill={fg} opacity="0.7">
+          Geconstrueerd glas.
+        </text>
+        <text x={140} y={190} textAnchor="middle" fontFamily={S} fontSize={5} letterSpacing="2" fill={CREAM}>glassgrasie.nl</text>
+      </>}
+    </svg>
+  );
+}
+
+function HoodieIllustration({ bg='#090806', fg='#E8E2D8', accent='#C9A87C', size=280 }) {
+  return (
+    <svg width={size} height={size*1.25} viewBox="0 0 280 350" style={{display:'block'}}>
+      <ellipse cx={140} cy={344} rx={80} ry={8} fill="rgba(0,0,0,0.22)"/>
+      {/* Body */}
+      <path d="M65,22 L28,40 L4,32 L10,95 L42,84 L42,320 L238,320 L238,84 L270,95 L276,32 L252,40 L215,22 Q178,-2 140,16 Q102,-2 65,22Z"
+        fill={bg} stroke="rgba(255,255,255,0.07)" strokeWidth="1"/>
+      {/* Hood */}
+      <path d="M100,16 Q115,-4 140,0 Q165,-4 180,16 Q160,8 140,22 Q120,8 100,16Z" fill={bg} stroke="rgba(255,255,255,0.1)" strokeWidth="0.8"/>
+      {/* Kangaroo pocket */}
+      <path d="M88,198 Q88,188 140,188 Q192,188 192,198 L192,240 Q192,248 140,248 Q88,248 88,240Z"
+        fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.06)" strokeWidth="0.8"/>
+      {/* Drawstrings */}
+      <line x1={125} y1={22} x2={120} y2={60} stroke="rgba(255,255,255,0.1)" strokeWidth="1.5"/>
+      <line x1={155} y1={22} x2={160} y2={60} stroke="rgba(255,255,255,0.1)" strokeWidth="1.5"/>
+      {/* Print */}
+      <text x={140} y={128} textAnchor="middle" fontFamily="'Cormorant Garamond',serif"  fontSize={10} letterSpacing="-2" fill={fg} opacity="0.9">Glass⏧Grasie</text>
+      <polygon points="140,140 147,148 140,156 133,148" fill="none" stroke={accent} strokeWidth="1" opacity="0.6"/>
+      <text x={140} y={168} textAnchor="middle" fontFamily={S} fontSize={5} letterSpacing="2" fill={CREAM}>ROTTERDAM</text>
+    </svg>
+  );
+}
+
+function BeanieIllustration({ bg='#090806', accent='#C9A87C', size=220 }) {
+  return (
+    <svg width={size} height={size*0.85} viewBox="0 0 220 187" style={{display:'block'}}>
+      <ellipse cx={110} cy={182} rx={70} ry={7} fill="rgba(0,0,0,0.22)"/>
+      {/* Beanie body */}
+      <path d="M12,120 Q8,55 110,18 Q212,55 208,120Z" fill={bg} stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+      {/* Brim */}
+      <rect x={8} y={118} width={204} height={36} rx={6} fill={bg} stroke="rgba(255,255,255,0.07)" strokeWidth="0.8"/>
+      {/* Brim texture lines */}
+      {[25,40,55,70,85,100,115,130,145,160,175,190].map(x=>(
+        <line key={x} x1={x} y1={118} x2={x-3} y2={154} stroke="rgba(255,255,255,0.04)" strokeWidth="1.5"/>
+      ))}
+      {/* Pom */}
+      <circle cx={110} cy={22} r={14} fill={GOLD} opacity="0.85"/>
+      <circle cx={110} cy={22} r={9} fill={GH}/>
+      <circle cx={106} cy={18} r={3} fill="rgba(255,255,255,0.25)"/>
+      {/* Logo on body */}
+      <text x={110} y={78} textAnchor="middle" fontFamily={S} fontWeight="700" fontSize={11} letterSpacing="3" fill={CREAM} opacity="0.8">G<tspan fill={accent}>⏧</tspan>G</text>
+      {/* Brim print */}
+      <text x={110} y={140} textAnchor="middle" fontFamily={M} fontSize={7} fill={CREAM} letterSpacing="2">Glass⏧Grasie</text>
+    </svg>
+  );
+}
+
+// ── Spec sheet ────────────────────────────────────────────────────────────────
+function SpecSheet({ title, specs, notes }) {
+  return (
+    <div style={{marginTop:20}}>
+      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:12}}>{title}</div>
+      <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+        {specs.map(([k,v])=>(
+          <div key={k} style={{background:BG2,padding:'9px 14px',display:'flex',justifyContent:'space-between',gap:12}}>
+            <span style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+            <span style={{fontFamily:R,fontStyle:'italic',fontSize:13,color:T3,textAlign:'right'}}>{v}</span>
+          </div>
+        ))}
+      </div>
+      {notes && <div style={{fontFamily:R,fontStyle:'italic',fontSize:12,color:T3,marginTop:8,lineHeight:1.7}}>{notes}</div>}
+    </div>
+  );
+}
+
+// ── Product spread ─────────────────────────────────────────────────────────────
+function Spread({ children, accent=false }) {
+  return (
+    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',justifyContent:'center',padding:'80px 72px',
+      borderBottom:`1px solid ${RULE}`,background:accent?BG2:BG3,position:'relative',overflow:'hidden'}}>
+      {children}
+    </div>
+  );
+}
+
+// ── Cover ─────────────────────────────────────────────────────────────────────
+function Cover() {
+  return (
+    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',justifyContent:'space-between',
+      padding:'64px 72px',background:`radial-gradient(ellipse 70% 60% at 55% 50%, #1C1810 0%, ${BG} 65%)`,
+      position:'relative',overflow:'hidden'}}>
+      <Shard x="70%" y="5%" sz={220} rot={18} color={GH} op={0.08}/>
+      <Shard x="5%" y="60%" sz={160} rot={-25} color={GH} op={0.06}/>
+      <Shard x="55%" y="55%" sz={180} rot={35} color="#7A9B6A" op={0.05}/>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+        <div style={{fontFamily:'Cormorant Garamond',fontSize:22,letterSpacing:'-0.05em',color:CREAM}}>Glass⏧Grasie<sup style={{fontSize:'0.55em',color:GH,verticalAlign:'super',letterSpacing:0}}>®</sup>
+        </div>
+        <div style={{fontFamily:M,fontSize:9,color:T3,textAlign:'right',lineHeight:1.8}}>
+          Merchandise Collection<br/>Seizoen 2026 · Rotterdam
+        </div>
+      </div>
+      <div style={{maxWidth:700,animation:'fadeUp 600ms ease'}}>
+        <div style={{fontFamily:S,fontSize:7,letterSpacing:'5px',color:T3,textTransform:'uppercase',marginBottom:32}}>Lookbook</div>
+        <div style={{fontFamily:R,fontStyle:'italic',fontWeight:300,fontSize:'clamp(36px,5vw,72px)',
+          color:CREAM,lineHeight:1.05,letterSpacing:'-0.02em',marginBottom:24}}>
+          Geconstrueerd.<br/>
+          <span style={{color:GH}}>Gedragen.</span>
+        </div>
+        <p style={{fontFamily:R,fontSize:18,color:T3,lineHeight:1.85,maxWidth:480}}>
+          Hetzelfde ontwerp-DNA als de glasobjecten — donker, precies, Rotterdam. Voor degenen die het verhaal willen dragen.
+        </p>
+      </div>
+      <div style={{display:'flex',gap:48,alignItems:'flex-end'}}>
+        <div>
+          <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:6}}>Collectie</div>
+          <div style={{fontFamily:R,fontStyle:'italic',fontSize:16,color:T3}}>T-shirt · Hoodie · Beanie</div>
+        </div>
+        <div>
+          <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:6}}>Kleur</div>
+          <div style={{display:'flex',gap:8}}>
+            {['#090806','#D4C9B8','#1C2028'].map(c=>(
+              <div key={c} style={{width:20,height:20,borderRadius:'50%',background:c,border:'1px solid rgba(255,255,255,0.1)'}}/>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:6}}>Verkoop</div>
+          <div style={{fontFamily:R,fontStyle:'italic',fontSize:16,color:T3}}>glassgrasie.nl</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App() {
+  return (
+    <div style={{maxWidth:1440,margin:'0 auto'}}>
+      {/* Cover */}
+      <Cover/>
+
+      {/* T-shirt spread */}
+      <Spread>
+        <Shard x="65%" y="10%" sz={200} rot={20} color={GH} op={0.07}/>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:64,alignItems:'start'}}>
+          <div style={{display:'flex',flexDirection:'column',gap:0}}>
+            <div style={{fontFamily:S,fontSize:7,letterSpacing:'4px',color:GOLD,textTransform:'uppercase',marginBottom:24}}>01 — T-Shirt</div>
+            <div style={{fontFamily:R,fontStyle:'italic',fontSize:42,color:CREAM,lineHeight:1.05,letterSpacing:'-0.02em',marginBottom:16}}>
+              De basis.<br/><span style={{color:GH}}>Puur zwart.</span>
+            </div>
+            <p style={{fontFamily:R,fontSize:16,color:T3,lineHeight:1.85,marginBottom:24}}>
+              100% organic cotton. Hetzelfde ontwerp-DNA als de glasobjecten — donker, precies, Rotterdam. Geen logo-gebeuk, alleen het woordmerk en het ⏧-diamant.
+            </p>
+            <SpecSheet title="Product specs" specs={[
+              ['Materiaal','100% organic cotton, 180g/m²'],['Kleur','Zwart · Crème'],
+              ['Snit','Unisex regular fit'],['Bedrukking','Waterbasis zeefdruk'],
+              ['Locatie','Borst centraal + optioneel rug'],['Maten','XS – 3XL'],
+              ['Prijs','€ 45 (zwart) · € 42 (crème)'],['Leverancier','Stanley/Stella Creator'],
+            ]}/>
+          </div>
+          <div style={{display:'flex',justifyContent:'center',alignItems:'center'}}>
+            <TshirtIllustration bg="#090806" fg={CREAM} accent={GH} print="wordmark" size={260}/>
+          </div>
+          <div style={{display:'flex',justifyContent:'center',alignItems:'center'}}>
+            <TshirtIllustration bg="#D4C9B8" fg="#090806" accent={GOLD} print="glyph" size={260}/>
+          </div>
+        </div>
+      </Spread>
+
+      {/* T-shirt back */}
+      <Spread accent>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:80,alignItems:'center'}}>
+          <div style={{display:'flex',justifyContent:'center'}}>
+            <TshirtIllustration bg="#090806" fg={CREAM} accent={GH} print="back" size={280}/>
+          </div>
+          <div>
+            <div style={{fontFamily:S,fontSize:7,letterSpacing:'4px',color:GOLD,textTransform:'uppercase',marginBottom:24}}>T-Shirt — Rugprint</div>
+            <div style={{fontFamily:R,fontStyle:'italic',fontSize:36,color:CREAM,lineHeight:1.1,marginBottom:20}}>
+              "Geconstrueerd glas."
+            </div>
+            <p style={{fontFamily:R,fontSize:16,color:T3,lineHeight:1.85,marginBottom:28}}>
+              De rugprint is optioneel — voor degenen die de volledige merkbeleving willen. Dezelfde typografie als het woordmerk: Cormorant Garamond Italic, 300 gewicht.
+            </p>
+            <SpecSheet title="Rugprint specs" specs={[
+              ['Typografie','Cormorant Garamond Italic · 300'],['Grootte','Chest 22cm breed'],['Kleur','Crème op zwart'],['Techniek','Zeefdruk waterbasis'],
+            ]}/>
+          </div>
+        </div>
+      </Spread>
+
+      {/* Hoodie spread */}
+      <Spread>
+        <Shard x="60%" y="5%" sz={240} rot={-18} color={GH} op={0.07}/>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:64,alignItems:'start'}}>
+          <div>
+            <div style={{fontFamily:S,fontSize:7,letterSpacing:'4px',color:GOLD,textTransform:'uppercase',marginBottom:24}}>02 — Hoodie</div>
+            <div style={{fontFamily:R,fontStyle:'italic',fontSize:42,color:CREAM,lineHeight:1.05,letterSpacing:'-0.02em',marginBottom:16}}>
+              Premium gewicht.<br/><span style={{color:GH}}>Rotterdam winter.</span>
+            </div>
+            <p style={{fontFamily:R,fontSize:16,color:T3,lineHeight:1.85,marginBottom:24}}>
+              380g/m² fleece. Zwaar, warm, duurzaam. Kangoeroezak met afgeronde hoeken. Dezelfde woordmarkbedrukking als het t-shirt — maar het formaat past bij het gewicht.
+            </p>
+            <SpecSheet title="Product specs" specs={[
+              ['Materiaal','80/20 organic cotton/polyester, 380g/m²'],
+              ['Kleur','Zwart · Crème · Navy'],
+              ['Snit','Unisex oversized'],
+              ['Bedrukking','Borst: zeefdruk · Rug: optioneel'],
+              ['Details','Verstelbaar trekkoord, kangoerozak'],
+              ['Maten','XS – 3XL'],
+              ['Prijs','€ 89 – € 95'],
+              ['Leverancier','Stanley/Stella Archer / IQONIQ'],
+            ]}/>
+          </div>
+          <div style={{display:'flex',justifyContent:'center'}}>
+            <HoodieIllustration bg="#090806" fg={CREAM} accent={GH} size={260}/>
+          </div>
+          <div style={{display:'flex',justifyContent:'center'}}>
+            <HoodieIllustration bg="#1C2028" fg={CREAM} accent={GH} size={260}/>
+          </div>
+        </div>
+      </Spread>
+
+      {/* Beanie spread */}
+      <Spread accent>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:80,alignItems:'center'}}>
+          <div>
+            <div style={{fontFamily:S,fontSize:7,letterSpacing:'4px',color:GOLD,textTransform:'uppercase',marginBottom:24}}>03 — Beanie</div>
+            <div style={{fontFamily:R,fontStyle:'italic',fontSize:48,color:CREAM,lineHeight:1.0,letterSpacing:'-0.02em',marginBottom:20}}>
+              G<span style={{color:GH}}>⏧</span>G.
+            </div>
+            <p style={{fontFamily:R,fontSize:16,color:T3,lineHeight:1.85,marginBottom:28}}>
+              Gebreide ribstructuur, goudkleurige pompon. Het ⏧ monogram op de manchet — subtiel genoeg voor elke context, herkenbaar genoeg voor wie het weet.
+            </p>
+            <SpecSheet title="Product specs" specs={[
+              ['Materiaal','100% merino wol of acryl mix'],
+              ['Kleur','Zwart (goud pom) · Crème (goud pom) · Navy'],
+              ['Bedrukking','Geborduurd monogram G⏧G op manchet'],
+              ['Detail','Goudkleurige pompon, ontwijkelbaar'],
+              ['Maten','One size (manchet oprolbaar)'],
+              ['Prijs','€ 38 – € 45'],
+              ['Leverancier','Beechfield B450 of Atlantis'],
+            ]} notes="Borduurbestand: ESD-formaat · 2,5cm breed · goudgeel garenstaal #C9A87C equivalent"/>
+          </div>
+          <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:48,flexWrap:'wrap'}}>
+            <BeanieIllustration bg="#090806" accent={GH} size={200}/>
+            <BeanieIllustration bg="#D4C9B8" accent={GOLD} size={200}/>
+            <BeanieIllustration bg="#1C2028" accent={GH} size={200}/>
+          </div>
+        </div>
+      </Spread>
+
+      {/* Set overview */}
+      <Spread>
+        <Shard x="75%" y="15%" sz={200} rot={25} color={GH} op={0.06}/>
+        <div style={{fontFamily:S,fontSize:7,letterSpacing:'5px',color:GOLD,textTransform:'uppercase',marginBottom:48,textAlign:'center'}}>Complete Merchandise Lijn</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:1,background:RULE,maxWidth:900,margin:'0 auto',width:'100%'}}>
+          {[
+            { title:'T-Shirt', sub:'Wordmark · Borst + Rug', price:'€ 42–45', colors:['#090806','#D4C9B8'], items:['Organic cotton 180g','Zeefdruk waterbasis','XS–3XL','2 kleurways'] },
+            { title:'Hoodie', sub:'Wordmark · Kangoerozak', price:'€ 89–95', colors:['#090806','#1C2028','#D4C9B8'], items:['380g fleece 80/20','Zeefdruk', 'XS–3XL','3 kleurways'] },
+            { title:'Beanie', sub:'G⏧G Monogram', price:'€ 38–45', colors:['#090806','#1C2028','#D4C9B8'], items:['Merino/acryl mix','Geborduurd logo','One size','3 kleurways'] },
+          ].map(item=>(
+            <div key={item.title} style={{background:BG2,padding:'28px 24px'}}>
+              <div style={{fontFamily:S,fontSize:7,letterSpacing:'3px',color:GH,textTransform:'uppercase',marginBottom:8}}>{item.title}</div>
+              <div style={{fontFamily:R,fontStyle:'italic',fontSize:14,color:T3,marginBottom:16}}>{item.sub}</div>
+              <div style={{fontFamily:R,fontSize:22,color:GH,fontWeight:300,marginBottom:16}}>{item.price}</div>
+              <div style={{display:'flex',gap:6,marginBottom:16}}>
+                {item.colors.map(c=><div key={c} style={{width:16,height:16,borderRadius:'50%',background:c,border:'1px solid rgba(255,255,255,0.1)'}}/>)}
+              </div>
+              <div style={{display:'flex',flexDirection:'column',gap:5}}>
+                {item.items.map(i=><div key={i} style={{fontFamily:M,fontSize:9,color:T3,display:'flex',gap:6,alignItems:'center'}}><span style={{color:GOLD,fontSize:7}}>◇</span>{i}</div>)}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{textAlign:'center',marginTop:56}}>
+          <div style={{fontFamily:R,fontStyle:'italic',fontSize:24,color:T3,marginBottom:8}}>
+            Beschikbaar via glassgrasie.nl
+          </div>
+          <div style={{fontFamily:S,fontSize:6,letterSpacing:'4px',color:T3,textTransform:'uppercase'}}>Rotterdam · Est. 2025</div>
+        </div>
+      </Spread>
+
+      {/* Footer */}
+      <div style={{padding:'32px 72px',display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:`1px solid ${RULE}`,background:BG}}>
+        <div style={{fontFamily:'Cormorant Garamond',fontSize:22,letterSpacing:'-0.05em',color:CREAM}}>Glass⏧Grasie<sup style={{fontSize:'0.55em',color:GH,verticalAlign:'super',letterSpacing:0}}>®</sup>
+        </div>
+        <div style={{fontFamily:M,fontSize:9,color:T3}}>Merchandise Lookbook 2026 · glassgrasie.nl</div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
