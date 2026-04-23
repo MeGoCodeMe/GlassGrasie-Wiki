@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Checkout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body, #root { width:100%; height:100%; background:#0D0C0B; overflow-y:auto; }
+::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:#2A2218; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes check { from{stroke-dashoffset:40} to{stroke-dashoffset:0} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const S="'Syncopate',sans-serif", R="'Cormorant Garamond',Georgia,serif", M="'JetBrains Mono',ui-monospace,monospace";
+const BG='#0D0C0B',BG2='#100F0D',BG3='#0A0908',RULE='#1C1810';
+const GOLD='#8B7355',GH='#C9A87C',CREAM='#E8E2D8',T3='#8A8070',T4='#5A5044',T5='#3A3020';
+const GREEN='#5A9A6A',PAPER='#F0EAE0';
+
+const CART = [
+  { id:'GG-2025-0042', name:'Fragment Tie Bar', variant:'Forest Floor', price:145, qty:1, accent:'#7A9B6A' },
+  { id:'GG-2026-0003', name:'Fragment Manchetknopen', variant:'Helder Float', price:125, qty:1, accent:GH },
+];
+
+// ── Input ─────────────────────────────────────────────────────────────────────
+function Input({ label, placeholder, value, onChange, type='text', half=false, mono=false }) {
+  const [focused, setFocused] = React.useState(false);
+  return (
+    <div style={{ width: half ? 'calc(50% - 6px)' : '100%' }}>
+      <div style={{fontFamily:S,fontSize:5,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:6}}>{label}</div>
+      <input type={type} value={value} onChange={e=>onChange(e.target.value)}
+        onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
+        placeholder={placeholder}
+        style={{width:'100%',padding:'11px 14px',background:BG3,
+          border:`1px solid ${focused?GOLD:RULE}`,color:CREAM,
+          fontFamily:mono?M:R,fontSize:mono?11:15,outline:'none',
+          transition:'border-color 150ms'}}/>
+    </div>
+  );
+}
+
+// ── Card input mock ────────────────────────────────────────────────────────────
+function CardInput() {
+  const [num,setNum]=React.useState('');
+  const [exp,setExp]=React.useState('');
+  const [cvc,setCvc]=React.useState('');
+  const fmt = v => v.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19);
+  const fmtExp = v => v.replace(/\D/g,'').replace(/(\d{2})(\d)/,'$1/$2').slice(0,5);
+  const brand = num.startsWith('4')?'Visa':num.startsWith('5')?'MC':num.startsWith('3')?'Amex':'';
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+      <div style={{background:BG3,padding:'12px 14px',position:'relative'}}>
+        <div style={{fontFamily:S,fontSize:5,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:6}}>Kaartnummer</div>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <input value={num} onChange={e=>setNum(fmt(e.target.value))} placeholder="1234 5678 9012 3456"
+            style={{flex:1,background:'transparent',border:'none',color:CREAM,fontFamily:M,fontSize:13,outline:'none'}}/>
+          {brand && <span style={{fontFamily:S,fontSize:6,color:T4,letterSpacing:'2px'}}>{brand}</span>}
+        </div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1}}>
+        <div style={{background:BG3,padding:'12px 14px'}}>
+          <div style={{fontFamily:S,fontSize:5,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:6}}>Vervaldatum</div>
+          <input value={exp} onChange={e=>setExp(fmtExp(e.target.value))} placeholder="MM/JJ"
+            style={{width:'100%',background:'transparent',border:'none',color:CREAM,fontFamily:M,fontSize:13,outline:'none'}}/>
+        </div>
+        <div style={{background:BG3,padding:'12px 14px'}}>
+          <div style={{fontFamily:S,fontSize:5,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:6}}>CVC</div>
+          <input value={cvc} onChange={e=>setCvc(e.target.value.slice(0,4))} placeholder="123"
+            style={{width:'100%',background:'transparent',border:'none',color:CREAM,fontFamily:M,fontSize:13,outline:'none'}}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Steps ─────────────────────────────────────────────────────────────────────
+const STEPS = ['Adres','Betaling','Bevestiging'];
+
+function StepBar({ step }) {
+  return (
+    <div style={{display:'flex',alignItems:'center',marginBottom:40}}>
+      {STEPS.map((s,i) => (
+        <React.Fragment key={s}>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <div style={{width:24,height:24,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
+              background:i<step?GREEN:i===step?GOLD:'transparent',
+              border:`1px solid ${i<step?GREEN:i===step?GOLD:RULE}`,
+              fontFamily:M,fontSize:9,color:i<=step?BG:T4,transition:'all 250ms'}}>
+              {i<step?'✓':i+1}
+            </div>
+            <div style={{fontFamily:S,fontSize:6,letterSpacing:'2px',
+              color:i===step?CREAM:i<step?T3:T5,textTransform:'uppercase',transition:'color 250ms'}}>{s}</div>
+          </div>
+          {i<STEPS.length-1 && <div style={{flex:1,height:1,background:i<step?`${GREEN}66`:RULE,margin:'0 12px',transition:'background 250ms'}}/>}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+// ── Order summary ─────────────────────────────────────────────────────────────
+function OrderSummary() {
+  const sub = CART.reduce((a,i)=>a+i.price*i.qty,0);
+  const ship = sub>=200?0:9.95;
+  const total = sub+ship;
+  return (
+    <div style={{background:BG2,border:`1px solid ${RULE}`,padding:'24px',position:'sticky',top:80}}>
+      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:16}}>Bestelling</div>
+      <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE,marginBottom:16}}>
+        {CART.map(item=>(
+          <div key={item.id} style={{background:BG2,padding:'12px 14px',display:'flex',gap:12,alignItems:'center'}}>
+            <div style={{width:36,height:36,background:`${item.accent}18`,border:`1px solid ${item.accent}33`,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <svg width={16} height={16} viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" fill="none" stroke={item.accent} strokeWidth="1.2"/></svg>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontFamily:R,fontSize:14,color:CREAM,lineHeight:1.2}}>{item.name}</div>
+              <div style={{fontFamily:R,fontStyle:'italic',fontSize:11,color:T4}}>{item.variant}</div>
+            </div>
+            <div style={{fontFamily:R,fontSize:15,color:item.accent,flexShrink:0}}>€{item.price}</div>
+          </div>
+        ))}
+      </div>
+      {[['Subtotaal',`€ ${sub.toFixed(2)}`],['Verzending',ship===0?'Gratis':`€ ${ship.toFixed(2)}`],['NFT Certificaat','Inbegrepen'],['BTW 21%',`€ ${(total*0.21/1.21).toFixed(2)}`]].map(([k,v])=>(
+        <div key={k} style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+          <span style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{k}</span>
+          <span style={{fontFamily:R,fontSize:13,color:T3}}>{v}</span>
+        </div>
+      ))}
+      <div style={{borderTop:`1px solid ${RULE}`,paddingTop:12,display:'flex',justifyContent:'space-between',marginTop:8}}>
+        <span style={{fontFamily:S,fontSize:6,letterSpacing:'2px',color:GOLD,textTransform:'uppercase'}}>Totaal</span>
+        <span style={{fontFamily:R,fontSize:22,color:GH}}>€ {total.toFixed(2)}</span>
+      </div>
+      <div style={{marginTop:14,padding:'10px 12px',background:`${GREEN}0A`,border:`1px solid ${GREEN}22`}}>
+        <div style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:GREEN,textTransform:'uppercase',marginBottom:3}}>Inbegrepen</div>
+        <div style={{fontFamily:R,fontStyle:'italic',fontSize:12,color:T4,lineHeight:1.7}}>NFT Certificaat van Herkomst · Blockchain verified · Gratis verzending</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Success screen ─────────────────────────────────────────────────────────────
+function SuccessScreen() {
+  const [showNFT,setShowNFT]=React.useState(false);
+  React.useEffect(()=>{ const t=setTimeout(()=>setShowNFT(true),800); return ()=>clearTimeout(t); },[]);
+  return (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'48px 24px',gap:28,animation:'fadeUp 400ms ease',textAlign:'center'}}>
+      {/* Animated check */}
+      <div style={{width:80,height:80,borderRadius:'50%',border:`2px solid ${GREEN}`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <svg width={40} height={40} viewBox="0 0 40 40">
+          <path d="M8 20 L16 28 L32 12" fill="none" stroke={GREEN} strokeWidth="2.5" strokeLinecap="round" strokeDasharray="40" strokeDashoffset="0" style={{animation:'check 600ms ease forwards'}}/>
+        </svg>
+      </div>
+      <div>
+        <div style={{fontFamily:S,fontSize:8,letterSpacing:'4px',color:GREEN,textTransform:'uppercase',marginBottom:10}}>Bestelling bevestigd</div>
+        <div style={{fontFamily:R,fontStyle:'italic',fontSize:32,color:CREAM,lineHeight:1.1,marginBottom:8}}>Dank u, Sergio.</div>
+        <div style={{fontFamily:R,fontSize:15,color:T3,lineHeight:1.8,maxWidth:440}}>Uw bestelling GG-ORD-2026-042 is ontvangen. U ontvangt een bevestigingsmail op sergio@glassgrasie.nl.</div>
+      </div>
+      {showNFT && (
+        <div style={{animation:'fadeUp 500ms ease',padding:'24px',border:`1px solid ${GH}33`,background:`${GH}06`,maxWidth:420,width:'100%'}}>
+          <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GH,textTransform:'uppercase',marginBottom:10}}>NFT Certificaat wordt gemint</div>
+          <div style={{fontFamily:M,fontSize:10,color:T3,lineHeight:1.9}}>
+            Token minting op XRP Ledger...<br/>
+            Serienummers: GG-2025-0042 · GG-2026-0003<br/>
+            Email: sergio@glassgrasie.nl<br/>
+          </div>
+          <div style={{marginTop:12,display:'flex',alignItems:'center',gap:8}}>
+            <div style={{width:6,height:6,borderRadius:'50%',background:GREEN,animation:'spin 1.5s linear infinite'}}/>
+            <span style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:GREEN,textTransform:'uppercase'}}>Blockchain logging actief</span>
+          </div>
+        </div>
+      )}
+      <div style={{display:'flex',gap:12,flexWrap:'wrap',justifyContent:'center'}}>
+        {['Bekijk NFT certificaat','Terug naar winkel'].map((l,i)=>(
+          <button key={l} style={{padding:'12px 24px',fontFamily:S,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',
+            background:i===0?GOLD:'transparent',color:i===0?BG:T4,border:`1px solid ${i===0?GOLD:RULE}`,cursor:'pointer'}}>{l}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+function App() {
+  const [step,setStep]=React.useState(0);
+  const [pay,setPay]=React.useState('stripe');
+  const [processing,setProcessing]=React.useState(false);
+  const [form,setForm]=React.useState({name:'',email:'',address:'',city:'',postcode:'',country:'NL'});
+  const upForm=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  const doNext = async () => {
+    if (step===0) { setStep(1); return; }
+    if (step===1) {
+      setProcessing(true);
+      await new Promise(r=>setTimeout(r,1600));
+      setProcessing(false);
+      setStep(2);
+    }
+  };
+
+  return (
+    <div style={{minHeight:'100vh',background:BG}}>
+      {/* Nav */}
+      <div style={{borderBottom:`1px solid ${RULE}`,padding:'14px 40px',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,background:'rgba(13,12,11,0.97)',backdropFilter:'blur(12px)',zIndex:10}}>
+        <div style={{fontFamily:'Cormorant Garamond',fontSize:22,letterSpacing:'-0.05em',color:CREAM}}>Glass⏧Grasie<sup style={{fontSize:'0.55em',color:GH,verticalAlign:'super',letterSpacing:0}}>®</sup>
+        </div>
+        <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase'}}>Veilige betaling · SSL</div>
+      </div>
+
+      <div style={{maxWidth:1100,margin:'0 auto',padding:'48px 40px'}}>
+        {step===2 ? <SuccessScreen/> : (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 360px',gap:56,alignItems:'start'}}>
+            {/* Left */}
+            <div>
+              <StepBar step={step}/>
+              {step===0 && (
+                <div style={{animation:'fadeUp 250ms ease'}}>
+                  <div style={{fontFamily:S,fontSize:7,letterSpacing:'4px',color:GOLD,textTransform:'uppercase',marginBottom:24}}>Bezorgadres</div>
+                  <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                    <Input label="Volledige naam" placeholder="Sergio Dias" value={form.name} onChange={v=>upForm('name',v)}/>
+                    <Input label="E-mailadres" placeholder="sergio@glassgrasie.nl" type="email" value={form.email} onChange={v=>upForm('email',v)}/>
+                    <Input label="Straat en huisnummer" placeholder="Orteliusplein 4" value={form.address} onChange={v=>upForm('address',v)}/>
+                    <div style={{display:'flex',gap:12}}>
+                      <Input label="Postcode" placeholder="3014 RN" value={form.postcode} onChange={v=>upForm('postcode',v)} half mono/>
+                      <Input label="Stad" placeholder="Rotterdam" value={form.city} onChange={v=>upForm('city',v)} half/>
+                    </div>
+                    <div>
+                      <div style={{fontFamily:S,fontSize:5,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:6}}>Land</div>
+                      <select value={form.country} onChange={e=>upForm('country',e.target.value)}
+                        style={{width:'100%',padding:'11px 14px',background:BG3,border:`1px solid ${RULE}`,color:CREAM,fontFamily:R,fontSize:15,outline:'none'}}>
+                        {[['NL','Nederland'],['BE','België'],['DE','Duitsland'],['FR','Frankrijk'],['GB','Verenigd Koninkrijk']].map(([v,l])=>(
+                          <option key={v} value={v}>{l}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {step===1 && (
+                <div style={{animation:'fadeUp 250ms ease'}}>
+                  <div style={{fontFamily:S,fontSize:7,letterSpacing:'4px',color:GOLD,textTransform:'uppercase',marginBottom:24}}>Betaalmethode</div>
+                  {/* Method select */}
+                  <div style={{display:'flex',gap:8,marginBottom:24}}>
+                    {[['stripe','💳 Stripe'],['ripple','⬡ Ripple XRP'],['ideal','🇳🇱 iDEAL']].map(([m,l])=>(
+                      <button key={m} onClick={()=>setPay(m)} style={{
+                        flex:1,padding:'12px',fontFamily:S,fontSize:6,letterSpacing:'2px',textTransform:'uppercase',
+                        border:`1px solid ${pay===m?GOLD:RULE}`,background:pay===m?`${GOLD}12`:'transparent',
+                        color:pay===m?GH:T4,cursor:'pointer',transition:'all 150ms',
+                      }}>{l}</button>
+                    ))}
+                  </div>
+
+                  {pay==='stripe' && (
+                    <div style={{animation:'fadeUp 200ms ease'}}>
+                      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:12}}>Kaartgegevens</div>
+                      <CardInput/>
+                      <div style={{marginTop:12,display:'flex',alignItems:'center',gap:8}}>
+                        <svg width={12} height={12} viewBox="0 0 12 12"><path d="M6 1L7.5 4h3l-2.5 2 1 3L6 7.5 3 9l1-3L1.5 4h3z" fill={GOLD} opacity="0.6"/></svg>
+                        <span style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>256-bit SSL · Stripe beveiligd</span>
+                      </div>
+                    </div>
+                  )}
+                  {pay==='ripple' && (
+                    <div style={{padding:'20px',border:`1px solid rgba(106,154,138,0.25)`,background:'rgba(106,154,138,0.04)',animation:'fadeUp 200ms ease'}}>
+                      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:'#6A9A8A',textTransform:'uppercase',marginBottom:10}}>XRP Wallet koppelen</div>
+                      <div style={{fontFamily:R,fontSize:14,color:T3,lineHeight:1.8,marginBottom:12}}>Verbind uw XRP Ledger wallet voor crypto checkout. Loyalty tokens + DAO toegang worden automatisch verstuurd na betaling.</div>
+                      <button style={{padding:'10px 20px',fontFamily:S,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',background:'rgba(106,154,138,0.15)',color:'#6A9A8A',border:'1px solid rgba(106,154,138,0.3)',cursor:'pointer'}}>
+                        Wallet verbinden →
+                      </button>
+                    </div>
+                  )}
+                  {pay==='ideal' && (
+                    <div style={{padding:'20px',border:`1px solid ${RULE}`,animation:'fadeUp 200ms ease'}}>
+                      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:T3,textTransform:'uppercase',marginBottom:10}}>Bank kiezen</div>
+                      <select style={{width:'100%',padding:'11px 14px',background:BG3,border:`1px solid ${RULE}`,color:CREAM,fontFamily:R,fontSize:15,outline:'none'}}>
+                        {['ABN AMRO','ING','Rabobank','ASN Bank','Bunq','Knab','SNS','Triodos'].map(b=><option key={b}>{b}</option>)}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* CTA */}
+              <button onClick={doNext} disabled={processing} style={{
+                width:'100%',marginTop:32,padding:'16px',
+                fontFamily:S,fontSize:8,letterSpacing:'4px',textTransform:'uppercase',
+                background:processing?BG3:GOLD,color:processing?T4:BG,
+                border:`1px solid ${processing?RULE:GOLD}`,cursor:processing?'default':'pointer',
+                display:'flex',alignItems:'center',justifyContent:'center',gap:10,transition:'all 200ms',
+              }}>
+                {processing && <div style={{width:12,height:12,border:`1px solid ${GOLD}`,borderTopColor:'transparent',borderRadius:'50%',animation:'spin 0.7s linear infinite'}}/>}
+                {processing?'Verwerken...':(step===0?'Naar betaling →':'Bestelling plaatsen →')}
+              </button>
+
+              {step===1 && (
+                <div style={{marginTop:10,display:'flex',gap:20,justifyContent:'center'}}>
+                  {['Stripe','iDEAL','Visa','Mastercard','PayPal'].map(b=>(
+                    <span key={b} style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{b}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right */}
+            <OrderSummary/>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
