@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Wazer Batch Logger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body, #root { width:100%; height:100%; overflow:hidden; background:#090806; }
+::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:#2A2218; }
+input, select, textarea { font-family:inherit; }
+button { cursor:pointer; font-family:inherit; }
+@keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes spin { to{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const S = "'Syncopate',sans-serif";
+const R = "'Cormorant Garamond',Georgia,serif";
+const M = "'JetBrains Mono',ui-monospace,monospace";
+const BG='#090806',BG2='#0D0C0B',BG3='#100F0D',RULE='#1C1810';
+const GOLD='#8B7355',GOLD_HI='#C9A87C',CREAM='#E8E2D8';
+const T3='#8A8070',T4='#5A5044',T5='#3A3020';
+const GREEN='#5A9A6A',RED='#9A5A5A';
+
+// ── Seed data ─────────────────────────────────────────────────────────────────
+const SEED_BATCHES = [
+  { id:'VD-2025-0138', date:'2025-03-14', time:'07:22', material:'Bedrukt restglas Forest Floor', source:'Van Dijken Glas', thickness:'3mm', dims:'320×210mm', weight:0.62, quality:'A', cutTime:'4m12s', co2:1.31, operator:'Sergio Dias', dxf:'gg-forest-floor-v3.dxf', status:'on-chain', hash:'0xd8f4a2e1b3c5...', products:['GG-2025-0018','GG-2025-0042','GG-2025-0043'], notes:'Run 001 — Forest Floor. 3 pendant + 2 tie bar + 2 oorbellen.' },
+  { id:'VD-2026-0012', date:'2026-01-08', time:'09:05', material:'Helder float 4mm', source:'Van Dijken Glas', thickness:'4mm', dims:'400×300mm', weight:1.44, quality:'A', cutTime:'6m38s', co2:3.04, operator:'Sergio Dias', dxf:'gg-tie-bar-matte-v2.dxf', status:'on-chain', hash:'0xa2c1f4d8...', products:['GG-2026-0001','GG-2026-0002','GG-2026-0003'], notes:'Tie bar batch. Matte zwart coaten na snijwerk.' },
+  { id:'VD-2026-0038', date:'2026-03-22', time:'11:14', material:'Helder float 5mm', source:'Van Dijken Glas', thickness:'5mm', dims:'280×180mm', weight:1.13, quality:'A', cutTime:'5m55s', co2:2.38, operator:'Sergio Dias', dxf:'gg-manchetknopen-v4.dxf', status:'on-chain', hash:'0xb7e3a1c2...', products:['GG-2026-0040','GG-2026-0041'], notes:'Manchetknopen set. WAZER programma 142.' },
+  { id:'VD-2026-0071', date:'2026-04-18', time:'08:30', material:'Bedrukt restglas Ocean Blue', source:'Van Dijken Glas', thickness:'3mm', dims:'360×240mm', weight:0.78, quality:'B', cutTime:'3m44s', co2:1.64, operator:'Sergio Dias', dxf:'gg-ocean-v1.dxf', status:'pending', hash:'—', products:[], notes:'Run 002 — Ocean Blue. Kwaliteit B door rand beschadiging. Bruikbaar.' },
+];
+
+function genHash() {
+  return '0x' + Array.from({length:8},()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0')).join('') + '...';
+}
+
+function genBatchId() {
+  const n = Math.floor(Math.random()*900)+100;
+  return `VD-2026-0${n}`;
+}
+
+// ── Components ────────────────────────────────────────────────────────────────
+const Label = ({c,s=6,children}) => <div style={{fontFamily:S,fontSize:s,letterSpacing:'3px',color:c||GOLD,textTransform:'uppercase'}}>{children}</div>;
+const Row = ({k,v,vc}) => (
+  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 14px',background:BG2}}>
+    <span style={{fontFamily:S,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase',flexShrink:0}}>{k}</span>
+    <span style={{fontFamily:M,fontSize:10,color:vc||CREAM,textAlign:'right',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:220}}>{v}</span>
+  </div>
+);
+
+const StatusBadge = ({s}) => {
+  const map = {'on-chain':['#3A6A3A',GREEN,'On-chain ✓'],'pending':[`${GOLD}44`,GOLD_HI,'Pending'],'error':['#6A3A3A',RED,'Error']};
+  const [bg,col,label] = map[s]||map['pending'];
+  return <span style={{fontFamily:S,fontSize:6,letterSpacing:'2px',padding:'3px 8px',background:bg,color:col,textTransform:'uppercase',border:`1px solid ${col}44`}}>{label}</span>;
+};
+
+// ── Batch Card ────────────────────────────────────────────────────────────────
+function BatchCard({ b, selected, onSelect }) {
+  return (
+    <div onClick={()=>onSelect(b)} style={{
+      padding:'14px 16px',border:`1px solid ${selected?GOLD:RULE}`,
+      background:selected?`rgba(139,115,85,0.08)`:BG2,cursor:'pointer',
+      transition:'all 150ms',animation:'fadeUp 250ms ease',
+    }}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
+        <div>
+          <div style={{fontFamily:M,fontSize:11,color:GOLD_HI,marginBottom:3}}>{b.id}</div>
+          <div style={{fontFamily:R,fontStyle:'italic',fontSize:12,color:CREAM}}>{b.material}</div>
+        </div>
+        <StatusBadge s={b.status}/>
+      </div>
+      <div style={{display:'flex',gap:16}}>
+        <div><Label c={T5} s={5}>Datum</Label><div style={{fontFamily:M,fontSize:9,color:T3}}>{b.date}</div></div>
+        <div><Label c={T5} s={5}>Gewicht</Label><div style={{fontFamily:M,fontSize:9,color:T3}}>{b.weight}kg</div></div>
+        <div><Label c={T5} s={5}>Kwaliteit</Label><div style={{fontFamily:M,fontSize:9,color:b.quality==='A'?GREEN:GOLD_HI}}>{b.quality}</div></div>
+        <div><Label c={T5} s={5}>CO₂</Label><div style={{fontFamily:M,fontSize:9,color:GREEN}}>{b.co2}kg</div></div>
+      </div>
+    </div>
+  );
+}
+
+// ── New Batch Form ─────────────────────────────────────────────────────────────
+function NewBatchForm({ onSave, onCancel }) {
+  const [form,setForm] = React.useState({
+    id:genBatchId(), date:new Date().toISOString().slice(0,10),
+    time:new Date().toTimeString().slice(0,5),
+    material:'', source:'Van Dijken Glas', thickness:'', dims:'',
+    weight:'', quality:'A', cutTime:'', operator:'Sergio Dias', dxf:'', notes:'',
+  });
+  const up = (k,v) => setForm(f=>({...f,[k]:v}));
+
+  const fields = [
+    {k:'id',label:'Batch ID',ph:'VD-2026-XXXX',type:'text'},
+    {k:'date',label:'Snijdatum',ph:'YYYY-MM-DD',type:'date'},
+    {k:'time',label:'Tijd',ph:'HH:MM',type:'time'},
+    {k:'material',label:'Materiaal',ph:'Bedrukt restglas / Helder float 4mm',type:'text'},
+    {k:'source',label:'Bron',ph:'Van Dijken Glas',type:'text'},
+    {k:'thickness',label:'Dikte',ph:'3mm / 4mm / 5mm',type:'text'},
+    {k:'dims',label:'Afmetingen',ph:'320×210mm',type:'text'},
+    {k:'weight',label:'Gewicht (kg)',ph:'0.62',type:'number'},
+    {k:'quality',label:'Kwaliteitsklasse',ph:'A/B/C',type:'select',opts:['A','B','C']},
+    {k:'cutTime',label:'Snijtijd',ph:'4m12s',type:'text'},
+    {k:'operator',label:'Operator',ph:'Sergio Dias',type:'text'},
+    {k:'dxf',label:'DXF bestand',ph:'gg-product-v1.dxf',type:'text'},
+    {k:'notes',label:'Notities',ph:'Vrije tekst...',type:'textarea'},
+  ];
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
+      <div style={{padding:'16px 20px',borderBottom:`1px solid ${RULE}`,flexShrink:0}}>
+        <Label>Nieuwe batch loggen</Label>
+      </div>
+      <div style={{flex:1,overflowY:'auto',padding:'16px 20px',display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+        {fields.map(f=>(
+          <div key={f.k} style={{background:BG2,padding:'10px 14px'}}>
+            <Label c={T5} s={5}>{f.label}</Label>
+            {f.type==='select' ? (
+              <select value={form[f.k]} onChange={e=>up(f.k,e.target.value)} style={{marginTop:4,width:'100%',background:BG3,border:'none',color:CREAM,fontFamily:M,fontSize:11,padding:'4px 0',outline:'none'}}>
+                {f.opts.map(o=><option key={o} value={o}>{o}</option>)}
+              </select>
+            ) : f.type==='textarea' ? (
+              <textarea rows={2} value={form[f.k]} onChange={e=>up(f.k,e.target.value)} placeholder={f.ph}
+                style={{marginTop:4,width:'100%',background:BG3,border:'none',color:CREAM,fontFamily:M,fontSize:11,padding:'4px 0',outline:'none',resize:'none'}}/>
+            ) : (
+              <input type={f.type} value={form[f.k]} onChange={e=>up(f.k,e.target.value)} placeholder={f.ph}
+                style={{marginTop:4,width:'100%',background:BG3,border:'none',color:CREAM,fontFamily:M,fontSize:11,padding:'4px 0',outline:'none'}}/>
+            )}
+          </div>
+        ))}
+      </div>
+      <div style={{padding:'14px 20px',borderTop:`1px solid ${RULE}`,display:'flex',gap:8,flexShrink:0}}>
+        <button onClick={()=>onSave({...form,weight:parseFloat(form.weight)||0,co2:parseFloat((parseFloat(form.weight||0)*2.11).toFixed(2)),status:'pending',hash:'—',products:[]})} style={{flex:1,padding:'10px',fontFamily:S,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',background:GOLD,color:BG,border:'none'}}>Batch opslaan</button>
+        <button onClick={onCancel} style={{padding:'10px 16px',fontFamily:S,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',background:'transparent',color:T4,border:`1px solid ${RULE}`}}>Annuleren</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Batch Detail ───────────────────────────────────────────────────────────────
+function BatchDetail({ b, onChain }) {
+  const [logging,setLogging] = React.useState(false);
+
+  const doChain = async () => {
+    setLogging(true);
+    await new Promise(r=>setTimeout(r,1800));
+    onChain(b.id);
+    setLogging(false);
+  };
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
+      <div style={{padding:'16px 20px',borderBottom:`1px solid ${RULE}`,display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
+        <div>
+          <Label>Batch Detail</Label>
+          <div style={{fontFamily:M,fontSize:12,color:GOLD_HI,marginTop:4}}>{b.id}</div>
+        </div>
+        <StatusBadge s={b.status}/>
+      </div>
+      <div style={{flex:1,overflowY:'auto',padding:'16px 20px',display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+        {[
+          ['Materiaal',b.material],['Bron',b.source],['Dikte',b.thickness],
+          ['Datum + tijd',`${b.date} · ${b.time}`],['Afmetingen',b.dims],
+          ['Gewicht',`${b.weight} kg`],['Snijtijd',b.cutTime],
+          ['Kwaliteit',b.quality,b.quality==='A'?GREEN:GOLD_HI],
+          ['CO₂ offset',`${b.co2} kg`,GREEN],
+          ['Operator',b.operator],['DXF',b.dxf],
+          ['Blockchain hash',b.hash,b.status==='on-chain'?GREEN:T4],
+        ].map(([k,v,c])=><Row key={k} k={k} v={v} vc={c}/>)}
+        {b.notes && (
+          <div style={{padding:'10px 14px',background:BG2}}>
+            <Label c={T5} s={5}>Notities</Label>
+            <div style={{fontFamily:R,fontStyle:'italic',fontSize:13,color:T3,marginTop:6,lineHeight:1.7}}>{b.notes}</div>
+          </div>
+        )}
+        {b.products.length>0 && (
+          <div style={{padding:'10px 14px',background:BG2}}>
+            <Label c={T5} s={5}>Gekoppelde producten</Label>
+            {b.products.map(p=><div key={p} style={{fontFamily:M,fontSize:10,color:GOLD_HI,marginTop:4}}>{p}</div>)}
+          </div>
+        )}
+      </div>
+      {/* Actions */}
+      <div style={{padding:'14px 20px',borderTop:`1px solid ${RULE}`,display:'flex',flexDirection:'column',gap:8,flexShrink:0}}>
+        {b.status==='pending' && (
+          <button onClick={doChain} disabled={logging} style={{
+            width:'100%',padding:'11px',fontFamily:S,fontSize:7,letterSpacing:'3px',
+            textTransform:'uppercase',background:logging?BG3:GREEN,
+            color:logging?T4:'#fff',border:`1px solid ${logging?RULE:GREEN}`,
+            display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+          }}>
+            {logging && <div style={{width:10,height:10,border:`1px solid ${GREEN}`,borderTopColor:'transparent',borderRadius:'50%',animation:'spin 0.7s linear infinite'}}/>}
+            {logging?'Blockchain logging...':'Op blockchain zetten →'}
+          </button>
+        )}
+        <button onClick={()=>{
+          const txt = Object.entries(b).map(([k,v])=>`${k}: ${Array.isArray(v)?v.join(', '):v}`).join('\n');
+          const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);
+          a.download=`${b.id}-batch-record.txt`;a.click();
+        }} style={{width:'100%',padding:'9px',fontFamily:S,fontSize:7,letterSpacing:'3px',textTransform:'uppercase',background:'transparent',color:GOLD,border:`1px solid ${GOLD}44`}}>
+          Export batch record ↓
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Stats strip ────────────────────────────────────────────────────────────────
+function StatsStrip({ batches }) {
+  const totalKg = batches.reduce((a,b)=>a+b.weight,0).toFixed(2);
+  const totalCo2 = batches.reduce((a,b)=>a+b.co2,0).toFixed(2);
+  const onChain = batches.filter(b=>b.status==='on-chain').length;
+  const pending = batches.filter(b=>b.status==='pending').length;
+  return (
+    <div style={{display:'flex',borderBottom:`1px solid ${RULE}`,flexShrink:0}}>
+      {[
+        ['Batches',batches.length,GOLD_HI],
+        ['Glas gered',`${totalKg} kg`,GREEN],
+        ['CO₂ offset',`${totalCo2} kg`,GREEN],
+        ['On-chain',onChain,GREEN],
+        ['Pending',pending,pending>0?GOLD_HI:T5],
+      ].map(([l,v,c])=>(
+        <div key={l} style={{flex:1,padding:'12px 16px',borderRight:`1px solid ${RULE}`}}>
+          <div style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase',marginBottom:4}}>{l}</div>
+          <div style={{fontFamily:R,fontSize:20,color:c,fontWeight:300}}>{v}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Main App ───────────────────────────────────────────────────────────────────
+function App() {
+  const [batches,setBatches] = React.useState(SEED_BATCHES);
+  const [selected,setSelected] = React.useState(SEED_BATCHES[0]);
+  const [mode,setMode] = React.useState('list'); // list | new
+  const [search,setSearch] = React.useState('');
+  const filtered = batches.filter(b=>
+    b.id.toLowerCase().includes(search.toLowerCase()) ||
+    b.material.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleChain = (id) => {
+    setBatches(prev=>prev.map(b=>b.id===id?{...b,status:'on-chain',hash:genHash()}:b));
+    setSelected(prev=>prev?.id===id?{...prev,status:'on-chain',hash:genHash()}:prev);
+  };
+  const handleSave = (batch) => {
+    setBatches(prev=>[batch,...prev]);
+    setSelected(batch);
+    setMode('list');
+  };
+
+  return (
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:BG,color:CREAM}}>
+      {/* Top bar */}
+      <div style={{height:44,borderBottom:`1px solid ${RULE}`,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 20px',flexShrink:0,background:BG2}}>
+        <div style={{display:'flex',alignItems:'center',gap:16}}>
+          <div style={{fontFamily:'Cormorant Garamond',fontSize:22,letterSpacing:'-0.05em',color:CREAM}}>Glass⏧Grasie
+          </div>
+          <div style={{width:1,height:20,background:RULE}}/>
+          <div style={{fontFamily:S,fontSize:7,letterSpacing:'3px',color:GOLD,textTransform:'uppercase'}}>Wazer Batch Logger</div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <div style={{width:6,height:6,borderRadius:'50%',background:GREEN,animation:'pulse 2s infinite'}}/>
+          <span style={{fontFamily:M,fontSize:9,color:GREEN}}>Wazer · Online</span>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <StatsStrip batches={batches}/>
+
+      {/* Body */}
+      <div style={{flex:1,display:'flex',minHeight:0}}>
+        {/* Left — batch list */}
+        <div style={{width:300,flexShrink:0,borderRight:`1px solid ${RULE}`,display:'flex',flexDirection:'column'}}>
+          {/* Search + New */}
+          <div style={{padding:'12px 14px',borderBottom:`1px solid ${RULE}`,display:'flex',gap:8,flexShrink:0}}>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Zoeken..."
+              style={{flex:1,background:BG3,border:`1px solid ${RULE}`,color:CREAM,padding:'7px 10px',fontFamily:M,fontSize:10,outline:'none'}}/>
+            <button onClick={()=>setMode('new')} style={{
+              padding:'7px 12px',fontFamily:S,fontSize:6,letterSpacing:'2px',textTransform:'uppercase',
+              background:GOLD,color:BG,border:'none',flexShrink:0,
+            }}>+ Nieuw</button>
+          </div>
+          <div style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:1,background:RULE,padding:1}}>
+            {filtered.map(b=>(
+              <BatchCard key={b.id} b={b} selected={selected?.id===b.id} onSelect={setSelected}/>
+            ))}
+          </div>
+        </div>
+
+        {/* Right — detail or form */}
+        <div style={{flex:1,minWidth:0}}>
+          {mode==='new' ? (
+            <NewBatchForm onSave={handleSave} onCancel={()=>setMode('list')}/>
+          ) : selected ? (
+            <BatchDetail b={selected} onChain={handleChain}/>
+          ) : (
+            <div style={{height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <div style={{fontFamily:R,fontStyle:'italic',fontSize:18,color:T4}}>Selecteer een batch</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
