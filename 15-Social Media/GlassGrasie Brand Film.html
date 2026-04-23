@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Glass⏧Grasie — Brand Film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #060504; }
+  #root { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+// animations.jsx
+// Reusable animation starter: Stage, Timeline, Sprite, easing helpers.
+// Usage (in an HTML file that loads React + Babel):
+//
+//   <Stage width={1280} height={720} duration={10} background="#f6f4ef">
+//     <MyScene />
+//   </Stage>
+//
+// Inside <Stage>, any child can call useTime() to read the current
+// playhead (seconds). Or wrap content in <Sprite start={1} end={4}>...</Sprite>
+// to only render during that window -- children receive a `localTime` and
+// `progress` via the useSprite() hook.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Easing functions (hand-rolled, Popmotion-style) ─────────────────────────
+// All easings take t ∈ [0,1] and return eased t ∈ [0,1] (may overshoot for back/elastic).
+const Easing = {
+  linear: (t) => t,
+
+  // Quad
+  easeInQuad:    (t) => t * t,
+  easeOutQuad:   (t) => t * (2 - t),
+  easeInOutQuad: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
+
+  // Cubic
+  easeInCubic:    (t) => t * t * t,
+  easeOutCubic:   (t) => (--t) * t * t + 1,
+  easeInOutCubic: (t) => (t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1),
+
+  // Quart
+  easeInQuart:    (t) => t * t * t * t,
+  easeOutQuart:   (t) => 1 - (--t) * t * t * t,
+  easeInOutQuart: (t) => (t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t),
+
+  // Expo
+  easeInExpo:  (t) => (t === 0 ? 0 : Math.pow(2, 10 * (t - 1))),
+  easeOutExpo: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+  easeInOutExpo: (t) => {
+    if (t === 0) return 0;
+    if (t === 1) return 1;
+    if (t < 0.5) return 0.5 * Math.pow(2, 20 * t - 10);
+    return 1 - 0.5 * Math.pow(2, -20 * t + 10);
+  },
+
+  // Sine
+  easeInSine:    (t) => 1 - Math.cos((t * Math.PI) / 2),
+  easeOutSine:   (t) => Math.sin((t * Math.PI) / 2),
+  easeInOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+
+  // Back (overshoot)
+  easeOutBack: (t) => {
+    const c1 = 1.70158, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  },
+  easeInBack: (t) => {
+    const c1 = 1.70158, c3 = c1 + 1;
+    return c3 * t * t * t - c1 * t * t;
+  },
+  easeInOutBack: (t) => {
+    const c1 = 1.70158, c2 = c1 * 1.525;
+    return t < 0.5
+      ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
+      : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+  },
+
+  // Elastic
+  easeOutElastic: (t) => {
+    const c4 = (2 * Math.PI) / 3;
+    if (t === 0) return 0;
+    if (t === 1) return 1;
+    return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+  },
+};
+
+// ── Core interpolation helpers ──────────────────────────────────────────────
+
+// Clamp a value to [min, max]
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+// interpolate([0, 0.5, 1], [0, 100, 50], ease?) -> fn(t)
+// Popmotion-style: linearly maps t across input keyframes to output values,
+// with optional easing per segment (single fn or array of fns).
+function interpolate(input, output, ease = Easing.linear) {
+  return (t) => {
+    if (t <= input[0]) return output[0];
+    if (t >= input[input.length - 1]) return output[output.length - 1];
+    for (let i = 0; i < input.length - 1; i++) {
+      if (t >= input[i] && t <= input[i + 1]) {
+        const span = input[i + 1] - input[i];
+        const local = span === 0 ? 0 : (t - input[i]) / span;
+        const easeFn = Array.isArray(ease) ? (ease[i] || Easing.linear) : ease;
+        const eased = easeFn(local);
+        return output[i] + (output[i + 1] - output[i]) * eased;
+      }
+    }
+    return output[output.length - 1];
+  };
+}
+
+// animate({from, to, start, end, ease})(t) — simpler single-segment tween.
+// Returns `from` before `start`, `to` after `end`.
+function animate({ from = 0, to = 1, start = 0, end = 1, ease = Easing.easeInOutCubic }) {
+  return (t) => {
+    if (t <= start) return from;
+    if (t >= end) return to;
+    const local = (t - start) / (end - start);
+    return from + (to - from) * ease(local);
+  };
+}
+
+// ── Timeline context ────────────────────────────────────────────────────────
+
+const TimelineContext = React.createContext({ time: 0, duration: 10, playing: false });
+
+const useTime = () => React.useContext(TimelineContext).time;
+const useTimeline = () => React.useContext(TimelineContext);
+
+// ── Sprite ──────────────────────────────────────────────────────────────────
+// Renders children only when the playhead is inside [start, end]. Provides
+// a sub-context with `localTime` (seconds since start) and `progress` (0..1).
+//
+//   <Sprite start={2} end={5}>
+//     {({ localTime, progress }) => <Thing x={progress * 100} />}
+//   </Sprite>
+//
+// Or as a plain wrapper — children can call useSprite() themselves.
+
+const SpriteContext = React.createContext({ localTime: 0, progress: 0, duration: 0 });
+const useSprite = () => React.useContext(SpriteContext);
+
+function Sprite({ start = 0, end = Infinity, children, keepMounted = false }) {
+  const { time } = useTimeline();
+  const visible = time >= start && time <= end;
+  if (!visible && !keepMounted) return null;
+
+  const duration = end - start;
+  const localTime = Math.max(0, time - start);
+  const progress = duration > 0 && isFinite(duration)
+    ? clamp(localTime / duration, 0, 1)
+    : 0;
+
+  const value = { localTime, progress, duration, visible };
+
+  return (
+    <SpriteContext.Provider value={value}>
+      {typeof children === 'function' ? children(value) : children}
+    </SpriteContext.Provider>
+  );
+}
+
+// ── Sample sprite components ────────────────────────────────────────────────
+
+// TextSprite: fades/slides text in on entry, holds, then fades out on exit.
+// Props: text, x, y, size, color, font, entryDur, exitDur, align
+function TextSprite({
+  text,
+  x = 0, y = 0,
+  size = 48,
+  color = '#111',
+  font = 'Inter, system-ui, sans-serif',
+  weight = 600,
+  entryDur = 0.45,
+  exitDur = 0.35,
+  entryEase = Easing.easeOutBack,
+  exitEase = Easing.easeInCubic,
+  align = 'left',
+  letterSpacing = '-0.01em',
+}) {
+  const { localTime, duration } = useSprite();
+  const exitStart = Math.max(0, duration - exitDur);
+
+  let opacity = 1;
+  let ty = 0;
+
+  if (localTime < entryDur) {
+    const t = entryEase(clamp(localTime / entryDur, 0, 1));
+    opacity = t;
+    ty = (1 - t) * 16;
+  } else if (localTime > exitStart) {
+    const t = exitEase(clamp((localTime - exitStart) / exitDur, 0, 1));
+    opacity = 1 - t;
+    ty = -t * 8;
+  }
+
+  const translateX = align === 'center' ? '-50%' : align === 'right' ? '-100%' : '0';
+
+  return (
+    <div style={{
+      position: 'absolute',
+      left: x, top: y,
+      transform: `translate(${translateX}, ${ty}px)`,
+      opacity,
+      fontFamily: font,
+      fontSize: size,
+      fontWeight: weight,
+      color,
+      letterSpacing,
+      whiteSpace: 'pre',
+      lineHeight: 1.1,
+      willChange: 'transform, opacity',
+    }}>
+      {text}
+    </div>
+  );
+}
+
+// ImageSprite: scales + fades in; optional Ken Burns drift during hold.
+function ImageSprite({
+  src,
+  x = 0, y = 0,
+  width = 400, height = 300,
+  entryDur = 0.6,
+  exitDur = 0.4,
+  kenBurns = false,
+  kenBurnsScale = 1.08,
+  radius = 12,
+  fit = 'cover',
+  placeholder = null, // {label: string} for striped placeholder
+}) {
+  const { localTime, duration } = useSprite();
+  const exitStart = Math.max(0, duration - exitDur);
+
+  let opacity = 1;
+  let scale = 1;
+
+  if (localTime < entryDur) {
+    const t = Easing.easeOutCubic(clamp(localTime / entryDur, 0, 1));
+    opacity = t;
+    scale = 0.96 + 0.04 * t;
+  } else if (localTime > exitStart) {
+    const t = Easing.easeInCubic(clamp((localTime - exitStart) / exitDur, 0, 1));
+    opacity = 1 - t;
+    scale = (kenBurns ? kenBurnsScale : 1) + 0.02 * t;
+  } else if (kenBurns) {
+    const holdSpan = exitStart - entryDur;
+    const holdT = holdSpan > 0 ? (localTime - entryDur) / holdSpan : 0;
+    scale = 1 + (kenBurnsScale - 1) * holdT;
+  }
+
+  const content = placeholder ? (
+    <div style={{
+      width: '100%', height: '100%',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'repeating-linear-gradient(135deg, #e9e6df 0 10px, #dcd8cf 10px 20px)',
+      color: '#6b6458',
+      fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+      fontSize: 13,
+      letterSpacing: '0.04em',
+      textTransform: 'uppercase',
+    }}>
+      {placeholder.label || 'image'}
+    </div>
+  ) : (
+    <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: fit, display: 'block' }} />
+  );
+
+  return (
+    <div style={{
+      position: 'absolute',
+      left: x, top: y,
+      width, height,
+      opacity,
+      transform: `scale(${scale})`,
+      transformOrigin: 'center',
+      borderRadius: radius,
+      overflow: 'hidden',
+      willChange: 'transform, opacity',
+    }}>
+      {content}
+    </div>
+  );
+}
+
+// RectSprite: simple rectangle that animates position/size/color via props.
+// Useful demo primitive — takes a `render` fn for per-frame customization.
+function RectSprite({
+  x = 0, y = 0,
+  width = 100, height = 100,
+  color = '#111',
+  radius = 8,
+  entryDur = 0.4,
+  exitDur = 0.3,
+  render, // optional: (ctx) => style overrides
+}) {
+  const spriteCtx = useSprite();
+  const { localTime, duration } = spriteCtx;
+  const exitStart = Math.max(0, duration - exitDur);
+
+  let opacity = 1;
+  let scale = 1;
+
+  if (localTime < entryDur) {
+    const t = Easing.easeOutBack(clamp(localTime / entryDur, 0, 1));
+    opacity = clamp(localTime / entryDur, 0, 1);
+    scale = 0.4 + 0.6 * t;
+  } else if (localTime > exitStart) {
+    const t = Easing.easeInQuad(clamp((localTime - exitStart) / exitDur, 0, 1));
+    opacity = 1 - t;
+    scale = 1 - 0.15 * t;
+  }
+
+  const overrides = render ? render(spriteCtx) : {};
+
+  return (
+    <div style={{
+      position: 'absolute',
+      left: x, top: y,
+      width, height,
+      background: color,
+      borderRadius: radius,
+      opacity,
+      transform: `scale(${scale})`,
+      transformOrigin: 'center',
+      willChange: 'transform, opacity',
+      ...overrides,
+    }} />
+  );
+}
+
+
+function Stage({
+  width = 1280,
+  height = 720,
+  duration = 10,
+  background = '#f6f4ef',
+  fps = 60,
+  loop = true,
+  autoplay = true,
+  persistKey = 'animstage',
+  children,
+}) {
+  const [time, setTime] = React.useState(() => {
+    try {
+      const v = parseFloat(localStorage.getItem(persistKey + ':t') || '0');
+      return isFinite(v) ? clamp(v, 0, duration) : 0;
+    } catch { return 0; }
+  });
+  const [playing, setPlaying] = React.useState(autoplay);
+  const [hoverTime, setHoverTime] = React.useState(null);
+  const [scale, setScale] = React.useState(1);
+
+  const stageRef = React.useRef(null);
+  const canvasRef = React.useRef(null);
+  const rafRef = React.useRef(null);
+  const lastTsRef = React.useRef(null);
+
+  // Persist playhead
+  React.useEffect(() => {
+    try { localStorage.setItem(persistKey + ':t', String(time)); } catch {}
+  }, [time, persistKey]);
+
+  // Auto-scale to fit viewport
+  React.useEffect(() => {
+    if (!stageRef.current) return;
+    const el = stageRef.current;
+    const measure = () => {
+      const barH = 44; // playback bar height
+      const s = Math.min(
+        el.clientWidth / width,
+        (el.clientHeight - barH) / height
+      );
+      setScale(Math.max(0.05, s));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [width, height]);
+
+  // Animation loop
+  React.useEffect(() => {
+    if (!playing) {
+      lastTsRef.current = null;
+      return;
+    }
+    const step = (ts) => {
+      if (lastTsRef.current == null) lastTsRef.current = ts;
+      const dt = (ts - lastTsRef.current) / 1000;
+      lastTsRef.current = ts;
+      setTime((t) => {
+        let next = t + dt;
+        if (next >= duration) {
+          if (loop) next = next % duration;
+          else { next = duration; setPlaying(false); }
+        }
+        return next;
+      });
+      rafRef.current = requestAnimationFrame(step);
+    };
+    rafRef.current = requestAnimationFrame(step);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      lastTsRef.current = null;
+    };
+  }, [playing, duration, loop]);
+
+  // Keyboard: space = play/pause, ← → = seek
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setPlaying(p => !p);
+      } else if (e.code === 'ArrowLeft') {
+        setTime(t => clamp(t - (e.shiftKey ? 1 : 0.1), 0, duration));
+      } else if (e.code === 'ArrowRight') {
+        setTime(t => clamp(t + (e.shiftKey ? 1 : 0.1), 0, duration));
+      } else if (e.key === '0' || e.code === 'Home') {
+        setTime(0);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [duration]);
+
+  const displayTime = hoverTime != null ? hoverTime : time;
+
+  const ctxValue = React.useMemo(
+    () => ({ time: displayTime, duration, playing, setTime, setPlaying }),
+    [displayTime, duration, playing]
+  );
+
+  return (
+    <div
+      ref={stageRef}
+      style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center',
+        background: '#0a0a0a',
+        fontFamily: 'Inter, system-ui, sans-serif',
+      }}
+    >
+      {/* Canvas area — vertically centered in remaining space */}
+      <div style={{
+        flex: 1,
+        width: '100%',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden',
+        minHeight: 0,
+      }}>
+        <div
+          ref={canvasRef}
+          style={{
+            width, height,
+            background,
+            position: 'relative',
+            transform: `scale(${scale})`,
+            transformOrigin: 'center',
+            flexShrink: 0,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+            overflow: 'hidden',
+          }}
+        >
+          <TimelineContext.Provider value={ctxValue}>
+            {children}
+          </TimelineContext.Provider>
+        </div>
+      </div>
+
+      {/* Playback bar — stacked below canvas, never overlapping */}
+      <PlaybackBar
+        time={displayTime}
+        actualTime={time}
+        duration={duration}
+        playing={playing}
+        onPlayPause={() => setPlaying(p => !p)}
+        onReset={() => { setTime(0); }}
+        onSeek={(t) => setTime(t)}
+        onHover={(t) => setHoverTime(t)}
+      />
+    </div>
+  );
+}
+
+// ── Playback bar ────────────────────────────────────────────────────────────
+// Play/pause, return-to-begin, scrub track, time display.
+// Uses fixed-width time fields so layout doesn't thrash.
+
+function PlaybackBar({ time, duration, playing, onPlayPause, onReset, onSeek, onHover }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+
+  const timeFromEvent = React.useCallback((e) => {
+    const rect = trackRef.current.getBoundingClientRect();
+    const x = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+    return x * duration;
+  }, [duration]);
+
+  const onTrackMove = (e) => {
+    if (!trackRef.current) return;
+    const t = timeFromEvent(e);
+    if (dragging) {
+      onSeek(t);
+    } else {
+      onHover(t);
+    }
+  };
+
+  const onTrackLeave = () => {
+    if (!dragging) onHover(null);
+  };
+
+  const onTrackDown = (e) => {
+    setDragging(true);
+    const t = timeFromEvent(e);
+    onSeek(t);
+    onHover(null);
+  };
+
+  React.useEffect(() => {
+    if (!dragging) return;
+    const onUp = () => setDragging(false);
+    const onMove = (e) => {
+      if (!trackRef.current) return;
+      const t = timeFromEvent(e);
+      onSeek(t);
+    };
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('mousemove', onMove);
+    return () => {
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('mousemove', onMove);
+    };
+  }, [dragging, timeFromEvent, onSeek]);
+
+  const pct = duration > 0 ? (time / duration) * 100 : 0;
+  const fmt = (t) => {
+    const total = Math.max(0, t);
+    const m = Math.floor(total / 60);
+    const s = Math.floor(total % 60);
+    const cs = Math.floor((total * 100) % 100);
+    return `${String(m).padStart(1, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
+  };
+
+  const mono = 'JetBrains Mono, ui-monospace, SFMono-Regular, monospace';
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12,
+      padding: '8px 16px',
+      background: 'rgba(20,20,20,0.92)',
+      borderTop: '1px solid rgba(255,255,255,0.08)',
+      width: '100%',
+      maxWidth: 680,
+      alignSelf: 'center',
+
+      borderRadius: 8,
+      color: '#f6f4ef',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      userSelect: 'none',
+      flexShrink: 0,
+    }}>
+      <IconButton onClick={onReset} title="Return to start (0)">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M3 2v10M12 2L5 7l7 5V2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round"/>
+        </svg>
+      </IconButton>
+      <IconButton onClick={onPlayPause} title="Play/pause (space)">
+        {playing ? (
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="3" y="2" width="3" height="10" fill="currentColor"/>
+            <rect x="8" y="2" width="3" height="10" fill="currentColor"/>
+          </svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 2l9 5-9 5V2z" fill="currentColor"/>
+          </svg>
+        )}
+      </IconButton>
+
+      {/* Current time: fixed width so it doesn't thrash */}
+      <div style={{
+        fontFamily: mono,
+        fontSize: 12,
+        fontVariantNumeric: 'tabular-nums',
+        width: 64, textAlign: 'right',
+        color: '#f6f4ef',
+      }}>
+        {fmt(time)}
+      </div>
+
+      {/* Scrub track */}
+      <div
+        ref={trackRef}
+        onMouseMove={onTrackMove}
+        onMouseLeave={onTrackLeave}
+        onMouseDown={onTrackDown}
+        style={{
+          flex: 1,
+          height: 22,
+          position: 'relative',
+          cursor: 'pointer',
+          display: 'flex', alignItems: 'center',
+        }}
+      >
+        <div style={{
+          position: 'absolute',
+          left: 0, right: 0, height: 4,
+          background: 'rgba(255,255,255,0.12)',
+          borderRadius: 2,
+        }}/>
+        <div style={{
+          position: 'absolute',
+          left: 0, width: `${pct}%`, height: 4,
+          background: 'oklch(72% 0.12 250)',
+          borderRadius: 2,
+        }}/>
+        <div style={{
+          position: 'absolute',
+          left: `${pct}%`, top: '50%',
+          width: 12, height: 12,
+          marginLeft: -6, marginTop: -6,
+          background: '#fff',
+          borderRadius: 6,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.4)',
+        }}/>
+      </div>
+
+      {/* Duration: fixed width */}
+      <div style={{
+        fontFamily: mono,
+        fontSize: 12,
+        fontVariantNumeric: 'tabular-nums',
+        width: 64, textAlign: 'left',
+        color: 'rgba(246,244,239,0.55)',
+      }}>
+        {fmt(duration)}
+      </div>
+    </div>
+  );
+}
+
+function IconButton({ children, onClick, title }) {
+  const [hover, setHover] = React.useState(false);
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        width: 28, height: 28,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: hover ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: 6,
+        color: '#f6f4ef',
+        cursor: 'pointer',
+        padding: 0,
+        transition: 'background 120ms',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+
+Object.assign(window, {
+  Easing, interpolate, animate, clamp,
+  TimelineContext, useTime, useTimeline,
+  Sprite, SpriteContext, useSprite,
+  TextSprite, ImageSprite, RectSprite,
+  Stage, PlaybackBar,
+});
+
+
+</script>
+<script type="text/babel">
+
+// ── Brand tokens ───────────────────────────────────────────────────────────
+const GOLD   = 'oklch(72% 0.13 82)';
+const GOLD2  = 'oklch(60% 0.10 82)';
+const CREAM  = 'oklch(95% 0.008 85)';
+const DARK   = '#0c0b08';
+const SERIF  = '"Playfair Display", Georgia, serif';
+const LOGO_FONT = '"Cormorant Garamond", Georgia, serif';
+const SANS   = '"DM Sans", system-ui, sans-serif';
+const MONO   = '"JetBrains Mono", ui-monospace, monospace';
+
+// ── Static shard data ──────────────────────────────────────────────────────
+const SHAPES = [
+  '0,80 40,0 100,20 85,100',
+  '20,0 100,30 70,100 0,65',
+  '50,0 100,45 55,100 0,70 15,20',
+  '0,40 60,0 100,55 45,100',
+  '10,0 90,10 100,80 60,100 0,60',
+  '30,0 100,20 80,100 0,75',
+  '0,20 70,0 100,50 80,100 10,90',
+  '20,0 100,40 90,100 0,80 5,30',
+];
+
+const SHARDS = [
+  { id:0,  x:120,  y:80,  s:180, r:15,  sh:0, bc:'rgba(200,195,185,0.07)', lc:'rgba(210,175,70,0.32)'  },
+  { id:1,  x:380,  y:260, s:140, r:-10, sh:1, bc:'rgba(200,195,185,0.05)', lc:'rgba(90,145,205,0.28)'  },
+  { id:2,  x:640,  y:45,  s:220, r:25,  sh:2, bc:'rgba(200,195,185,0.06)', lc:'rgba(90,185,140,0.26)'  },
+  { id:3,  x:890,  y:190, s:160, r:-20, sh:3, bc:'rgba(200,195,185,0.05)', lc:'rgba(205,170,70,0.30)'  },
+  { id:4,  x:1150, y:85,  s:190, r:8,   sh:4, bc:'rgba(200,195,185,0.04)', lc:'rgba(70,140,215,0.24)'  },
+  { id:5,  x:1430, y:215, s:150, r:-35, sh:5, bc:'rgba(200,195,185,0.06)', lc:'rgba(155,205,110,0.28)' },
+  { id:6,  x:1680, y:55,  s:200, r:18,  sh:6, bc:'rgba(200,195,185,0.05)', lc:'rgba(225,160,65,0.32)'  },
+  { id:7,  x:200,  y:720, s:170, r:-12, sh:7, bc:'rgba(200,195,185,0.06)', lc:'rgba(95,180,205,0.28)'  },
+  { id:8,  x:760,  y:620, s:130, r:30,  sh:0, bc:'rgba(200,195,185,0.04)', lc:'rgba(175,220,135,0.26)' },
+  { id:9,  x:1310, y:660, s:160, r:-22, sh:3, bc:'rgba(200,195,185,0.05)', lc:'rgba(205,140,75,0.30)'  },
+  { id:10, x:1760, y:510, s:140, r:42,  sh:5, bc:'rgba(200,195,185,0.04)', lc:'rgba(115,160,225,0.26)' },
+];
+
+// ── GlassShard ─────────────────────────────────────────────────────────────
+function GlassShard({ d, lit, progress, driftY = 0 }) {
+  const appear = Math.min(1, progress * 2.5);
+  const slowRot = progress * d.r * 0.12;
+  const drift = progress * 28 + driftY;
+  const color = lit ? d.lc : d.bc;
+  return (
+    <div style={{
+      position:'absolute', left:d.x, top: d.y - drift,
+      width:d.s, height:d.s,
+      opacity: appear,
+      transform:`rotate(${d.r + slowRot}deg)`,
+      pointerEvents:'none', willChange:'transform,opacity',
+    }}>
+      <svg viewBox="0 0 100 100" width={d.s} height={d.s}>
+        <defs>
+          <linearGradient id={`gl${d.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.18)"/>
+            <stop offset="100%" stopColor="rgba(255,255,255,0.01)"/>
+          </linearGradient>
+        </defs>
+        <polygon points={SHAPES[d.sh]} fill={color} stroke="rgba(255,255,255,0.10)" strokeWidth="0.7"/>
+        <polygon points={SHAPES[d.sh]} fill={`url(#gl${d.id})`}/>
+      </svg>
+    </div>
+  );
+}
+
+// ── Scene 1 — Waste (0–15s) ────────────────────────────────────────────────
+function Scene1() {
+  const t = useTime();
+  const textP = Easing.easeOutCubic(clamp((t - 4.5) / 1.5, 0, 1));
+  const subP  = Easing.easeOutCubic(clamp((t - 6.5) / 1.2, 0, 1));
+  return (
+    <Sprite start={0} end={15}>
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(ellipse 55% 50% at 50% 55%, #1c1810 0%, ${DARK} 68%)`}}/>
+      {SHARDS.map(d => (
+        <GlassShard key={d.id} d={d} lit={false}
+          progress={clamp((t - d.id * 0.28) / 3.5, 0, 1)}/>
+      ))}
+      {/* Thin horizontal rule */}
+      <div style={{
+        position:'absolute', left:'50%', top:'37%',
+        transform:'translateX(-50%)',
+        width: 80, height:1,
+        background:`rgba(210,175,80,0.35)`,
+        opacity: textP,
+      }}/>
+      <div style={{
+        position:'absolute', left:'50%', top:'40%',
+        transform:`translateX(-50%) translateY(${(1-textP)*22}px)`,
+        opacity:textP, textAlign:'center', willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SERIF,fontSize:88,color:CREAM,fontWeight:400,letterSpacing:'-0.015em',lineHeight:1.05,textWrap:'balance',textShadow:'0 4px 48px rgba(0,0,0,1), 0 2px 12px rgba(0,0,0,0.8)'}}>
+          Wat anderen weggooien...
+        </div>
+      </div>
+      <div style={{
+        position:'absolute', left:'50%', top:'62%',
+        transform:`translateX(-50%) translateY(${(1-subP)*12}px)`,
+        opacity:subP * 0.82, textAlign:'center', willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SANS,fontSize:22,color:CREAM,fontWeight:300,letterSpacing:'0.22em',textTransform:'uppercase',textShadow:'0 2px 24px rgba(0,0,0,0.95)'}}>
+          What others throw away...
+        </div>
+      </div>
+    </Sprite>
+  );
+}
+
+// ── Scene 2 — Transformation (15–32s) ─────────────────────────────────────
+function Scene2() {
+  const t = useTime();
+  const lt = t - 15;
+  const burstP = Easing.easeOutExpo(clamp(lt / 3.5, 0, 1));
+  const r = burstP * 180;
+  const textP  = Easing.easeOutCubic(clamp((lt - 4) / 1.6, 0, 1));
+  const text2P = Easing.easeOutCubic(clamp((lt - 6) / 1.2, 0, 1));
+  const p1 = Easing.easeOutCubic(clamp((lt - 9.5) / 1.0, 0, 1));
+  const p2 = Easing.easeOutCubic(clamp((lt - 11)  / 1.0, 0, 1));
+  const p3 = Easing.easeOutCubic(clamp((lt - 12.5)/ 1.0, 0, 1));
+  const RAYS = [0,40,80,120,160,200,240,280,320];
+  return (
+    <Sprite start={15} end={32}>
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(ellipse ${r}% ${r*0.65}% at 50% 52%,
+          oklch(32% 0.07 82) 0%,
+          oklch(16% 0.04 82) 42%,
+          ${DARK} 68%)`}}/>
+      {RAYS.map((angle,i) => {
+        const rp = Easing.easeOutExpo(clamp((lt - i*0.06)/2.5, 0, 1));
+        return <div key={angle} style={{
+          position:'absolute', left:'50%', top:'50%',
+          width:950, height:1.5,
+          background:`linear-gradient(to right, rgba(210,175,80,${0.14*rp}), transparent)`,
+          transformOrigin:'0 50%',
+          transform:`rotate(${angle}deg)`,
+          opacity:rp, willChange:'opacity',
+        }}/>;
+      })}
+      {SHARDS.map(d => (
+        <GlassShard key={d.id} d={d} lit={true}
+          progress={clamp((lt - 0.3 - d.id*0.12)/2.5, 0, 1)}
+          driftY={lt * 2.5}/>
+      ))}
+      <div style={{
+        position:'absolute', left:'50%', top:'35%',
+        transform:`translateX(-50%) translateY(${(1-textP)*26}px)`,
+        opacity:textP, textAlign:'center', willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SERIF,fontSize:118,color:GOLD,fontWeight:400,letterSpacing:'-0.02em',lineHeight:1,fontStyle:'italic'}}>
+          ...bewaren wij.
+        </div>
+      </div>
+      <div style={{
+        position:'absolute', left:'50%', top:'57%',
+        transform:`translateX(-50%)`,
+        opacity:text2P * 0.85, textAlign:'center',
+      }}>
+        <div style={{fontFamily:SANS,fontSize:24,color:CREAM,fontWeight:300,letterSpacing:'0.22em',textTransform:'uppercase',textShadow:'0 2px 20px rgba(0,0,0,0.95)'}}>
+          We keep it.
+        </div>
+      </div>
+      {[
+        {nl:'Precies gemaakt.',en:'Exactly crafted.',p:p1},
+        {nl:'Traceerbaar.',    en:'Traceable.',      p:p2},
+        {nl:'Uniek.',         en:'Unique.',          p:p3},
+      ].map((item,i) => (
+        <div key={i} style={{
+          position:'absolute', left:'50%', top:`${68+i*7.5}%`,
+          transform:`translateX(-50%) translateY(${(1-item.p)*14}px)`,
+          opacity:item.p, textAlign:'center',
+          display:'flex', alignItems:'center', gap:18,
+          willChange:'transform,opacity',
+        }}>
+          <div style={{width:36,height:1,background:`rgba(210,175,80,0.5)`}}/>
+          <span style={{fontFamily:SERIF,fontSize:30,color:CREAM,fontWeight:400,textShadow:'0 2px 20px rgba(0,0,0,0.9)'}}>{item.nl}</span>
+          <span style={{fontFamily:SANS,fontSize:16,color:CREAM,opacity:0.72,fontWeight:300,letterSpacing:'0.12em',textShadow:'0 2px 16px rgba(0,0,0,0.9)'}}>{item.en}</span>
+          <div style={{width:36,height:1,background:`rgba(210,175,80,0.5)`}}/>
+        </div>
+      ))}
+    </Sprite>
+  );
+}
+
+// ── Scene 3 — Collection (32–55s) ──────────────────────────────────────────
+const PRODUCTS = [
+  {
+    nl:'Sieraden', en:'Jewellery', price:'€45 – €145',
+    nl2:'Watergesneden uit industrieel restfloatglas',
+    en2:'Waterjet-cut from float glass offcuts',
+    accent:'oklch(72% 0.13 82)',
+    bg:'linear-gradient(150deg, oklch(22% 0.07 82) 0%, oklch(15% 0.04 68) 100%)',
+  },
+  {
+    nl:'Objecten', en:'Home Objects', price:'€65 – €650',
+    nl2:'Kaarsenhouders, schalen, woonaccessoires',
+    en2:'Candle holders, bowls, home accessories',
+    accent:'oklch(68% 0.12 220)',
+    bg:'linear-gradient(150deg, oklch(20% 0.07 220) 0%, oklch(14% 0.04 205) 100%)',
+  },
+  {
+    nl:'Architectuur', en:'Architecture', price:'€350 – €850/m²',
+    nl2:'Bartops, wandpanelen, circulaire projecten',
+    en2:'Bartops, wall panels, circular projects',
+    accent:'oklch(70% 0.10 162)',
+    bg:'linear-gradient(150deg, oklch(19% 0.07 162) 0%, oklch(14% 0.04 148) 100%)',
+  },
+];
+
+function ProductCard({prod, progress}) {
+  const sp = Easing.easeOutBack(clamp(progress, 0, 1));
+  return (
+    <div style={{
+      width:490, padding:'40px 36px',
+      background: prod.bg,
+      border:`1px solid rgba(255,255,255,0.07)`,
+      borderRadius:3,
+      transform:`translateY(${(1-sp)*90}px)`,
+      opacity: clamp(progress*2.5, 0, 1),
+      willChange:'transform,opacity',
+      position:'relative', overflow:'hidden',
+    }}>
+      {/* Placeholder shot */}
+      <div style={{
+        width:'100%', height:190,
+        background:`repeating-linear-gradient(135deg,rgba(255,255,255,0.025) 0 10px,transparent 10px 20px)`,
+        border:`1px solid rgba(255,255,255,0.07)`,
+        borderRadius:2, marginBottom:28,
+        display:'flex', alignItems:'center', justifyContent:'center',
+      }}>
+        <span style={{fontFamily:MONO,fontSize:10,color:'rgba(255,255,255,0.18)',letterSpacing:'0.1em'}}>PRODUCT SHOT</span>
+      </div>
+      <div style={{fontFamily:SERIF,fontSize:46,color:CREAM,fontWeight:400,letterSpacing:'-0.01em',lineHeight:1,marginBottom:4}}>
+        {prod.nl}
+      </div>
+      <div style={{fontFamily:SANS,fontSize:12,color:CREAM,opacity:0.3,letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:22}}>
+        {prod.en}
+      </div>
+      <div style={{fontFamily:SERIF,fontSize:30,color:prod.accent,fontWeight:400,marginBottom:14}}>
+        {prod.price}
+      </div>
+      <div style={{fontFamily:SANS,fontSize:15,color:CREAM,opacity:0.65,lineHeight:1.55}}>
+        {prod.nl2}
+      </div>
+      <div style={{fontFamily:SANS,fontSize:12,color:CREAM,opacity:0.28,lineHeight:1.55,marginTop:4}}>
+        {prod.en2}
+      </div>
+      {/* Corner accent */}
+      <div style={{position:'absolute',top:0,right:0,width:3,height:60,background:prod.accent,opacity:0.5}}/>
+    </div>
+  );
+}
+
+function Scene3() {
+  const t = useTime();
+  const lt = t - 32;
+  const hdrP = Easing.easeOutCubic(clamp(lt / 1.8, 0, 1));
+  return (
+    <Sprite start={32} end={55}>
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(ellipse 80% 60% at 50% 55%, #1c1a10 0%, ${DARK} 62%)`}}/>
+      {/* Header */}
+      <div style={{
+        position:'absolute', left:'50%', top:52,
+        transform:`translateX(-50%) translateY(${(1-hdrP)*18}px)`,
+        opacity:hdrP, textAlign:'center', willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SANS,fontSize:12,color:GOLD,letterSpacing:'0.32em',textTransform:'uppercase',marginBottom:14}}>
+          De Collectie · The Collection
+        </div>
+        <div style={{width:56,height:1,background:`rgba(210,175,80,0.38)`,margin:'0 auto'}}/>
+      </div>
+      {/* Cards */}
+      <div style={{
+        position:'absolute', left:'50%', top:'50%',
+        transform:'translate(-50%, -43%)',
+        display:'flex', gap:28,
+      }}>
+        {PRODUCTS.map((p,i) => (
+          <ProductCard key={i} prod={p}
+            progress={clamp((lt - 2 - i*1.4) / 1.8, 0, 1)}/>
+        ))}
+      </div>
+    </Sprite>
+  );
+}
+
+// ── Scene 4 — Rotterdam (55–72s) ───────────────────────────────────────────
+function Scene4() {
+  const t = useTime();
+  const lt = t - 55;
+  const gridP  = Easing.easeOutCubic(clamp(lt / 2.5, 0, 1));
+  const bg1P   = Easing.easeOutExpo(clamp((lt - 1) / 1.8, 0, 1));
+  const bg2P   = Easing.easeOutCubic(clamp((lt - 3.5) / 1.4, 0, 1));
+  const certP  = Easing.easeOutBack(clamp((lt - 5.5) / 2.2, 0, 1));
+  const quoteP = Easing.easeOutCubic(clamp((lt - 9) / 2.0, 0, 1));
+  return (
+    <Sprite start={55} end={72}>
+      <div style={{position:'absolute',inset:0,background:'#0c0b08'}}/>
+      {/* Grid motif */}
+      <div style={{
+        position:'absolute',inset:0,
+        backgroundImage:`linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px)`,
+        backgroundSize:'80px 80px',
+        opacity:gridP,
+      }}/>
+      {/* Ghost text */}
+      <div style={{
+        position:'absolute', left:120, top:140,
+        fontFamily:SERIF, fontSize:200, color:CREAM,
+        fontWeight:700, letterSpacing:'-0.04em', lineHeight:0.85,
+        opacity: bg1P * 0.055,
+        userSelect:'none', whiteSpace:'nowrap',
+      }}>
+        ROTTERDAM
+      </div>
+      {/* Real heading */}
+      <div style={{
+        position:'absolute', left:130, top:165,
+        transform:`translateX(${(1-bg1P)*-50}px)`,
+        opacity:bg1P, willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SERIF,fontSize:130,color:CREAM,fontWeight:400,letterSpacing:'-0.025em',lineHeight:1,textShadow:'0 4px 60px rgba(0,0,0,1)'}}>
+          Rotterdam.
+        </div>
+      </div>
+      {/* Partners line */}
+      <div style={{
+        position:'absolute', left:135, top:345,
+        transform:`translateY(${(1-bg2P)*16}px)`,
+        opacity:bg2P, display:'flex', alignItems:'center', gap:20,
+        willChange:'transform,opacity',
+      }}>
+        {['BlueCity','×','Van Dijken Glas','×','WAZER Desktop'].map((item,i) => (
+          <span key={i} style={{
+            fontFamily: i%2===1 ? SERIF : SANS,
+            fontSize: i%2===1 ? 22 : 18,
+            color: i===0 ? GOLD : CREAM,
+            opacity: i%2===1 ? 0.38 : (i===0 ? 1 : 0.82),
+            textShadow:'0 2px 16px rgba(0,0,0,0.9)',
+            letterSpacing: i%2===1 ? 0 : '0.14em',
+          }}>{item}</span>
+        ))}
+      </div>
+      {/* Certificate */}
+      <div style={{
+        position:'absolute', right:130, top:'50%',
+        transform:`translateY(-50%) scale(${0.72+0.28*certP})`,
+        opacity:certP, width:400,
+        border:`1px solid rgba(210,175,80,0.22)`,
+        padding:'30px 34px',
+        background:'rgba(255,255,255,0.018)',
+        willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SANS,fontSize:9,color:GOLD,letterSpacing:'0.28em',textTransform:'uppercase',marginBottom:18}}>
+          Certificaat van Herkomst · Certificate of Origin
+        </div>
+        <div style={{fontFamily:MONO,fontSize:12,color:CREAM,opacity:0.45,lineHeight:2.1}}>
+          <div>Materiaal: Float glas, bedrukt</div>
+          <div>Bron: Van Dijken Glas, Waddinxveen</div>
+          <div>Productierun: VD-2024-0138</div>
+          <div>Serie: GG-2025-0042</div>
+          <div>Datum: April 2025</div>
+        </div>
+        <div style={{marginTop:20,paddingTop:18,borderTop:'1px solid rgba(255,255,255,0.07)'}}>
+          <div style={{fontFamily:SERIF,fontSize:26,color:GOLD,fontWeight:400,fontStyle:'italic'}}>
+            Glass⏧Grasie®
+          </div>
+        </div>
+      </div>
+      {/* Quote */}
+      <div style={{
+        position:'absolute', left:130, bottom:100,
+        transform:`translateY(${(1-quoteP)*20}px)`,
+        opacity:quoteP, maxWidth:820,
+        willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SERIF,fontSize:34,color:CREAM,fontWeight:400,lineHeight:1.45,fontStyle:'italic',opacity:0.97,textShadow:'0 2px 32px rgba(0,0,0,1)'}}>
+          "Elk stuk vertelt een verhaal<br/>dat niemand anders kan vertellen."
+        </div>
+        <div style={{fontFamily:SANS,fontSize:17,color:CREAM,opacity:0.72,marginTop:14,letterSpacing:'0.06em',textShadow:'0 2px 16px rgba(0,0,0,0.95)'}}>
+          Every piece tells a story no one else can tell.
+        </div>
+      </div>
+    </Sprite>
+  );
+}
+
+// ── Scene 5 — Mascot + Logo (72–90s) ──────────────────────────────────────
+function Scene5() {
+  const t = useTime();
+  const lt = t - 72;
+  const bgP      = Easing.easeOutCubic(clamp(lt / 2.5, 0, 1));
+  const mascotP  = Easing.easeOutCubic(clamp((lt - 1) / 2.8, 0, 1));
+  const logoP    = Easing.easeOutBack(clamp((lt - 3.5) / 2.2, 0, 1));
+  const taglineP = Easing.easeOutCubic(clamp((lt - 6) / 1.8, 0, 1));
+  const subP     = Easing.easeOutCubic(clamp((lt - 7.8) / 1.4, 0, 1));
+  const siteP    = Easing.easeOutCubic(clamp((lt - 11) / 1.2, 0, 1));
+  // Ken-burns slow zoom on mascot
+  const zoom = 1 + mascotP * 0.03;
+  return (
+    <Sprite start={72} end={90}>
+      <div style={{position:'absolute',inset:0,
+        background:`radial-gradient(ellipse 65% 65% at 32% 100%,
+          oklch(22% 0.07 82) 0%,
+          oklch(12% 0.03 82) 45%,
+          ${DARK} 70%)`,
+        opacity:bgP}}/>
+      {/* Subtle shards */}
+      {SHARDS.slice(0,6).map(d => (
+        <GlassShard key={d.id}
+          d={{...d, x:d.x*0.45+50, y:d.y*0.6+100, s:d.s*0.7}}
+          lit={true} progress={clamp((lt-2)/5,0,1)}/>
+      ))}
+      {/* Mascot — right side, bottom-anchored */}
+      <div style={{
+        position:'absolute', right: 80 + (1-mascotP)*220,
+        bottom:0, width:560,
+        opacity: mascotP,
+        transform:`scale(${zoom})`, transformOrigin:'bottom center',
+        willChange:'transform,opacity',
+      }}>
+        <img src="uploads/fashionme_nobg.png" alt="Glass⏧Grasie mascot"
+          style={{width:'100%',objectFit:'contain',display:'block'}}
+        />
+      </div>
+      {/* Logo wordmark */}
+      <div style={{
+        position:'absolute', left:130, top:'22%',
+        transform:`translateY(${(1-logoP)*32}px)`,
+        opacity:logoP, willChange:'transform,opacity',
+      }}>
+        {/* Badge line */}
+        <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:28}}>
+          <svg width="38" height="38" viewBox="0 0 38 38">
+            <polygon points="19,2 36,19 19,36 2,19" fill="none" stroke={GOLD} strokeWidth="1.4"/>
+            <polygon points="19,8 30,19 19,30 8,19" fill={GOLD} opacity="0.18"/>
+          </svg>
+          <div style={{width:1,height:32,background:'rgba(210,175,80,0.25)'}}/>
+          <div style={{fontFamily:SANS,fontSize:10,color:GOLD,letterSpacing:'0.28em',textTransform:'uppercase',opacity:0.7}}>
+            Rotterdam, NL · Est. 2025
+          </div>
+        </div>
+        {/* Wordmark */}
+        <div style={{
+          fontFamily:LOGO_FONT, fontSize:108, color:CREAM,
+          fontWeight:400, letterSpacing:'-0.05em', lineHeight:0.92, position:'relative',
+          textShadow:'0 4px 48px rgba(0,0,0,1), 0 2px 16px rgba(0,0,0,0.8)',
+        }}>
+          Glass⏧Grasie
+          <span style={{fontFamily:SERIF,fontSize:24,color:GOLD,verticalAlign:'super',marginLeft:4}}>®</span>
+        </div>
+      </div>
+      {/* Tagline NL */}
+      <div style={{
+        position:'absolute', left:133, top:'calc(22% + 188px)',
+        transform:`translateY(${(1-taglineP)*16}px)`,
+        opacity:taglineP, willChange:'transform,opacity',
+      }}>
+        <div style={{fontFamily:SANS,fontSize:28,color:CREAM,fontWeight:300,letterSpacing:'0.07em',textShadow:'0 2px 24px rgba(0,0,0,0.95)'}}>
+          Geconstrueerd glas uit Rotterdam.
+        </div>
+      </div>
+      {/* English */}
+      <div style={{
+        position:'absolute', left:134, top:'calc(22% + 232px)',
+        opacity:subP * 0.72,
+      }}>
+        <div style={{fontFamily:SANS,fontSize:17,color:CREAM,fontWeight:300,letterSpacing:'0.14em',textTransform:'uppercase',textShadow:'0 2px 16px rgba(0,0,0,0.9)'}}>
+          Constructed glass from Rotterdam.
+        </div>
+      </div>
+      {/* Divider */}
+      <div style={{
+        position:'absolute', left:133, top:'calc(22% + 272px)',
+        opacity: taglineP * 0.3, display:'flex', alignItems:'center', gap:12,
+      }}>
+        <div style={{width:44,height:1,background:GOLD}}/>
+        <svg width="8" height="8" viewBox="0 0 8 8">
+          <polygon points="4,0 8,4 4,8 0,4" fill={GOLD}/>
+        </svg>
+        <div style={{width:44,height:1,background:GOLD}}/>
+      </div>
+      {/* Website */}
+      <div style={{position:'absolute',left:133,bottom:70,opacity:siteP * 0.72}}>
+        <div style={{fontFamily:SANS,fontSize:15,color:CREAM,letterSpacing:'0.24em',textTransform:'uppercase'}}>
+          glassgrasie.nl
+        </div>
+      </div>
+    </Sprite>
+  );
+}
+
+// ── Flash transition ───────────────────────────────────────────────────────
+function Flash({ at, dur=0.45 }) {
+  const t = useTime();
+  const d = Math.abs(t - at);
+  const op = d < dur ? (1 - d/dur) * (1 - d/dur) * 0.9 : 0;
+  if (op < 0.01) return null;
+  return <div style={{position:'absolute',inset:0,background:'#000',opacity:op,pointerEvents:'none'}}/>;
+}
+
+// ── Timestamp screen label ─────────────────────────────────────────────────
+function TSLabel() {
+  const t = useTime();
+  const sec = Math.floor(t);
+  return <div data-screen-label={`${sec}s`} style={{position:'absolute',inset:0,pointerEvents:'none'}}/>;
+}
+
+// ── App ────────────────────────────────────────────────────────────────────
+function App() {
+  return (
+    <Stage width={1920} height={1080} duration={90} background={DARK}
+      persistKey="gg-brand-v1" loop={false} autoplay={true}>
+      <Scene1/>
+      <Scene2/>
+      <Scene3/>
+      <Scene4/>
+      <Scene5/>
+      <Flash at={15}/>
+      <Flash at={32}/>
+      <Flash at={55}/>
+      <Flash at={72}/>
+      <TSLabel/>
+    </Stage>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
