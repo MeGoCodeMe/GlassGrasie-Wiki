@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Enterprise Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body, #root { width: 100%; height: 100%; overflow: hidden; background: #090806; }
+  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #111; } ::-webkit-scrollbar-thumb { background: #2a2418; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const SERIF = '"Cormorant Garamond", Georgia, serif';
+const SANS  = '"Syncopate", sans-serif';
+const MONO  = '"JetBrains Mono", ui-monospace, monospace';
+const GOLD  = '#8B7355';
+const GOLD_HI = '#C9A87C';
+const CREAM = '#E8E2D8';
+const DARK  = '#090806';
+const RULE  = '#1C1810';
+
+// ── Pillar data ─────────────────────────────────────────────────────────────
+const PILLARS = [
+  {
+    id: '01', key: 'brand', label: 'Brand', name: 'Merk & Identiteit',
+    status: 80, statusLabel: '80% voltooid',
+    color: '#C9A87C', accent: 'oklch(72% 0.13 82)',
+    row: 0, col: 0,
+    desc: 'Cormorant + Syncopate design system. Certificaat van Herkomst. Woordmerk Glass⏧Grasie® vergrendeld.',
+    tags: ['Stylegids','Logo','ToV','Kleurpalet'],
+    links: ['02','05'],
+    kpis: [{ k:'Merkdocumenten', v:'7/10' }, { k:'Fonts locked', v:'✓' }, { k:'Palette', v:'12 swatches' }],
+  },
+  {
+    id: '02', key: 'marketing', label: 'Marketing', name: 'Marketing & Campagnes',
+    status: 38, statusLabel: '38% actief',
+    color: '#7A9B6A', accent: 'oklch(65% 0.12 145)',
+    row: 0, col: 1,
+    desc: 'Brand film 90s gereed. YouTube kanaal setup. Pod⏧Glassed podcast: 3 series (Eps, Studio Diaries, Product Spotlights). DDW Eindhoven okt 2026.',
+    tags: ['Brand Film','Pod⏧Glassed','YouTube','DDW 2026'],
+    links: ['01','03'],
+    kpis: [{ k:'Brand Film', v:'✓ 90s' }, { k:'YouTube', v:'Setup ✓' }, { k:'Podcast Ep.1', v:'In productie' }],
+    modules: [
+      { name:'Pod⏧Glassed', sub:'Wekelijks · ma 10:00 CET', status:'In productie' },
+      { name:'Studio Diaries', sub:'2× per maand · do', status:'Gepland' },
+      { name:'Product Spotlights', sub:'Wekelijks · vr', status:'Gepland' },
+      { name:'DDW Eindhoven', sub:'Oktober 2026 · 350K bezoekers', status:'Geboekt' },
+    ],
+  },
+  {
+    id: '03', key: 'social', label: 'Social', name: 'Social & Community',
+    status: 22, statusLabel: '22% actief',
+    color: '#7A7A9B', accent: 'oklch(62% 0.10 260)',
+    row: 0, col: 2,
+    desc: 'Instagram @glassgrasie · TikTok · LinkedIn · Discord seed. YouTube cross-post workflow. Community tab 4-5 posts/week.',
+    tags: ['@glassgrasie','YouTube','Discord','Community'],
+    links: ['02','04'],
+    kpis: [{ k:'Handle', v:'@glassgrasie' }, { k:'YouTube subs', v:'—' }, { k:'Discord', v:'Concept' }],
+  },
+  {
+    id: '04', key: 'web', label: 'Web Store', name: 'Web Presence & Cymatics',
+    status: 30, statusLabel: '30% gebouwd — 🔴 Revenue Engine',
+    color: '#C97A5A', accent: 'oklch(62% 0.13 40)',
+    row: 0, col: 3,
+    desc: 'Cloudflare Workers + Pages. DNS actief. Stripe test mode. Ripple/XRP crypto checkout. NFT cert auto-issuance op elke aankoop. DAO toegangsportaal. Cymatics Engine M1–M4 embedded.',
+    tags: ['Cloudflare','Stripe','Ripple/XRP','NFT Cert','DAO','Cymatics M1–M4'],
+    links: ['03','07','08'],
+    kpis: [{ k:'Cloudflare DNS', v:'✓ Actief' }, { k:'Stripe', v:'Test mode' }, { k:'Ripple/XRP', v:'In assessment' }],
+    modules: [
+      { name:'M1 Composer', sub:'Chladni canvas · 3 layers · 60fps', status:'Production Ready' },
+      { name:'M2 Advisor', sub:'Claude AI · 15 SKUs · top-3 match', status:'Production Ready' },
+      { name:'M3 Immersie', sub:'3D refractie + microfoon input', status:'Production Ready' },
+      { name:'M4 Deployment', sub:'React orchestrator · 36KB · /cymatics/', status:'Production Ready' },
+      { name:'Stripe Checkout', sub:'Live mode · volledige checkout flow', status:'Test mode' },
+      { name:'Ripple/XRP', sub:'ISO 20022 · crypto checkout', status:'In assessment' },
+      { name:'NFT Certificaat', sub:'Auto-issuance bij aankoop', status:'Pending' },
+      { name:'Blockchain QR', sub:'Materiaalreis per product zichtbaar', status:'Pending' },
+      { name:'Wallet Auth', sub:'Web3-native returning customers', status:'Pending' },
+      { name:'n8n Automation', sub:'Stripe → Accounting · Ripple → Accounting · 🔴 High', status:'To configure' },
+    ],
+  },
+  {
+    id: '05', key: 'design', label: 'Design', name: 'Product Design & R&D',
+    status: 65, statusLabel: '65% voltooid',
+    color: '#9B8A5A', accent: 'oklch(68% 0.11 90)',
+    row: 1, col: 0,
+    desc: 'Fragment sieradenlijn. Tie Bar nieuw. Woonaccessoires. Architectuurpanelen. WAZER Desktop cutting.',
+    tags: ['Fragment','Tie Bar','Woonacc.','Architectuur'],
+    links: ['01','06'],
+    kpis: [{ k:'SKUs ontworpen', v:'12' }, { k:'WAZER', v:'In gebruik' }, { k:'GitHub', v:'Active' }],
+  },
+  {
+    id: '06', key: 'product', label: 'Product', name: 'Productie & Voorraadbeheer',
+    status: 30, statusLabel: '30% operationeel',
+    color: '#6A8A9B', accent: 'oklch(60% 0.09 210)',
+    row: 1, col: 1,
+    desc: 'Van Dijken Glas exclusiviteitsovereenkomst. WAZER-snijprogramma. Batch planning Q2.',
+    tags: ['Van Dijken','WAZER','Batches','Certificaten'],
+    links: ['05','08'],
+    kpis: [{ k:'Materiaalkost', v:'~€0' }, { k:'Van Dijken', v:'Partner' }, { k:'Batch 1', v:'Planning' }],
+  },
+  {
+    id: '07', key: 'finance', label: 'Finance', name: 'Finance & Treasury',
+    status: 55, statusLabel: '55% ingericht',
+    color: '#7A9B7A', accent: 'oklch(65% 0.10 155)',
+    row: 1, col: 2,
+    desc: 'WBSO €23.975 aftrek. Stripe payments. Ripple XRP treasury. MIA/Vamil aanvraag. Startinvest €630.',
+    tags: ['WBSO','Stripe','Ripple','MIA/Vamil'],
+    links: ['04','12'],
+    kpis: [{ k:'WBSO', v:'€23.975' }, { k:'Startkosten', v:'€630' }, { k:'Omzet Y1', v:'€32–52K' }],
+  },
+  {
+    id: '08', key: 'mfg', label: 'MFG Ops', name: 'Manufacturing & IoT',
+    status: 75, statusLabel: '75% actief — Wazer operationeel',
+    color: '#8A7A9B', accent: 'oklch(60% 0.09 290)',
+    row: 1, col: 3,
+    desc: 'Wazer CNC waterjet operationeel in Rotterdam. Restfloatglas pipeline actief. IoT blockchain logging is de gap — elk batch traceerbaar tot klantfacing provenance record.',
+    tags: ['Wazer CNC','IoT logging','Blockchain batch','QR Code','B2B Compliance PDF'],
+    links: ['06','04','07'],
+    kpis: [{ k:'Wazer CNC', v:'✓ Operationeel' }, { k:'IoT sensors', v:'Spec fase' }, { k:'Blockchain log', v:'Pending' }],
+    modules: [
+      { name:'Wazer CNC', sub:'Waterjet · Rotterdam workshop · Starlink', status:'Operationeel' },
+      { name:'IoT Sensor spec', sub:'Batch ID · gewicht · afmetingen · kwaliteit', status:'In spec' },
+      { name:'Blockchain logging', sub:'Unieke batch hash · immutable record', status:'Pending' },
+      { name:'QR Code systeem', sub:'Fysiek product → blockchain batch record', status:'In ontwerp' },
+      { name:'B2B Compliance PDF', sub:'Auto-gegenereerd uit chain data per batch', status:'Pending' },
+      { name:'n8n: IoT → Blockchain', sub:'Wazer data → log → Obsidian batch note', status:'🔴 To configure' },
+    ],
+  },
+  {
+    id: '09', key: 'legal', label: 'Legal', name: 'Legal & IP',
+    status: 40, statusLabel: '40% gedekt',
+    color: '#9B6A6A', accent: 'oklch(55% 0.09 20)',
+    row: 2, col: 0,
+    desc: 'Glass⏧Grasie® trademark aanvraag. IP op ⏧-glyph. Bijproduct vs. afval classificatie NL-recht. AML/KYC crypto T&Cs. GDPR Privacy Policy.',
+    tags: ['Trademark','IP ⏧','Bijproduct','AML/KYC','GDPR'],
+    links: ['10'],
+    kpis: [{ k:'® Status', v:'Aanvraag' }, { k:'VDG contract', v:'Concept' }, { k:'Crypto T&Cs', v:'In progress' }],
+  },
+  {
+    id: '10', key: 'compliance', label: 'Compliance', name: 'Compliance & Certificering',
+    status: 45, statusLabel: '45% gestart — B2B gate',
+    color: '#6A9B8A', accent: 'oklch(62% 0.09 170)',
+    row: 2, col: 1,
+    desc: 'CE markering decoratief glas. AML/KYC voor Ripple/XRP. AFM/DNB VASP beoordeling. GDPR data flows. Koolstofcredits per product. ISO 20022.',
+    tags: ['CE Mark','AML/KYC','GDPR','Carbon Credits','ISO 20022'],
+    links: ['09'],
+    kpis: [{ k:'CE Marking', v:'Research ✓' }, { k:'AML/KYC', v:'In assessment' }, { k:'Carbon std', v:'VCS / Gold Std' }],
+    modules: [
+      { name:'CE Markering', sub:'Decoratief float glas — EU directive', status:'Onderzoek' },
+      { name:'AML/KYC', sub:'Ripple/XRP drempelwaarden', status:'In progress' },
+      { name:'AFM/DNB VASP', sub:'XRP registratieplicht beoordeling', status:'Pending' },
+      { name:'Carbon Credits', sub:'VCS of Gold Standard per product', status:'Keuze nodig' },
+      { name:'GDPR Policy', sub:'Cloudflare · Stripe · Ripple · Obsidian', status:'Concept' },
+      { name:'B2B Compliance Pack', sub:'CE + herkomst + duurzaamheid', status:'Pending' },
+    ],
+  },
+  {
+    id: '11', key: 'partnerships', label: 'Partners', name: 'Partnerships & B2B',
+    status: 20, statusLabel: '20% actief',
+    color: '#9B9A6A', accent: 'oklch(68% 0.09 100)',
+    row: 2, col: 2,
+    desc: 'BlueCity Rotterdam. The Farm Material Lab. MVRDV. Superuse Studios. Art Rotterdam 2027.',
+    tags: ['BlueCity','The Farm','MVRDV','Art Rotterdam'],
+    links: ['01','06'],
+    kpis: [{ k:'BlueCity', v:'Gesprek' }, { k:'The Farm', v:'Via VDG' }, { k:'MVRDV', v:'Target' }],
+  },
+  {
+    id: '12', key: 'analytics', label: 'Analytics', name: 'Analytics & Noord-ster',
+    status: 15, statusLabel: '15% ingericht',
+    color: '#6A8A7A', accent: 'oklch(60% 0.08 165)',
+    row: 2, col: 3,
+    desc: 'Noord-ster: duurzame impact (kg glas gered) × omzet (€). Google Analytics 4. Madaster dashboard.',
+    tags: ['Noord-ster','GA4','Madaster','Impact KPI'],
+    links: ['07'],
+    kpis: [{ k:'Noord-ster', v:'Gedefinieerd' }, { k:'Kg gered', v:'Tracking' }, { k:'Dashboard', v:'Pending' }],
+  },
+];
+
+// ── Tech Stack data ──────────────────────────────────────────────────────────
+const TECH_STACK = [
+  { cat:'Infrastructure', items:[
+    { tool:'Cloudflare', role:'Web hosting + CDN', status:'Active', pillar:'04' },
+    { tool:'UniFi Dream Machine Pro', role:'Local network', status:'Active', pillar:'All' },
+    { tool:'UniFi NAS', role:'Local storage', status:'Arriving soon', pillar:'All' },
+    { tool:'Starlink', role:'Internet', status:'Active', pillar:'All' },
+    { tool:'MacBook Pro M1', role:'Primary workstation', status:'Active', pillar:'All' },
+    { tool:'iPad Pro 12.9"', role:'Creative + mobile', status:'Active', pillar:'All' },
+  ]},
+  { cat:'Development', items:[
+    { tool:'VS Code', role:'IDE', status:'Active', pillar:'04, 05' },
+    { tool:'GitHub', role:'Code + version control', status:'Active', pillar:'04–06' },
+    { tool:'21st Dev', role:'DevOps tooling', status:'Active', pillar:'04' },
+  ]},
+  { cat:'Payments & Finance', items:[
+    { tool:'Stripe', role:'Fiat payments', status:'Active', pillar:'04, 07' },
+    { tool:'Ripple / XRP', role:'Crypto settlements', status:'To set up', pillar:'04, 07' },
+    { tool:'QuickBooks', role:'Accounting', status:'To configure', pillar:'07' },
+  ]},
+  { cat:'Automation', items:[
+    { tool:'n8n / Make', role:'Workflow automation', status:'To configure', pillar:'All' },
+    { tool:'Apify', role:'Web scraping + data', status:'Active', pillar:'02, 12' },
+  ]},
+  { cat:'Communication & CRM', items:[
+    { tool:'Proton Mail', role:'Email + scheduling', status:'Active', pillar:'All' },
+    { tool:'Odoo', role:'CRM — B2B + B2C', status:'To configure', pillar:'02, 11' },
+    { tool:'Discord', role:'Community + support', status:'To set up', pillar:'03, 11' },
+  ]},
+  { cat:'Content & Social', items:[
+    { tool:'YouTube', role:'Long-form video + podcast', status:'Live', pillar:'03' },
+    { tool:'Instagram', role:'Visual social', status:'Live', pillar:'03' },
+    { tool:'TikTok', role:'Short-form content', status:'Live', pillar:'03' },
+    { tool:'Runway', role:'AI video generation', status:'Live', pillar:'03' },
+    { tool:'Buffer', role:'Social scheduling', status:'Live', pillar:'03' },
+  ]},
+  { cat:'Manufacturing', items:[
+    { tool:'Wazer CNC', role:'Precision glass cutting', status:'Active', pillar:'06, 08' },
+    { tool:'Apple Studio', role:'Design suite', status:'Active', pillar:'05' },
+  ]},
+];
+
+const N8N_FLOWS = [
+  { from:'Stripe', to:'Accounting', trigger:'New sale', priority:'🔴' },
+  { from:'Pipedrive', to:'Proton Mail', trigger:'New B2B lead', priority:'🔴' },
+  { from:'Wazer IoT', to:'Blockchain', trigger:'Per batch', priority:'🔴' },
+  { from:'GitHub', to:'Obsidian note', trigger:'New commit', priority:'🟡' },
+  { from:'Social platforms', to:'Weekly analytics note', trigger:'Every Friday', priority:'🟡' },
+  { from:'Ripple', to:'Accounting', trigger:'Crypto settlement', priority:'🔴' },
+];
+const FLOW_CONNECTIONS = [
+  { from:'01', to:'02', label:'shapes' },
+  { from:'02', to:'03', label:'drives' },
+  { from:'03', to:'04', label:'traffic' },
+  { from:'01', to:'05', label:'informs' },
+  { from:'05', to:'06', label:'specs' },
+  { from:'06', to:'08', label:'production' },
+  { from:'08', to:'04', label:'IoT+chain' },
+  { from:'04', to:'07', label:'sales' },
+  { from:'07', to:'12', label:'measures' },
+  { from:'09', to:'10', label:'governs' },
+  { from:'12', to:'07', label:'feedback' },
+];
+
+// ── Status bar ─────────────────────────────────────────────────────────────
+function StatusBar({ pct, color }) {
+  return (
+    <div style={{ width:'100%', height:2, background:'rgba(255,255,255,0.06)', borderRadius:1, overflow:'hidden' }}>
+      <div style={{ width:`${pct}%`, height:'100%', background:color, borderRadius:1,
+        transition:'width 0.6s ease', boxShadow:`0 0 6px ${color}44` }}/>
+    </div>
+  );
+}
+
+// ── Pillar card ─────────────────────────────────────────────────────────────
+function PillarCard({ p, active, onSelect }) {
+  const [hov, setHov] = React.useState(false);
+  const isActive = active?.id === p.id;
+  return (
+    <div
+      onClick={() => onSelect(isActive ? null : p)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: isActive ? `rgba(${hexToRgb(p.color)},0.12)` : hov ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.015)',
+        border: `1px solid ${isActive ? p.color + '55' : hov ? 'rgba(255,255,255,0.1)' : RULE}`,
+        borderRadius: 2,
+        padding: '18px 16px 14px',
+        cursor: 'pointer',
+        transition: 'all 180ms',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* accent top bar */}
+      <div style={{ position:'absolute', top:0, left:0, right:0, height: isActive ? 2 : 1,
+        background: isActive ? p.color : `${p.color}44`, transition:'height 180ms' }}/>
+
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
+        <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:p.color,
+          textTransform:'uppercase' }}>
+          {p.id} — {p.label}
+        </div>
+        <div style={{ fontFamily:MONO, fontSize:9, color:p.status >= 70 ? '#5A9A5A' :
+          p.status >= 40 ? GOLD : '#7A4A4A', letterSpacing:'0.5px' }}>
+          {p.status}%
+        </div>
+      </div>
+
+      <div style={{ fontFamily:SERIF, fontSize:15, color:CREAM, fontWeight:400,
+        lineHeight:1.2, marginBottom:10, letterSpacing:'-0.01em' }}>
+        {p.name}
+      </div>
+
+      <StatusBar pct={p.status} color={p.color}/>
+
+      <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginTop:10 }}>
+        {p.tags.slice(0,3).map(t => (
+          <span key={t} style={{ fontFamily:SANS, fontSize:6, letterSpacing:'1.5px',
+            color:'rgba(232,226,216,0.75)', border:'1px solid rgba(255,255,255,0.07)',
+            padding:'2px 6px', textTransform:'uppercase' }}>{t}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Detail panel ─────────────────────────────────────────────────────────────
+function DetailPanel({ p, onClose, allPillars }) {
+  if (!p) return null;
+  const linked = allPillars.filter(x => p.links.includes(x.id));
+  return (
+    <div style={{
+      position:'absolute', right:0, top:0, bottom:0, width:360,
+      background:'#0D0C0A', borderLeft:`1px solid ${RULE}`,
+      display:'flex', flexDirection:'column',
+      animation:'slideIn 180ms ease',
+      zIndex:10,
+    }}>
+      <style>{`@keyframes slideIn { from { transform: translateX(20px); opacity:0; } to { transform:translateX(0); opacity:1; } }`}</style>
+
+      {/* Header */}
+      <div style={{ padding:'20px 24px 16px', borderBottom:`1px solid ${RULE}` }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+          <div style={{ fontFamily:SANS, fontSize:8, letterSpacing:'4px', color:p.color, textTransform:'uppercase' }}>
+            Pillar {p.id}
+          </div>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer',
+            color:'rgba(232,226,216,0.72)', fontSize:18, lineHeight:1, padding:'2px 6px' }}>×</button>
+        </div>
+        <div style={{ fontFamily:SERIF, fontSize:24, color:CREAM, fontWeight:400, letterSpacing:'-0.01em', lineHeight:1.15 }}>
+          {p.name}
+        </div>
+        <div style={{ marginTop:12, marginBottom:4 }}>
+          <StatusBar pct={p.status} color={p.color}/>
+        </div>
+        <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'2px', color:p.color, textTransform:'uppercase', marginTop:8 }}>
+          {p.statusLabel}
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{ flex:1, overflowY:'auto', padding:'20px 24px' }}>
+        <p style={{ fontFamily:SERIF, fontSize:15, color:'rgba(232,226,216,0.92)', lineHeight:1.75, marginBottom:24 }}>
+          {p.desc}
+        </p>
+
+        {/* KPIs */}
+        <div style={{ marginBottom:24 }}>
+          <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:GOLD, textTransform:'uppercase', marginBottom:12 }}>
+            KPI's
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:1, background:RULE }}>
+            {p.kpis.map(kpi => (
+              <div key={kpi.k} style={{ background:'#0D0C0A', padding:'10px 14px',
+                display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <span style={{ fontFamily:SANS, fontSize:7, letterSpacing:'2px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase' }}>{kpi.k}</span>
+                <span style={{ fontFamily:MONO, fontSize:11, color:CREAM }}>{kpi.v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Modules (if any) */}
+        {p.modules && p.modules.length > 0 && (
+          <div style={{ marginBottom:24 }}>
+            <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:GOLD, textTransform:'uppercase', marginBottom:12 }}>
+              Modules
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:1, background:RULE }}>
+              {p.modules.map((m,i) => (
+                <div key={i} style={{ background:'#0D0C0A', padding:'10px 14px',
+                  display:'flex', justifyContent:'space-between', alignItems:'center', gap:8 }}>
+                  <div>
+                    <div style={{ fontFamily:MONO, fontSize:11, color:CREAM, marginBottom:2 }}>{m.name}</div>
+                    <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'1.5px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase' }}>{m.sub}</div>
+                  </div>
+                  <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'1.5px', textTransform:'uppercase', padding:'3px 8px',
+                    border:`1px solid`, flexShrink:0,
+                    borderColor: m.status === 'Production Ready' ? '#3A6A3A' : m.status === 'Geboekt' ? `${GOLD}55` : RULE,
+                    color: m.status === 'Production Ready' ? '#5A9A5A' : m.status === 'Geboekt' ? GOLD_HI : 'rgba(232,226,216,0.72)' }}>
+                    {m.status}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Cymatics Engine mini-preview for Pillar 04 */}
+        {p.id === '04' && <CymaticsPreview color={p.color}/>}
+
+        {/* Tags */}
+        <div style={{ marginBottom:24 }}>
+          <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:GOLD, textTransform:'uppercase', marginBottom:12 }}>
+            Modules
+          </div>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+            {p.tags.map(t => (
+              <span key={t} style={{ fontFamily:SANS, fontSize:7, letterSpacing:'2px',
+                color:p.color, border:`1px solid ${p.color}44`, padding:'5px 10px', textTransform:'uppercase' }}>{t}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Linked pillars */}
+        {linked.length > 0 && (
+          <div>
+            <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:GOLD, textTransform:'uppercase', marginBottom:12 }}>
+              Verbonden met
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+              {linked.map(lp => (
+                <div key={lp.id} style={{ display:'flex', alignItems:'center', gap:12,
+                  padding:'8px 12px', border:`1px solid ${RULE}`, background:'rgba(255,255,255,0.01)' }}>
+                  <div style={{ width:4, height:4, borderRadius:'50%', background:lp.color, flexShrink:0 }}/>
+                  <span style={{ fontFamily:SANS, fontSize:7, letterSpacing:'2px', color:lp.color, textTransform:'uppercase', flexShrink:0 }}>
+                    {lp.id}
+                  </span>
+                  <span style={{ fontFamily:SERIF, fontSize:13, color:'rgba(232,226,216,0.82)' }}>
+                    {lp.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Flow diagram (SVG) ───────────────────────────────────────────────────────
+function FlowDiagram({ pillars, onSelect }) {
+  const W = 900, H = 320;
+  // Position each pillar as a node
+  const COLS = 4, ROWS = 3;
+  const cw = W / COLS, rh = H / ROWS;
+  const nodePos = {};
+  pillars.forEach(p => {
+    nodePos[p.id] = { x: p.col * cw + cw/2, y: p.row * rh + rh/2 };
+  });
+
+  const pillarById = {};
+  pillars.forEach(p => { pillarById[p.id] = p; });
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%"
+      style={{ display:'block', overflow:'visible' }}>
+      {/* Connections */}
+      {FLOW_CONNECTIONS.map((c, i) => {
+        const from = nodePos[c.from], to = nodePos[c.to];
+        if (!from || !to) return null;
+        const fp = pillarById[c.from];
+        const mx = (from.x + to.x) / 2, my = (from.y + to.y) / 2;
+        const dx = to.x - from.x, dy = to.y - from.y;
+        const len = Math.sqrt(dx*dx + dy*dy);
+        // shorten line so it doesn't overlap nodes
+        const r = 28;
+        const sx = from.x + dx/len*r, sy = from.y + dy/len*r;
+        const ex = to.x   - dx/len*r, ey = to.y   - dy/len*r;
+        return (
+          <g key={i}>
+            <defs>
+              <marker id={`arr${i}`} markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill={fp?.color || GOLD} opacity="0.5"/>
+              </marker>
+            </defs>
+            <line x1={sx} y1={sy} x2={ex} y2={ey}
+              stroke={fp?.color || GOLD} strokeWidth="1" strokeDasharray="3 4"
+              opacity="0.35" markerEnd={`url(#arr${i})`}/>
+            <text x={mx} y={my-4} textAnchor="middle"
+              fontFamily={MONO} fontSize="7" fill="rgba(232,226,216,0.85)" letterSpacing="1">
+              {c.label}
+            </text>
+          </g>
+        );
+      })}
+      {/* Nodes */}
+      {pillars.map(p => {
+        const pos = nodePos[p.id];
+        return (
+          <g key={p.id} style={{ cursor:'pointer' }} onClick={() => onSelect(p)}>
+            <circle cx={pos.x} cy={pos.y} r={26} fill="#0D0C0A"
+              stroke={p.color} strokeWidth="1" opacity="0.9"/>
+            <circle cx={pos.x} cy={pos.y} r={26} fill={p.color} opacity="0.06"/>
+            <text x={pos.x} y={pos.y - 7} textAnchor="middle"
+              fontFamily={SANS} fontSize="8" fontWeight="700" fill={p.color} letterSpacing="1">
+              {p.id}
+            </text>
+            <text x={pos.x} y={pos.y + 6} textAnchor="middle"
+              fontFamily={SANS} fontSize="6" fill={CREAM} letterSpacing="1" opacity="0.7">
+              {p.label.toUpperCase()}
+            </text>
+            {/* Progress arc */}
+            <circle cx={pos.x} cy={pos.y} r={26}
+              fill="none" stroke={p.color} strokeWidth="2"
+              strokeDasharray={`${2*Math.PI*26 * p.status/100} ${2*Math.PI*26 * (1 - p.status/100)}`}
+              strokeDashoffset={2*Math.PI*26 * 0.25}
+              opacity="0.5"/>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ── Top bar metrics ──────────────────────────────────────────────────────────
+function TopMetric({ label, value, sub, color }) {
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
+      <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'3px', color:GOLD, textTransform:'uppercase' }}>{label}</div>
+      <div style={{ fontFamily:SERIF, fontSize:22, color: color || CREAM, fontWeight:300, lineHeight:1 }}>{value}</div>
+      {sub && <div style={{ fontFamily:MONO, fontSize:9, color:'rgba(232,226,216,0.72)', letterSpacing:'0.5px' }}>{sub}</div>}
+    </div>
+  );
+}
+
+// helper
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+// ── North Star ticker ─────────────────────────────────────────────────────────
+function NorthStar() {
+  const [kg, setKg] = React.useState(0);
+  React.useEffect(() => {
+    const t = setInterval(() => setKg(k => Math.min(k + 0.7, 142)), 40);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div style={{ display:'flex', alignItems:'center', gap:14,
+      padding:'10px 18px', border:`1px solid rgba(201,168,124,0.2)`,
+      background:'rgba(201,168,124,0.04)' }}>
+      <div>
+        <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'3px', color:GOLD_HI, textTransform:'uppercase', marginBottom:4 }}>
+          ★ Noord-ster
+        </div>
+        <div style={{ fontFamily:SERIF, fontSize:14, color:CREAM, fontStyle:'italic', opacity:0.8 }}>
+          Duurzame impact × omzet
+        </div>
+      </div>
+      <div style={{ width:1, height:36, background:'rgba(255,255,255,0.08)' }}/>
+      <div>
+        <div style={{ fontFamily:MONO, fontSize:18, color:GOLD_HI }}>{Math.floor(kg)}<span style={{fontSize:11,color:GOLD}}> kg</span></div>
+        <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'2px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase' }}>glas gered · ytd</div>
+      </div>
+      <div style={{ width:1, height:36, background:'rgba(255,255,255,0.08)' }}/>
+      <div>
+        <div style={{ fontFamily:MONO, fontSize:18, color:'#7A9B6A' }}>€<span style={{fontSize:14}}>0</span></div>
+        <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'2px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase' }}>omzet ytd</div>
+      </div>
+    </div>
+  );
+}
+
+// ── View toggle ──────────────────────────────────────────────────────────────
+function ViewBtn({ active, onClick, children }) {
+  return (
+    <button onClick={onClick} style={{
+      fontFamily:SANS, fontSize:6, letterSpacing:'3px', textTransform:'uppercase',
+      padding:'7px 14px', cursor:'pointer', border:'1px solid',
+      borderColor: active ? `${GOLD}88` : RULE,
+      background: active ? 'rgba(139,115,85,0.12)' : 'transparent',
+      color: active ? GOLD_HI : 'rgba(232,226,216,0.75)',
+      transition:'all 150ms',
+    }}>{children}</button>
+  );
+}
+
+// ── Cymatics mini-preview ────────────────────────────────────────────────────
+function CymaticsPreview({ color }) {
+  const canvasRef = React.useRef(null);
+  const [freq, setFreq] = React.useState(440);
+  const [layer, setLayer] = React.useState(1);
+  const rafRef = React.useRef(null);
+  const tRef = React.useRef(0);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    const draw = () => {
+      tRef.current += 0.012;
+      const t = tRef.current;
+      ctx.fillStyle = '#09080A';
+      ctx.fillRect(0, 0, W, H);
+
+      const m = freq / 80;
+      const n = layer + 1.5;
+      const img = ctx.createImageData(W, H);
+      const d = img.data;
+
+      for (let px = 0; px < W; px++) {
+        for (let py = 0; py < H; py++) {
+          const x = (px / W - 0.5) * 2;
+          const y = (py / H - 0.5) * 2;
+          // Chladni: |cos(m·π·x)·cos(n·π·y) - cos(n·π·x)·cos(m·π·y)|
+          const val = Math.abs(
+            Math.cos(m * Math.PI * x) * Math.cos(n * Math.PI * y) -
+            Math.cos(n * Math.PI * x) * Math.cos(m * Math.PI * y + t * 0.3)
+          );
+          const thresh = 0.08 + 0.03 * Math.sin(t);
+          const bright = val < thresh ? Math.pow(1 - val / thresh, 2.5) : 0;
+          const idx = (py * W + px) * 4;
+          // Use pillar color tint
+          d[idx]   = Math.round(bright * 200);
+          d[idx+1] = Math.round(bright * 160);
+          d[idx+2] = Math.round(bright * 100);
+          d[idx+3] = Math.round(bright * 220);
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+
+      // Overlay labels
+      ctx.fillStyle = 'rgba(139,115,85,0.6)';
+      ctx.font = `600 9px ${MONO}`;
+      ctx.fillText(`${freq} Hz`, 10, 16);
+      ctx.fillText(`M1 Composer`, 10, H - 10);
+
+      rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [freq, layer]);
+
+  return (
+    <div style={{ marginBottom:24 }}>
+      <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:GOLD,
+        textTransform:'uppercase', marginBottom:10 }}>Cymatics Live Preview</div>
+      <canvas ref={canvasRef} width={312} height={180}
+        style={{ width:'100%', borderRadius:2, border:`1px solid ${RULE}`, display:'block' }}/>
+      <div style={{ marginTop:10, display:'flex', flexDirection:'column', gap:8 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <span style={{ fontFamily:SANS, fontSize:6, letterSpacing:'2px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase', width:50 }}>Freq</span>
+          <input type="range" min={200} max={1400} step={10} value={freq}
+            onChange={e => setFreq(+e.target.value)}
+            style={{ flex:1, accentColor:GOLD_HI, cursor:'pointer' }}/>
+          <span style={{ fontFamily:MONO, fontSize:10, color:GOLD_HI, width:46, textAlign:'right' }}>{freq} Hz</span>
+        </div>
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <span style={{ fontFamily:SANS, fontSize:6, letterSpacing:'2px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase', width:50 }}>Laag m</span>
+          <input type="range" min={1} max={6} step={1} value={layer}
+            onChange={e => setLayer(+e.target.value)}
+            style={{ flex:1, accentColor:GOLD_HI, cursor:'pointer' }}/>
+          <span style={{ fontFamily:MONO, fontSize:10, color:GOLD_HI, width:46, textAlign:'right' }}>n={layer+1}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main App ─────────────────────────────────────────────────────────────────
+function App() {
+  const [selected, setSelected] = React.useState(null);
+  const [view, setView] = React.useState('grid');
+
+  const avgProgress = Math.round(PILLARS.reduce((a, p) => a + p.status, 0) / PILLARS.length);
+  const activeCount = PILLARS.filter(p => p.status >= 20).length;
+
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+      background:DARK, fontFamily:SERIF, color:CREAM, overflow:'hidden' }}>
+
+      {/* ── Top bar ───────────────────────────────────────────────── */}
+      <div style={{ borderBottom:`1px solid ${RULE}`, padding:'14px 28px',
+        display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+          <div style={{ fontFamily:'"Cormorant Garamond",Georgia,serif', fontWeight:400, fontSize:20, letterSpacing:'-0.05em', color:CREAM }}>
+            Glass⏧Grasie<sup style={{fontSize:'0.5em',color:GOLD_HI,verticalAlign:'super',letterSpacing:0}}>®</sup>
+          </div>
+          <div style={{ width:1, height:28, background:RULE }}/>
+          <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase' }}>
+            Enterprise Dashboard · April 2026
+          </div>
+        </div>
+
+        <div style={{ display:'flex', gap:32, alignItems:'center' }}>
+          <TopMetric label="Voortgang" value={`${avgProgress}%`} sub="12 pilaren gemiddeld"/>
+          <TopMetric label="Actieve pilaren" value={activeCount} sub={`van 12 gestart`}/>
+          <TopMetric label="Startinvestering" value="€630" sub="excl. WAZER"/>
+          <TopMetric label="WBSO voordeel" value="€23.975" sub="jaar 1" color="#7A9B6A"/>
+        </div>
+
+        <div style={{ display:'flex', gap:4 }}>
+          <ViewBtn active={view==='grid'} onClick={()=>setView('grid')}>Grid</ViewBtn>
+          <ViewBtn active={view==='flow'} onClick={()=>setView('flow')}>Flow</ViewBtn>
+          <ViewBtn active={view==='tech'} onClick={()=>setView('tech')}>Tech Stack</ViewBtn>
+        </div>
+      </div>
+
+      {/* ── Body ─────────────────────────────────────────────────── */}
+      <div style={{ flex:1, display:'flex', minHeight:0, position:'relative' }}>
+
+        {/* Main content */}
+        <div style={{ flex:1, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+
+          {/* North Star strip */}
+          <div style={{ padding:'12px 28px', borderBottom:`1px solid ${RULE}`, flexShrink:0 }}>
+            <NorthStar/>
+          </div>
+
+          {view === 'grid' && (
+            <div style={{ flex:1, overflowY:'auto', padding:'20px 28px' }}>
+              {/* Row labels */}
+              {[['Merk & Markt','Pillars 01–04'],['Design & Operations','Pillars 05–08'],['Governance & Groei','Pillars 09–12']].map(([title, sub], ri) => (
+                <div key={ri} style={{ marginBottom:28 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:12 }}>
+                    <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:GOLD, textTransform:'uppercase' }}>{title}</div>
+                    <div style={{ flex:1, height:1, background:RULE }}/>
+                    <div style={{ fontFamily:MONO, fontSize:9, color:'rgba(232,226,216,0.2)' }}>{sub}</div>
+                  </div>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
+                    {PILLARS.filter(p => p.row === ri).map(p => (
+                      <PillarCard key={p.id} p={p} active={selected} onSelect={setSelected}/>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {view === 'tech' && (
+            <div style={{ flex:1, overflowY:'auto', padding:'20px 28px' }}>
+              {/* n8n flows */}
+              <div style={{ marginBottom:32 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:12 }}>
+                  <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:GOLD, textTransform:'uppercase' }}>n8n Automation Priority</div>
+                  <div style={{ flex:1, height:1, background:RULE }}/>
+                </div>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:1, background:RULE }}>
+                  {N8N_FLOWS.map((f,i) => (
+                    <div key={i} style={{ background:DARK, padding:'12px 14px' }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:6 }}>
+                        <span style={{ fontSize:10 }}>{f.priority}</span>
+                        <span style={{ fontFamily:MONO, fontSize:10, color:CREAM }}>{f.from}</span>
+                        <span style={{ color:GOLD, fontSize:10 }}>→</span>
+                        <span style={{ fontFamily:MONO, fontSize:10, color:GOLD_HI }}>{f.to}</span>
+                      </div>
+                      <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'1.5px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase' }}>{f.trigger}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Tech stack by category */}
+              {TECH_STACK.map(cat => (
+                <div key={cat.cat} style={{ marginBottom:24 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:10 }}>
+                    <div style={{ fontFamily:SANS, fontSize:7, letterSpacing:'3px', color:GOLD, textTransform:'uppercase' }}>{cat.cat}</div>
+                    <div style={{ flex:1, height:1, background:RULE }}/>
+                  </div>
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:1, background:RULE }}>
+                    {cat.items.map(item => (
+                      <div key={item.tool} style={{ background:DARK, padding:'12px 14px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                        <div>
+                          <div style={{ fontFamily:MONO, fontSize:11, color:CREAM, marginBottom:3 }}>{item.tool}</div>
+                          <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'1.5px', color:'rgba(232,226,216,0.72)', textTransform:'uppercase' }}>{item.role} · P{item.pillar}</div>
+                        </div>
+                        <div style={{ fontFamily:SANS, fontSize:6, letterSpacing:'1.5px', textTransform:'uppercase', padding:'3px 8px', border:'1px solid', flexShrink:0,
+                          borderColor: item.status==='Active'||item.status==='Live' ? '#3A6A3A' : item.status==='Arriving soon' ? `${GOLD}55` : RULE,
+                          color: item.status==='Active'||item.status==='Live' ? '#5A9A5A' : item.status==='Arriving soon' ? GOLD_HI : 'rgba(232,226,216,0.72)' }}>
+                          {item.status}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {view === 'flow' && (
+            <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', padding:'28px' }}>
+              <div style={{ width:'100%', maxWidth:900, aspectRatio:'900/320' }}>
+                <FlowDiagram pillars={PILLARS} onSelect={p => setSelected(prev => prev?.id === p.id ? null : p)}/>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Detail panel */}
+        <DetailPanel p={selected} onClose={() => setSelected(null)} allPillars={PILLARS}/>
+      </div>
+
+      {/* ── Status strip ─────────────────────────────────────────── */}
+      <div style={{ borderTop:`1px solid ${RULE}`, padding:'8px 28px',
+        display:'flex', gap:6, alignItems:'center', flexShrink:0 }}>
+        {PILLARS.map(p => (
+          <div key={p.id} title={`${p.label}: ${p.status}%`}
+            onClick={() => setSelected(prev => prev?.id === p.id ? null : p)}
+            style={{ flex:1, cursor:'pointer' }}>
+            <div style={{ fontFamily:SANS, fontSize:5, letterSpacing:'1px', color:p.color,
+              textTransform:'uppercase', marginBottom:3, textAlign:'center', opacity:0.7 }}>{p.id}</div>
+            <div style={{ height:3, background:RULE, borderRadius:1, overflow:'hidden' }}>
+              <div style={{ height:'100%', width:`${p.status}%`, background:p.color,
+                boxShadow:`0 0 4px ${p.color}55` }}/>
+            </div>
+          </div>
+        ))}
+        <div style={{ width:1, height:20, background:RULE, marginLeft:8, marginRight:8 }}/>
+        <div style={{ fontFamily:MONO, fontSize:9, color:'rgba(232,226,216,0.25)', whiteSpace:'nowrap' }}>
+          glassgrasie.nl · Rotterdam
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
