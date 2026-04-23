@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — 🚀 Launch Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body, #root { width:100%; height:100%; overflow:hidden; background:#090806; }
+::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:#2A2218; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const S="'Syncopate',sans-serif", R="'Cormorant Garamond',Georgia,serif", M="'JetBrains Mono',ui-monospace,monospace";
+const BG='#090806',BG2='#0D0C0B',BG3='#100F0D',RULE='#1C1810';
+const GOLD='#8B7355',GH='#C9A87C',CREAM='#E8E2D8',T3='#8A8070',T4='#5A5044',T5='#3A3020';
+const GREEN='#5A9A6A',RED='#9A5A5A',AMBER='#9A7A3A';
+
+const PILLARS_MAP = {
+  '01':'Brand','02':'Marketing','03':'Social','04':'Web',
+  '05':'Design','06':'Product','07':'Finance','08':'MFG',
+  '09':'Legal','10':'Compliance','11':'Partners','12':'Analytics'
+};
+
+const INITIAL_ITEMS = [
+  // ── FASE 1: FUNDAMENT (nu) ──
+  { id:'f01', phase:1, pillar:'01', title:'Brand Guidelines vergrendeld', desc:'Cormorant + Syncopate, kleurpalet, ToV — zie Brand Guidelines.html', done:true, priority:'critical', owner:'Sergio' },
+  { id:'f02', phase:1, pillar:'01', title:'Wordmerk Glass⏧Grasie® trademark aanvraag', desc:'® registratie BOIP ingediend', done:false, priority:'critical', owner:'Sergio' },
+  { id:'f03', phase:1, pillar:'08', title:'Wazer CNC operationeel', desc:'Machine actief in Rotterdam workshop', done:true, priority:'critical', owner:'Sergio' },
+  { id:'f04', phase:1, pillar:'06', title:'Van Dijken Glas exclusiviteitsovereenkomst', desc:'Contract ondertekend voor restglas levering', done:false, priority:'critical', owner:'Sergio' },
+  { id:'f05', phase:1, pillar:'04', title:'Cloudflare DNS actief', desc:'glassgrasie.nl geconfigureerd', done:true, priority:'high', owner:'Sergio' },
+  { id:'f06', phase:1, pillar:'09', title:'KVK inschrijving', desc:'Eenmanszaak / BV geregistreerd', done:false, priority:'critical', owner:'Sergio' },
+
+  // ── FASE 2: PRODUCT (week 1-4) ──
+  { id:'p01', phase:2, pillar:'06', title:'Eerste batch sieraden gereed', desc:'Fragment Tie Bar + Manchetknopen × 5 stuks per SKU', done:false, priority:'critical', owner:'Sergio' },
+  { id:'p02', phase:2, pillar:'08', title:'Batch logging geactiveerd', desc:'Wazer IoT → blockchain logging live', done:false, priority:'high', owner:'Sergio' },
+  { id:'p03', phase:2, pillar:'06', title:'Certificaten van Herkomst gedrukt', desc:'Per product · 300gsm · QR naar blockchain', done:false, priority:'high', owner:'Sergio' },
+  { id:'p04', phase:2, pillar:'06', title:'Productiefoto\'s gemaakt', desc:'Donker arduin achtergrond · 5000px · RAW+JPEG', done:false, priority:'critical', owner:'Fotograaf' },
+  { id:'p05', phase:2, pillar:'06', title:'Verpakking besteld', desc:'Industrial black box · hazard stripes · 100 stuks minimum', done:false, priority:'high', owner:'Sergio' },
+  { id:'p06', phase:2, pillar:'06', title:'Prijslijst B2B gereed', desc:'PDF architectenbrochure · staalkaart aanvraagflow', done:false, priority:'medium', owner:'Sergio' },
+
+  // ── FASE 3: STORE (week 3-6) ──
+  { id:'s01', phase:3, pillar:'04', title:'Cloudflare Workers store live', desc:'Homepage · catalogue · product detail', done:false, priority:'critical', owner:'Sergio' },
+  { id:'s02', phase:3, pillar:'04', title:'Stripe live mode actief', desc:'Test → production checkout flow', done:false, priority:'critical', owner:'Sergio' },
+  { id:'s03', phase:3, pillar:'04', title:'Eerste 3 SKUs gepubliceerd', desc:'Tie Bar + Manchetknopen + 1 woonaccessoire', done:false, priority:'critical', owner:'Sergio' },
+  { id:'s04', phase:3, pillar:'06', title:'NFT certificaat auto-issuance', desc:'Mint trigger bij Stripe payment_intent.succeeded', done:false, priority:'high', owner:'Sergio' },
+  { id:'s05', phase:3, pillar:'04', title:'Cymatics Engine live op /cymatics/', desc:'M1+M2+M3+M4 embedded · Anthropic API key ingesteld', done:false, priority:'medium', owner:'Sergio' },
+  { id:'s06', phase:3, pillar:'12', title:'Google Analytics 4 geactiveerd', desc:'E-commerce tracking · conversie events', done:false, priority:'high', owner:'Sergio' },
+
+  // ── FASE 4: MARKETING (week 4-8) ──
+  { id:'m01', phase:4, pillar:'02', title:'Eerste Pod⏧Glassed episode opgenomen', desc:'Ep.01 — Restglas als kunststof · 30-45 min', done:false, priority:'high', owner:'Sergio' },
+  { id:'m02', phase:4, pillar:'02', title:'YouTube kanaal live', desc:'Banner · beschrijving · playlists aangemaakt', done:false, priority:'high', owner:'Sergio' },
+  { id:'m03', phase:4, pillar:'03', title:'Instagram @glassgrasie actief', desc:'9 grid posts · stories · Bio met link in bio', done:false, priority:'critical', owner:'Sergio' },
+  { id:'m04', phase:4, pillar:'02', title:'DDW Eindhoven aanmelding', desc:'October 2026 · deadline aanmelding checken', done:false, priority:'high', owner:'Sergio' },
+  { id:'m05', phase:4, pillar:'11', title:'BlueCity gesprek gepland', desc:'Studio/werkplaats + netwerk toegang', done:false, priority:'medium', owner:'Sergio' },
+  { id:'m06', phase:4, pillar:'11', title:'The Farm Material Lab onboarding', desc:'Via Van Dijken · B2B architect bereik', done:false, priority:'medium', owner:'Sergio' },
+
+  // ── FASE 5: COMPLIANCE (doorlopend) ──
+  { id:'c01', phase:5, pillar:'10', title:'CE markering beoordeling', desc:'Decoratief float glas — EU directive beslissing documenteren', done:false, priority:'medium', owner:'Jurist' },
+  { id:'c02', phase:5, pillar:'10', title:'GDPR Privacy Policy gepubliceerd', desc:'Cloudflare · Stripe · data flows gedocumenteerd', done:false, priority:'critical', owner:'Sergio' },
+  { id:'c03', phase:5, pillar:'07', title:'WBSO aanvraag ingediend', desc:'€23.975 aftrek jaar 1 · deadline check', done:false, priority:'critical', owner:'Sergio' },
+  { id:'c04', phase:5, pillar:'07', title:'Ripple/XRP AFM beoordeling', desc:'VASP registratieplicht assessment', done:false, priority:'medium', owner:'Jurist' },
+  { id:'c05', phase:5, pillar:'10', title:'C2C certificeringstraject gestart', desc:'Contact C2C Products Innovation Institute Amsterdam', done:false, priority:'medium', owner:'Sergio' },
+  { id:'c06', phase:5, pillar:'07', title:'Boekhoudsysteem actief', desc:'QuickBooks / Moneybird · BTW-aangifte setup', done:false, priority:'critical', owner:'Sergio' },
+];
+
+const PHASES = [
+  { id:1, label:'Fase 1', sub:'Fundament', color:'#7A7A9B', desc:'Merk · Juridisch · Productie setup' },
+  { id:2, label:'Fase 2', sub:'Product', color:GH, desc:'Eerste batch · Certificaten · Foto' },
+  { id:3, label:'Fase 3', sub:'Store', color:'#6A9B8A', desc:'Cloudflare · Stripe · Live SKUs' },
+  { id:4, label:'Fase 4', sub:'Marketing', color:'#7A9B6A', desc:'Podcast · Social · Partners' },
+  { id:5, label:'Fase 5', sub:'Compliance', color:'#9B8A5A', desc:'WBSO · GDPR · CE · C2C' },
+];
+
+const PRIORITY_MAP = { critical:[RED,'Kritiek'], high:[AMBER,'Hoog'], medium:[GOLD,'Middel'] };
+
+function CheckItem({ item, onToggle }) {
+  const [exp, setExp] = React.useState(false);
+  const [ph] = PRIORITY_MAP[item.priority];
+  return (
+    <div style={{background:item.done?`rgba(90,154,106,0.05)`:BG2,
+      border:`1px solid ${item.done?'rgba(90,154,106,0.2)':RULE}`,
+      marginBottom:1,transition:'all 150ms',animation:'fadeUp 200ms ease'}}>
+      <div style={{display:'flex',alignItems:'center',gap:12,padding:'10px 14px',cursor:'pointer'}}
+        onClick={()=>onToggle(item.id)}>
+        {/* Checkbox */}
+        <div style={{width:20,height:20,borderRadius:2,flexShrink:0,
+          background:item.done?GREEN:'transparent',
+          border:`1.5px solid ${item.done?GREEN:RULE}`,
+          display:'flex',alignItems:'center',justifyContent:'center',
+          transition:'all 200ms'}}>
+          {item.done && <svg width={12} height={12} viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" strokeWidth="1.8" fill="none" strokeLinecap="round"/></svg>}
+        </div>
+        {/* Priority dot */}
+        <div style={{width:6,height:6,borderRadius:'50%',background:ph,flexShrink:0,opacity:item.done?0.3:1}}/>
+        {/* Title */}
+        <div style={{flex:1,fontFamily:R,fontSize:15,
+          color:item.done?T4:CREAM,textDecoration:item.done?'line-through':'none',
+          lineHeight:1.3}}>
+          {item.title}
+        </div>
+        {/* Pillar badge */}
+        <div style={{fontFamily:S,fontSize:5,letterSpacing:'2px',
+          padding:'2px 6px',background:`${RULE}`,color:T3,textTransform:'uppercase',flexShrink:0}}>
+          P{item.pillar}
+        </div>
+        {/* Owner */}
+        <div style={{fontFamily:M,fontSize:8,color:T5,flexShrink:0,width:48,textAlign:'right'}}>{item.owner}</div>
+        {/* Expand */}
+        <button onClick={e=>{e.stopPropagation();setExp(x=>!x)}}
+          style={{background:'none',border:'none',color:T5,fontSize:12,padding:'0 4px',flexShrink:0}}>
+          {exp?'▲':'▼'}
+        </button>
+      </div>
+      {exp && (
+        <div style={{padding:'0 14px 12px 46px',fontFamily:R,fontStyle:'italic',
+          fontSize:13,color:T4,lineHeight:1.7}}>
+          {item.desc}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PhaseSection({ phase, items, onToggle, collapsed, onCollapse }) {
+  const done = items.filter(i=>i.done).length;
+  const pct = items.length > 0 ? Math.round((done/items.length)*100) : 0;
+  return (
+    <div style={{marginBottom:24}}>
+      {/* Phase header */}
+      <div onClick={onCollapse} style={{
+        display:'flex',alignItems:'center',gap:14,
+        padding:'12px 16px',background:BG3,border:`1px solid ${RULE}`,
+        cursor:'pointer',marginBottom:1,
+      }}>
+        <div style={{width:8,height:8,borderRadius:'50%',background:phase.color,
+          animation:pct<100?'pulse 2s infinite':'none'}}/>
+        <div style={{flex:1}}>
+          <div style={{display:'flex',alignItems:'baseline',gap:10}}>
+            <span style={{fontFamily:S,fontSize:7,letterSpacing:'3px',color:phase.color,textTransform:'uppercase'}}>{phase.label} — {phase.sub}</span>
+            <span style={{fontFamily:R,fontStyle:'italic',fontSize:12,color:T4}}>{phase.desc}</span>
+          </div>
+        </div>
+        <div style={{fontFamily:M,fontSize:10,color:pct===100?GREEN:phase.color,flexShrink:0}}>
+          {done}/{items.length}
+        </div>
+        {/* Progress bar */}
+        <div style={{width:80,height:2,background:RULE,flexShrink:0,borderRadius:1}}>
+          <div style={{width:`${pct}%`,height:'100%',background:pct===100?GREEN:phase.color,borderRadius:1,transition:'width 300ms'}}/>
+        </div>
+        <span style={{fontFamily:M,fontSize:9,color:T5,width:28,textAlign:'right',flexShrink:0}}>{pct}%</span>
+        <span style={{color:T5,fontSize:10}}>{collapsed?'▶':'▼'}</span>
+      </div>
+      {!collapsed && items.map(item=>(
+        <CheckItem key={item.id} item={item} onToggle={onToggle}/>
+      ))}
+    </div>
+  );
+}
+
+function App() {
+  const [items, setItems] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem('gg-launch-checklist');
+      if (saved) {
+        const checked = JSON.parse(saved);
+        return INITIAL_ITEMS.map(i=>({...i, done: checked[i.id] ?? i.done}));
+      }
+    } catch {}
+    return INITIAL_ITEMS;
+  });
+  const [collapsed, setCollapsed] = React.useState({});
+  const [filter, setFilter] = React.useState('all');
+
+  React.useEffect(() => {
+    const checked = Object.fromEntries(items.map(i=>[i.id, i.done]));
+    localStorage.setItem('gg-launch-checklist', JSON.stringify(checked));
+  }, [items]);
+
+  const toggle = (id) => setItems(prev=>prev.map(i=>i.id===id?{...i,done:!i.done}:i));
+  const toggleCollapse = (phase) => setCollapsed(c=>({...c,[phase]:!c[phase]}));
+
+  const totalDone = items.filter(i=>i.done).length;
+  const totalPct = Math.round((totalDone/items.length)*100);
+  const critical = items.filter(i=>i.priority==='critical'&&!i.done).length;
+
+  const filtered = filter==='all' ? items :
+    filter==='critical' ? items.filter(i=>i.priority==='critical') :
+    filter==='open' ? items.filter(i=>!i.done) :
+    items.filter(i=>i.done);
+
+  return (
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:BG,color:CREAM}}>
+      {/* Header */}
+      <div style={{borderBottom:`1px solid ${RULE}`,padding:'14px 24px',
+        display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,background:BG2}}>
+        <div style={{display:'flex',alignItems:'center',gap:16}}>
+          <div style={{fontFamily:'Cormorant Garamond',fontSize:22,letterSpacing:'-0.05em',color:CREAM}}>Glass⏧Grasie<sup style={{fontSize:'0.55em',color:GH,verticalAlign:'super',letterSpacing:0}}>®</sup>
+          </div>
+          <div style={{width:1,height:20,background:RULE}}/>
+          <div style={{fontFamily:S,fontSize:7,letterSpacing:'3px',color:GOLD}}>🚀 Launch Checklist</div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:20}}>
+          {critical > 0 && (
+            <div style={{display:'flex',alignItems:'center',gap:6}}>
+              <div style={{width:6,height:6,borderRadius:'50%',background:RED,animation:'pulse 1.5s infinite'}}/>
+              <span style={{fontFamily:M,fontSize:9,color:RED}}>{critical} kritieke items open</span>
+            </div>
+          )}
+          <div style={{fontFamily:M,fontSize:9,color:totalPct===100?GREEN:GH}}>
+            {totalDone}/{items.length} · {totalPct}%
+          </div>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div style={{height:3,background:RULE,flexShrink:0}}>
+        <div style={{height:'100%',width:`${totalPct}%`,background:totalPct===100?GREEN:GH,transition:'width 300ms'}}/>
+      </div>
+
+      {/* Filter bar */}
+      <div style={{display:'flex',gap:4,padding:'10px 24px',borderBottom:`1px solid ${RULE}`,flexShrink:0,background:BG3}}>
+        {[['all','Alle'],['critical','Kritiek'],['open','Open'],['done','Klaar']].map(([v,l])=>(
+          <button key={v} onClick={()=>setFilter(v)} style={{
+            fontFamily:S,fontSize:6,letterSpacing:'3px',textTransform:'uppercase',
+            padding:'6px 14px',border:`1px solid ${filter===v?GOLD:RULE}`,
+            background:filter===v?`${GOLD}18`:'transparent',
+            color:filter===v?GH:T4,cursor:'pointer',transition:'all 150ms',
+          }}>{l}</button>
+        ))}
+        <div style={{flex:1}}/>
+        <div style={{fontFamily:M,fontSize:8,color:T5,display:'flex',alignItems:'center',gap:12}}>
+          {PHASES.map(p=>{
+            const phItems=items.filter(i=>i.phase===p.id);
+            const phDone=phItems.filter(i=>i.done).length;
+            const phPct=phItems.length>0?Math.round((phDone/phItems.length)*100):0;
+            return <span key={p.id} style={{color:phPct===100?GREEN:p.color}}>{p.sub}: {phPct}%</span>;
+          })}
+        </div>
+      </div>
+
+      {/* Body */}
+      <div style={{flex:1,overflowY:'auto',padding:'20px 24px'}}>
+        {PHASES.map(phase=>{
+          const phItems = filtered.filter(i=>i.phase===phase.id);
+          if (phItems.length===0) return null;
+          return (
+            <PhaseSection key={phase.id} phase={phase}
+              items={phItems} onToggle={toggle}
+              collapsed={!!collapsed[phase.id]}
+              onCollapse={()=>toggleCollapse(phase.id)}/>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div style={{borderTop:`1px solid ${RULE}`,padding:'8px 24px',
+        display:'flex',justifyContent:'space-between',alignItems:'center',background:BG2,flexShrink:0}}>
+        <div style={{fontFamily:M,fontSize:8,color:T5}}>Voortgang persistent opgeslagen · klik item om te wisselen</div>
+        <button onClick={()=>{if(window.confirm('Reset alle voortgang?')){setItems(INITIAL_ITEMS.map(i=>({...i,done:i.done})));localStorage.removeItem('gg-launch-checklist');}}}
+          style={{fontFamily:S,fontSize:5,letterSpacing:'2px',textTransform:'uppercase',
+            padding:'5px 12px',background:'transparent',border:`1px solid ${RULE}`,color:T5,cursor:'pointer'}}>
+          Reset
+        </button>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
