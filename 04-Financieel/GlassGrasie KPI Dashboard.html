@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Noord-ster Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body, #root { width:100%; height:100%; overflow:hidden; background:#090806; }
+::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:#2A2218; }
+@keyframes countUp { from{opacity:0} to{opacity:1} }
+@keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+@keyframes grow { from{width:0} to{width:var(--w)} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const S="'Syncopate',sans-serif", R="'Cormorant Garamond',Georgia,serif", M="'JetBrains Mono',ui-monospace,monospace";
+const BG='#090806',BG2='#0D0C0B',BG3='#100F0D',RULE='#1C1810';
+const GOLD='#8B7355',GH='#C9A87C',CREAM='#E8E2D8',T3='#B0A898',T4='#8A8070',T5='#6A6058';
+const GREEN='#5A9A6A',BLUE='#5A7A9A',PURPLE='#7A5A9A';
+
+// ── Simulated data (replace with real API) ─────────────────────────────────
+const MONTHS = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+
+const generateData = () => {
+  // Jaar 1 targets: €32.500–52.500
+  // Simulate gradual growth
+  const omzet = [0,0,0,145,290,580,1160,2320,3480,4350,5220,6090];
+  const kgGlas = [0,0,0.041,0.123,0.287,0.614,1.228,2.456,3.684,4.500,5.400,6.300];
+  const co2 = kgGlas.map(k=>parseFloat((k*2.11).toFixed(3)));
+  const orders = [0,0,1,2,4,8,12,18,24,28,32,38];
+  const bezoekers = [0,0,120,340,680,1200,2100,3400,4800,5600,6800,8200];
+  return { omzet, kgGlas, co2, orders, bezoekers };
+};
+
+const DATA = generateData();
+const CUR_MONTH = 3; // April = index 3
+
+// ── Mini sparkline ─────────────────────────────────────────────────────────
+function Sparkline({ data, color=GH, height=40, filled=false }) {
+  const max = Math.max(...data, 1);
+  const w = 200, h = height;
+  const pts = data.map((v,i) => [
+    (i/(data.length-1))*w,
+    h - (v/max)*h*0.9 - 2
+  ]);
+  const path = pts.map((p,i)=>`${i===0?'M':'L'}${p[0]},${p[1]}`).join(' ');
+  const area = `${path} L${w},${h} L0,${h} Z`;
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{display:'block'}}>
+      {filled && <path d={area} fill={color} opacity="0.18"/>}
+      <path d={path} fill="none" stroke={color} strokeWidth="1.5" opacity="0.9"/>
+      {/* Current point */}
+      <circle cx={pts[CUR_MONTH][0]} cy={pts[CUR_MONTH][1]} r={4} fill={color}/>
+      <circle cx={pts[CUR_MONTH][0]} cy={pts[CUR_MONTH][1]} r={7} fill={color} opacity="0.45"/>
+    </svg>
+  );
+}
+
+// ── Ring chart ─────────────────────────────────────────────────────────────
+function Ring({ pct, color=GH, size=80, label }) {
+  const r = (size-8)/2, c = size/2;
+  const circ = 2*Math.PI*r;
+  const dash = circ * pct/100;
+  return (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={c} cy={c} r={r} fill="none" stroke={RULE} strokeWidth="4"/>
+        <circle cx={c} cy={c} r={r} fill="none" stroke={color} strokeWidth="4"
+          strokeDasharray={`${dash} ${circ-dash}`}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${c} ${c})`}
+          style={{transition:'stroke-dasharray 1s ease'}}/>
+        <text x={c} y={c+4} textAnchor="middle" fontFamily={M} fontSize="13" fontWeight="700" fill={color}>{pct}%</text>
+      </svg>
+      {label && <div style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase',textAlign:'center'}}>{label}</div>}
+    </div>
+  );
+}
+
+// ── Bar chart ──────────────────────────────────────────────────────────────
+function BarChart({ data, target, color=GH, h=80, months=MONTHS }) {
+  const max = Math.max(target, ...data, 1);
+  return (
+    <div style={{display:'flex',alignItems:'flex-end',gap:3,height:h,position:'relative'}}>
+      {/* Target line */}
+      <div style={{position:'absolute',left:0,right:0,
+        top:`${(1-target/max)*h}px`,
+        borderTop:`1px dashed ${RULE}`,zIndex:1}}/>
+      {data.map((v,i) => (
+        <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
+          <div style={{
+            width:'100%',
+            height:`${Math.max((v/max)*h,1)}px`,
+            background: i===CUR_MONTH ? color : i<CUR_MONTH ? `${color}66` : `${color}18`,
+            borderRadius:'1px 1px 0 0',
+            transition:'height 600ms ease',
+            position:'relative',
+          }}/>
+          {i%3===0 && <div style={{fontFamily:M,fontSize:5,color:T3}}>{months[i]}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── KPI Card ───────────────────────────────────────────────────────────────
+function KPICard({ label, value, sub, delta, color=GH, spark, target, unit='' }) {
+  return (
+    <div style={{background:BG2,border:`1px solid ${RULE}`,padding:'20px 20px 16px',
+      display:'flex',flexDirection:'column',gap:8}}>
+      <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase'}}>{label}</div>
+      <div style={{display:'flex',alignItems:'baseline',gap:6}}>
+        <div style={{fontFamily:R,fontSize:32,color:color,fontWeight:300,lineHeight:1}}>{value}</div>
+        {unit && <div style={{fontFamily:S,fontSize:8,letterSpacing:'2px',color:T3}}>{unit}</div>}
+      </div>
+      {sub && <div style={{fontFamily:R,fontStyle:'italic',fontSize:12,color:T3}}>{sub}</div>}
+      {delta !== undefined && (
+        <div style={{fontFamily:M,fontSize:9,color:delta>=0?GREEN:RED}}>
+          {delta>=0?'↑':'↓'} {Math.abs(delta)}% vs vorige maand
+        </div>
+      )}
+      {spark && <div style={{marginTop:4}}><Sparkline data={spark} color={color} filled/></div>}
+      {target && (
+        <div style={{marginTop:4}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+            <span style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3}}>DOEL JAAR 1</span>
+            <span style={{fontFamily:M,fontSize:8,color:T3}}>{target}</span>
+          </div>
+          <div style={{height:2,background:RULE,borderRadius:1}}>
+            <div style={{height:'100%',width:`${Math.min(100,parseFloat(value)/parseFloat(target)*100)||0}%`,
+              background:color,borderRadius:1,transition:'width 800ms ease'}}/>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Noord-ster indicator ───────────────────────────────────────────────────
+function NoordstersIndicator({ kgGlas, omzet }) {
+  // Noord-ster = duurzame impact (kg) × omzet (€)
+  const score = parseFloat((kgGlas * omzet / 100).toFixed(2));
+  const maxScore = (6.3 * 52500) / 100;
+  const pct = Math.round((score/maxScore)*100);
+  return (
+    <div style={{background:`radial-gradient(ellipse 70% 60% at 50% 55%, rgba(201,168,124,0.08) 0%, ${BG} 65%)`,
+      border:`1px solid rgba(201,168,124,0.2)`,padding:'24px',
+      display:'flex',flexDirection:'column',gap:16}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+        <div>
+          <div style={{fontFamily:S,fontSize:7,letterSpacing:'4px',color:GH,textTransform:'uppercase',marginBottom:8}}>
+            ★ Noord-ster Score
+          </div>
+          <div style={{fontFamily:R,fontStyle:'italic',fontSize:15,color:T3,lineHeight:1.5}}>
+            Duurzame impact × Omzet
+          </div>
+        </div>
+        <div style={{fontFamily:R,fontSize:48,color:GH,fontWeight:300,lineHeight:1}}>{score}</div>
+      </div>
+      <div style={{height:3,background:RULE,borderRadius:1,overflow:'hidden'}}>
+        <div style={{height:'100%',width:`${pct}%`,background:GH,borderRadius:1,transition:'width 1s ease'}}/>
+      </div>
+      <div style={{display:'flex',justifyContent:'space-between'}}>
+        <div style={{fontFamily:M,fontSize:9,color:T3}}>0</div>
+        <div style={{fontFamily:M,fontSize:9,color:GH}}>{pct}% van jaardoel</div>
+        <div style={{fontFamily:M,fontSize:9,color:T3}}>{maxScore.toFixed(0)}</div>
+      </div>
+      <div style={{fontFamily:R,fontStyle:'italic',fontSize:12,color:T3,lineHeight:1.7,borderTop:`1px solid ${RULE}`,paddingTop:10}}>
+        Definitie: (kg glas gered per maand) × (omzet €/maand) ÷ 100.<br/>
+        Stijgt bij elke verkoop én bij elk grammetje gered glas.
+      </div>
+    </div>
+  );
+}
+
+// ── Revenue breakdown ──────────────────────────────────────────────────────
+function RevenueBreakdown() {
+  const streams = [
+    { label:'B2C Sieraden', val:145, target:8000, color:GH },
+    { label:'B2C Woonacc.', val:0, target:6000, color:'#7A9B6A' },
+    { label:'B2B Architectuur', val:0, target:18000, color:'#5A7A9A' },
+    { label:'Kunstobjecten', val:0, target:12000, color:'#7A5A9A' },
+  ];
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+      {streams.map(s=>{
+        const pct = Math.round((s.val/s.target)*100);
+        return (
+          <div key={s.label} style={{background:BG2,padding:'12px 16px'}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+              <span style={{fontFamily:S,fontSize:6,letterSpacing:'2px',color:s.color,textTransform:'uppercase'}}>{s.label}</span>
+              <span style={{fontFamily:M,fontSize:10,color:CREAM}}>€{s.val.toLocaleString()} <span style={{color:T3,fontSize:8}}>/ €{s.target.toLocaleString()}</span></span>
+            </div>
+            <div style={{height:2,background:RULE,borderRadius:1}}>
+              <div style={{height:'100%',width:`${pct}%`,background:s.color,borderRadius:1,minWidth:s.val>0?4:0}}/>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Main App ───────────────────────────────────────────────────────────────
+function App() {
+  const [view, setView] = React.useState('overview');
+  const curOmzet = DATA.omzet[CUR_MONTH];
+  const curKg = DATA.kgGlas[CUR_MONTH];
+  const curCo2 = DATA.co2[CUR_MONTH];
+  const curOrders = DATA.orders[CUR_MONTH];
+  const curBez = DATA.bezoekers[CUR_MONTH];
+
+  // Month-over-month
+  const momOmzet = CUR_MONTH > 0 && DATA.omzet[CUR_MONTH-1] > 0
+    ? Math.round(((curOmzet - DATA.omzet[CUR_MONTH-1])/DATA.omzet[CUR_MONTH-1])*100) : null;
+
+  return (
+    <div style={{width:'100%',height:'100%',display:'flex',flexDirection:'column',background:BG,color:CREAM}}>
+      {/* Header */}
+      <div style={{height:44,borderBottom:`1px solid ${RULE}`,display:'flex',alignItems:'center',
+        justifyContent:'space-between',padding:'0 24px',flexShrink:0,background:BG2}}>
+        <div style={{display:'flex',alignItems:'center',gap:16}}>
+          <div style={{fontFamily:'Cormorant Garamond',fontSize:22,letterSpacing:'-0.05em',color:CREAM}}>Glass⏧Grasie<sup style={{fontSize:'0.55em',color:GH,verticalAlign:'super',letterSpacing:0}}>®</sup>
+          </div>
+          <div style={{width:1,height:20,background:RULE}}/>
+          <div style={{fontFamily:S,fontSize:7,letterSpacing:'3px',color:GOLD}}>★ Noord-ster KPI Dashboard</div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <div style={{fontFamily:M,fontSize:9,color:T3}}>April 2026 · Jaar 1</div>
+          <div style={{width:6,height:6,borderRadius:'50%',background:GREEN,animation:'pulse 2s infinite'}}/>
+        </div>
+      </div>
+
+      {/* Tab bar */}
+      <div style={{display:'flex',borderBottom:`1px solid ${RULE}`,flexShrink:0,background:BG3}}>
+        {[['overview','Overzicht'],['impact','Impact'],['finance','Financiën'],['channels','Kanalen']].map(([v,l])=>(
+          <button key={v} onClick={()=>setView(v)} style={{
+            padding:'10px 20px',fontFamily:S,fontSize:6,letterSpacing:'3px',textTransform:'uppercase',
+            border:'none',background:'none',cursor:'pointer',
+            color:view===v?GH:T4,
+            borderBottom:view===v?`2px solid ${GH}`:'2px solid transparent',
+            transition:'all 150ms',
+          }}>{l}</button>
+        ))}
+      </div>
+
+      {/* Body */}
+      <div style={{flex:1,overflowY:'auto',padding:'20px 24px'}}>
+
+        {view==='overview' && (
+          <div style={{display:'flex',flexDirection:'column',gap:20}}>
+            {/* Noord-ster */}
+            <NoordstersIndicator kgGlas={curKg} omzet={curOmzet}/>
+
+            {/* KPI grid */}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:1,background:RULE}}>
+              <KPICard label="Omzet YTD" value={`€${DATA.omzet.slice(0,CUR_MONTH+1).reduce((a,v)=>a+v,0).toLocaleString()}`}
+                sub="Cumulatief 2026" color={GH} spark={DATA.omzet} target="€32.500"/>
+              <KPICard label="Kg Glas Gered" value={curKg.toFixed(3)} unit="kg/mnd"
+                sub={`YTD: ${DATA.kgGlas.slice(0,CUR_MONTH+1).reduce((a,v)=>a+v,0).toFixed(3)}kg`}
+                color={GREEN} spark={DATA.kgGlas}/>
+              <KPICard label="CO₂ Offset" value={curCo2.toFixed(3)} unit="kg/mnd"
+                sub="Via WAZER waterjet" color={GREEN} spark={DATA.co2}/>
+              <KPICard label="Orders" value={curOrders} unit="stuks"
+                sub="April 2026" color={GH} spark={DATA.orders} target="200"/>
+            </div>
+
+            {/* Omzet barchart */}
+            <div style={{background:BG2,border:`1px solid ${RULE}`,padding:'20px'}}>
+              <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:16}}>
+                Omzet per maand — Jaar 1 (doel: €32.500)
+              </div>
+              <BarChart data={DATA.omzet} target={2700} color={GH} h={90}/>
+              <div style={{display:'flex',gap:16,marginTop:12}}>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <div style={{width:12,height:2,background:RULE,borderTop:`1px dashed ${RULE}`}}/>
+                  <span style={{fontFamily:M,fontSize:8,color:T3}}>Maandelijks doel ~€2.700</span>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:GH}}/>
+                  <span style={{fontFamily:M,fontSize:8,color:T3}}>Huidige maand</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Revenue breakdown */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1,background:RULE}}>
+              <div style={{background:BG2,padding:'20px'}}>
+                <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:16}}>Omzet per kanaal</div>
+                <RevenueBreakdown/>
+              </div>
+              <div style={{background:BG2,padding:'20px'}}>
+                <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:16}}>Voortgang indicatoren</div>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16}}>
+                  <Ring pct={Math.round(curOmzet/32500*100)||0} color={GH} label="Omzet doel"/>
+                  <Ring pct={Math.round(curKg/6.3*100)||0} color={GREEN} label="Kg glas doel"/>
+                  <Ring pct={Math.round(curOrders/200*100)||0} color={BLUE} label="Orders doel"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view==='impact' && (
+          <div style={{display:'flex',flexDirection:'column',gap:16}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:1,background:RULE}}>
+              <KPICard label="Glas Gered YTD" value={DATA.kgGlas.slice(0,CUR_MONTH+1).reduce((a,v)=>a+v,0).toFixed(3)} unit="kg"
+                sub="Van Dijken Glas restmateriaal" color={GREEN} spark={DATA.kgGlas} target="6.300"/>
+              <KPICard label="CO₂ Offset YTD" value={DATA.co2.slice(0,CUR_MONTH+1).reduce((a,v)=>a+v,0).toFixed(3)} unit="kg"
+                sub="Vermeden productie primair glas" color={GREEN} spark={DATA.co2}/>
+              <KPICard label="Producten Gemaakt" value={DATA.orders.slice(0,CUR_MONTH+1).reduce((a,v)=>a+v,0)} unit="stuks"
+                sub="Elk uniek · run-gebonden" color={GH} spark={DATA.orders}/>
+            </div>
+            <div style={{background:BG2,border:`1px solid ${RULE}`,padding:'24px'}}>
+              <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:16}}>Impact Barchart — kg glas gered per maand</div>
+              <BarChart data={DATA.kgGlas} target={0.525} color={GREEN} h={100}/>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1,background:RULE}}>
+              <div style={{background:BG2,padding:'20px'}}>
+                <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:14}}>CO₂ Berekening per product</div>
+                <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+                  {[['Primair float glas productie','~15 kg CO₂/kg glas'],['Restglas hergebruik','~2.11 kg CO₂/kg (transport+water)'],['Netto besparing per kg','~12.89 kg CO₂/kg'],['Per Fragment Tie Bar (0.041kg)','~0.528 kg CO₂ bespaard'],['Per m² wandpaneel (6mm)','~77 kg CO₂ bespaard']].map(([k,v])=>(
+                    <div key={k} style={{background:BG2,padding:'9px 12px',display:'flex',justifyContent:'space-between',gap:8}}>
+                      <span style={{fontFamily:S,fontSize:5,letterSpacing:'1.5px',color:T3,textTransform:'uppercase'}}>{k}</span>
+                      <span style={{fontFamily:M,fontSize:9,color:CREAM}}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{background:BG2,padding:'20px'}}>
+                <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:14}}>BREEAM-NL Impact</div>
+                <div style={{fontFamily:R,fontStyle:'italic',fontSize:15,color:T3,lineHeight:1.8,marginBottom:16}}>
+                  Elk verkocht B2B-paneel kan bijdragen aan de BREEAM-NL BRO 5 score van het project. Tier 1 hergebruikt materiaal.
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                  <div style={{fontFamily:M,fontSize:9,color:GREEN}}>✓ MPG score verlaging direct</div>
+                  <div style={{fontFamily:M,fontSize:9,color:GREEN}}>✓ BREEAM-NL Tier 1 classificatie</div>
+                  <div style={{fontFamily:M,fontSize:9,color:GOLD}}>◷ Madaster registratie: in opzet</div>
+                  <div style={{fontFamily:M,fontSize:9,color:GOLD}}>◷ EPD (NMD): gepland 2026</div>
+                  <div style={{fontFamily:M,fontSize:9,color:T3}}>○ C2C certificering: traject gestart</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view==='finance' && (
+          <div style={{display:'flex',flexDirection:'column',gap:16}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:1,background:RULE}}>
+              <KPICard label="Omzet YTD" value="€145" sub="1 transactie" color={GH}/>
+              <KPICard label="Startinvestering" value="€630" sub="Excl. WAZER" color={T3}/>
+              <KPICard label="WBSO Voordeel" value="€23.975" sub="Jaar 1 aftrek" color={GREEN}/>
+              <KPICard label="Materiaalkosten" value="~€0" sub="Restglas Van Dijken" color={GREEN}/>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1,background:RULE}}>
+              <div style={{background:BG2,padding:'20px'}}>
+                <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:14}}>Omzetdoelen</div>
+                <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+                  {[['Jaar 1 min','€32.500',45],['Jaar 1 max','€52.500',62],['Jaar 2 min','€89.000',0],['Jaar 2 max','€133.000',0]].map(([k,v,p])=>(
+                    <div key={k} style={{background:BG2,padding:'10px 14px'}}>
+                      <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+                        <span style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{k}</span>
+                        <span style={{fontFamily:M,fontSize:11,color:GH}}>{v}</span>
+                      </div>
+                      {p>0 && <div style={{height:1.5,background:RULE,borderRadius:1}}>
+                        <div style={{height:'100%',width:`${p}%`,background:GH,opacity:0.65}}/>
+                      </div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{background:BG2,padding:'20px'}}>
+                <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:14}}>Subsidies & Voordelen</div>
+                <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+                  {[['WBSO (50% starter)','€23.975',GREEN,'Actief'],['MIA/Vamil','Tot 14% investering',GOLD,'Aanvraag'],['Rotterdam Circulair','€50.000 max',GOLD,'Aanvraag'],['Horizon Europe','€5–8M (later)',T4,'Toekomst']].map(([k,v,c,s])=>(
+                    <div key={k} style={{background:BG2,padding:'9px 12px',display:'flex',justifyContent:'space-between',gap:8}}>
+                      <span style={{fontFamily:S,fontSize:5,letterSpacing:'1.5px',color:T3,textTransform:'uppercase'}}>{k}</span>
+                      <div style={{textAlign:'right'}}>
+                        <div style={{fontFamily:M,fontSize:9,color:c}}>{v}</div>
+                        <div style={{fontFamily:S,fontSize:5,letterSpacing:'1px',color:c,opacity:0.6}}>{s}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view==='channels' && (
+          <div style={{display:'flex',flexDirection:'column',gap:16}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:1,background:RULE}}>
+              <KPICard label="Webshop Bezoekers" value={curBez.toLocaleString()} unit="/mnd" color={BLUE} spark={DATA.bezoekers}/>
+              <KPICard label="Conversie" value={curBez>0?(curOrders/curBez*100).toFixed(1)+'%':'0%'} sub="Orders / bezoekers" color={GH}/>
+              <KPICard label="Gem. orderwaarde" value={curOrders>0?`€${Math.round(curOmzet/curOrders)}`:'—'} color={GH}/>
+              <KPICard label="B2B Pipeline" value="0" sub="Eerste gesprekken" color={PURPLE}/>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1,background:RULE}}>
+              <div style={{background:BG2,padding:'20px'}}>
+                <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:14}}>Verkoopkanalen target mix</div>
+                <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+                  {[['B2B Custom','40–50%',PURPLE],['B2C Webshop','20–30%',GH],['Workshops','5–10%','#7A9B6A'],['Consultancy','5–10%',BLUE],['Materiaallevering','5%',T3]].map(([k,v,c])=>(
+                    <div key={k} style={{background:BG2,padding:'9px 12px',display:'flex',justifyContent:'space-between'}}>
+                      <span style={{fontFamily:S,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{k}</span>
+                      <span style={{fontFamily:M,fontSize:10,color:c}}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{background:BG2,padding:'20px'}}>
+                <div style={{fontFamily:S,fontSize:6,letterSpacing:'3px',color:GOLD,textTransform:'uppercase',marginBottom:14}}>Bezoekers per maand</div>
+                <BarChart data={DATA.bezoekers} target={700} color={BLUE} h={100}/>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div style={{borderTop:`1px solid ${RULE}`,padding:'7px 24px',display:'flex',
+        justifyContent:'space-between',alignItems:'center',background:BG2,flexShrink:0}}>
+        <div style={{fontFamily:M,fontSize:8,color:T3}}>Gesimuleerde data · vervang met live API bij go-live</div>
+        <div style={{fontFamily:M,fontSize:8,color:T3}}>glassgrasie.nl · Pillar 12</div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+
+<script>
+const KPI_TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "showTargets": true,
+  "chartFill": true,
+  "fontSize": 1
+}/*EDITMODE-END*/;
+
+(function() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('gg-kpi-tweaks') || '{}'); } catch {}
+  const T = Object.assign({}, KPI_TWEAK_DEFAULTS, saved);
+
+  function applyTweaks() {
+    document.querySelectorAll('[data-target-row]').forEach(el => {
+      el.style.display = T.showTargets ? '' : 'none';
+    });
+    document.querySelectorAll('[data-chart-fill]').forEach(el => {
+      el.style.opacity = T.chartFill ? '0.18' : '0';
+    });
+    const scale = T.fontSize;
+    document.querySelectorAll('[data-kpi-value]').forEach(el => {
+      el.style.transform = scale !== 1 ? `scale(${scale})` : '';
+      el.style.transformOrigin = 'left center';
+    });
+  }
+
+  const panel = document.createElement('div');
+  panel.id = 'kpi-tweaks';
+  panel.style.cssText = 'display:none;position:fixed;bottom:24px;right:24px;z-index:9999;width:240px;background:#0A0908;border:1px solid #2C2418;font-family:\'Cormorant Garamond\',serif;color:#E8E2D8;box-shadow:0 8px 40px rgba(0,0,0,0.7);';
+  panel.innerHTML = `
+    <div style="padding:14px 18px 10px;border-bottom:1px solid #1C1810;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-family:'Syncopate',sans-serif;font-size:7px;letter-spacing:4px;color:#C9A87C;text-transform:uppercase;">Tweaks</span>
+      <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:2px;color:#6A6058;">KPI Dashboard</span>
+    </div>
+    <div style="padding:16px 18px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;">Doelen tonen</span>
+        <button id="kpi-targets" style="padding:5px 12px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #C9A87C;background:transparent;color:#C9A87C;cursor:pointer;text-transform:uppercase;">${T.showTargets?'Aan':'Uit'}</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;">Grafiek vulling</span>
+        <button id="kpi-fill" style="padding:5px 12px;font-family:'Syncopate',sans-serif;font-size:5px;letter-spacing:2px;border:1px solid #C9A87C;background:transparent;color:#C9A87C;cursor:pointer;text-transform:uppercase;">${T.chartFill?'Aan':'Uit'}</button>
+      </div>
+      <div>
+        <label style="font-family:'Syncopate',sans-serif;font-size:6px;letter-spacing:3px;color:#8A8070;text-transform:uppercase;display:block;margin-bottom:8px;">Waarde schaal <span id="kpi-fs-val">${Math.round(T.fontSize*100)}</span>%</label>
+        <input id="kpi-fs" type="range" min="80" max="140" step="5" value="${Math.round(T.fontSize*100)}" style="width:100%;accent-color:#C9A87C;cursor:pointer;">
+      </div>
+    </div>
+  `;
+  document.body.appendChild(panel);
+
+  panel.querySelector('#kpi-targets').addEventListener('click', () => {
+    T.showTargets = !T.showTargets;
+    panel.querySelector('#kpi-targets').textContent = T.showTargets ? 'Aan' : 'Uit';
+    try { localStorage.setItem('gg-kpi-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: T }, '*');
+  });
+  panel.querySelector('#kpi-fill').addEventListener('click', () => {
+    T.chartFill = !T.chartFill;
+    panel.querySelector('#kpi-fill').textContent = T.chartFill ? 'Aan' : 'Uit';
+    try { localStorage.setItem('gg-kpi-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: T }, '*');
+  });
+  panel.querySelector('#kpi-fs').addEventListener('input', e => {
+    T.fontSize = +e.target.value / 100;
+    panel.querySelector('#kpi-fs-val').textContent = e.target.value;
+    try { localStorage.setItem('gg-kpi-tweaks', JSON.stringify(T)); } catch {}
+    applyTweaks();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: T }, '*');
+  });
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === '__activate_edit_mode')   panel.style.display = 'block';
+    if (e.data?.type === '__deactivate_edit_mode') panel.style.display = 'none';
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+  setTimeout(applyTweaks, 500);
+})();
+</script>
+</body>
+</html>
