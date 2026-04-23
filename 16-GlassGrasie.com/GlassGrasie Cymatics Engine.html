@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Cymatics Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body, #root { width:100%; height:100%; overflow:hidden; background:#090806; }
+::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:#2A2218; }
+input[type=range] { -webkit-appearance:none; appearance:none; height:2px; background:#1C1810; outline:none; cursor:pointer; border-radius:1px; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#8B7355; cursor:pointer; }
+input[type=range]::-webkit-slider-thumb:hover { background:#C9A87C; }
+textarea { resize:none; }
+button { cursor:pointer; font-family:inherit; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const SERIF = "'Cormorant Garamond',Georgia,serif";
+const SANS  = "'Syncopate',sans-serif";
+const MONO  = "'JetBrains Mono',ui-monospace,monospace";
+const BG    = '#090806';
+const BG2   = '#0D0C0B';
+const BG3   = '#100F0D';
+const RULE  = '#1C1810';
+const GOLD  = '#8B7355';
+const GOLD_HI = '#C9A87C';
+const CREAM = '#E8E2D8';
+const T3    = '#8A8070';
+const T4    = '#5A5044';
+const T5    = '#3A3020';
+
+// ── 15 Glass SKU Database ───────────────────────────────────────────────────
+const SKU_DB = [
+  { id:'GG-001', name:'Helder Float 4mm', mat:'Float helder', thick:4, ri:1.52, baseFreq:440, synergy:108, harmony:82, strain:'Low',  color:'rgba(200,195,185,0.7)', accent:'#C9A87C' },
+  { id:'GG-002', name:'Forest Floor Print', mat:'Bedrukt restglas', thick:3, ri:1.52, baseFreq:380, synergy:134, harmony:88, strain:'Low',  color:'rgba(90,140,90,0.65)',  accent:'#7A9B6A' },
+  { id:'GG-003', name:'Deep Navy Coat', mat:'Float PVD navy', thick:4, ri:1.54, baseFreq:520, synergy:112, harmony:79, strain:'Low',  color:'rgba(60,80,140,0.65)', accent:'#7A7A9B' },
+  { id:'GG-004', name:'Matte Black Coat', mat:'Float PVD zwart', thick:4, ri:1.55, baseFreq:460, synergy:98,  harmony:74, strain:'Med', color:'rgba(40,40,40,0.8)',   accent:'#8A8070' },
+  { id:'GG-005', name:'Terracotta Print', mat:'Bedrukt restglas', thick:3, ri:1.52, baseFreq:350, synergy:126, harmony:91, strain:'Low',  color:'rgba(160,80,55,0.65)', accent:'#9B6A4A' },
+  { id:'GG-006', name:'Helder Float 6mm', mat:'Float helder', thick:6, ri:1.52, baseFreq:310, synergy:88,  harmony:70, strain:'Low',  color:'rgba(200,195,185,0.5)', accent:'#C9A87C' },
+  { id:'GG-007', name:'Aubergine Coat', mat:'Float PVD aubergine', thick:4, ri:1.56, baseFreq:580, synergy:118, harmony:85, strain:'Low',  color:'rgba(90,40,90,0.65)', accent:'#8A6A9B' },
+  { id:'GG-008', name:'Helder Float 8mm', mat:'Float helder', thick:8, ri:1.52, baseFreq:260, synergy:76,  harmony:65, strain:'Low',  color:'rgba(200,195,185,0.4)', accent:'#8B7355' },
+  { id:'GG-009', name:'Ocean Print', mat:'Bedrukt restglas', thick:3, ri:1.52, baseFreq:420, synergy:138, harmony:92, strain:'Low',  color:'rgba(40,100,160,0.65)', accent:'#5A8A9B' },
+  { id:'GG-010', name:'Warm Gold Coat', mat:'Float PVD goud', thick:4, ri:1.57, baseFreq:528, synergy:142, harmony:94, strain:'Low',  color:'rgba(180,140,60,0.7)', accent:'#C9A87C' },
+  { id:'GG-011', name:'Sage Print', mat:'Bedrukt restglas', thick:3, ri:1.52, baseFreq:396, synergy:122, harmony:87, strain:'Low',  color:'rgba(100,140,90,0.65)', accent:'#8A9B6A' },
+  { id:'GG-012', name:'Float Gelaagd', mat:'Gelaagd float', thick:6, ri:1.53, baseFreq:285, synergy:82,  harmony:68, strain:'Med', color:'rgba(210,205,195,0.6)', accent:'#9B8A5A' },
+  { id:'GG-013', name:'Copper Coat', mat:'Float PVD koper', thick:4, ri:1.56, baseFreq:495, synergy:116, harmony:81, strain:'Med', color:'rgba(170,100,60,0.65)', accent:'#9B6A3A' },
+  { id:'GG-014', name:'Smoke Grey Coat', mat:'Float PVD smoke', thick:4, ri:1.55, baseFreq:440, synergy:94,  harmony:76, strain:'Low',  color:'rgba(90,90,95,0.65)', accent:'#7A7A8A' },
+  { id:'GG-015', name:'Arctic Print', mat:'Bedrukt restglas', thick:3, ri:1.52, baseFreq:640, synergy:130, harmony:89, strain:'High', color:'rgba(180,210,230,0.65)', accent:'#6A9AB0' },
+];
+
+// ── Chladni rendering ────────────────────────────────────────────────────────
+function renderChladni(ctx, W, H, layers, t, bgColor='#090806') {
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, W, H);
+  if (!layers.some(l => l.on && l.skuId)) return;
+
+  const img = ctx.createImageData(W, H);
+  const d = img.data;
+
+  for (let px = 0; px < W; px++) {
+    for (let py = 0; py < H; py++) {
+      const x = (px / W - 0.5) * 2;
+      const y = (py / H - 0.5) * 2;
+      let totalR = 0, totalG = 0, totalB = 0, totalA = 0;
+      let hits = 0;
+
+      layers.forEach(layer => {
+        if (!layer.on || !layer.sku) return;
+        const freq = layer.sku.baseFreq + layer.df;
+        const m = freq / 80;
+        const n = (layer.sku.ri * 10) % 6 + 1.5;
+        const anim = t * 0.25 * (freq / 440);
+        const val = Math.abs(
+          Math.cos(m * Math.PI * x) * Math.cos(n * Math.PI * y) -
+          Math.cos(n * Math.PI * x) * Math.cos(m * Math.PI * y + anim)
+        );
+        const thresh = 0.07 + 0.02 * Math.sin(t * 0.4);
+        const bright = val < thresh ? Math.pow(1 - val / thresh, 2.8) * (layer.opacity / 100) : 0;
+        if (bright > 0.01) {
+          // Parse SKU color
+          const col = layer.sku.color;
+          const rgb = col.match(/[\d.]+/g);
+          if (rgb && rgb.length >= 3) {
+            totalR += parseFloat(rgb[0]) * bright;
+            totalG += parseFloat(rgb[1]) * bright;
+            totalB += parseFloat(rgb[2]) * bright;
+            totalA += bright;
+            hits++;
+          }
+        }
+      });
+
+      if (hits > 0) {
+        const idx = (py * W + px) * 4;
+        d[idx]   = Math.min(255, totalR * 255 + 12);
+        d[idx+1] = Math.min(255, totalG * 255 + 8);
+        d[idx+2] = Math.min(255, totalB * 255 + 5);
+        d[idx+3] = Math.min(255, totalA * 255 * 2.2);
+      }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+// ── Compute combined metrics ─────────────────────────────────────────────────
+function computeMetrics(layers) {
+  const active = layers.filter(l => l.on && l.sku);
+  if (!active.length) return { freq:0, synergy:0, harmony:0, layers:0 };
+  const freq = Math.round(active.reduce((a,l) => a + (l.sku.baseFreq + l.df) * (l.opacity/100), 0) / active.length);
+  const synergy = Math.round(active.reduce((a,l) => a + l.sku.synergy, 0) / active.length);
+  const harmony = active.length > 1
+    ? Math.round(100 - Math.abs(active[0].sku.baseFreq - active[active.length-1].sku.baseFreq) / 14)
+    : active[0].sku.harmony;
+  return { freq, synergy, harmony: Math.max(0, Math.min(100, harmony)), layers: active.length };
+}
+
+// ── HUD ──────────────────────────────────────────────────────────────────────
+function HUD({ metrics, module, onFullscreen, onHide, hidden }) {
+  return (
+    <div style={{
+      display:'flex', alignItems:'center', gap:0,
+      background:'rgba(9,8,6,0.85)', backdropFilter:'blur(20px) saturate(1.3)',
+      borderBottom:`1px solid ${RULE}`, height:44, flexShrink:0,
+      paddingLeft:16, paddingRight:12,
+    }}>
+      <div style={{fontFamily:'"Cormorant Garamond",Georgia,serif',fontWeight:400,fontSize:20,letterSpacing:'-0.05em',color:CREAM,marginRight:24,flexShrink:0}}>
+        Glass⏧Grasie
+        <span style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:GOLD,marginLeft:10,fontWeight:400}}>CYMATICS</span>
+      </div>
+      {[
+        ['FREQ', metrics.freq ? `${metrics.freq} Hz` : '—'],
+        ['SYNERGY', metrics.synergy ? `${metrics.synergy}/150` : '—'],
+        ['HARMONY', metrics.harmony ? `${metrics.harmony}/100` : '—'],
+        ['LAGEN', metrics.layers || '0'],
+      ].map(([k,v]) => (
+        <div key={k} style={{display:'flex',alignItems:'center',gap:6,
+          padding:'0 14px',borderRight:`1px solid ${RULE}`,height:'100%'}}>
+          <span style={{fontFamily:SANS,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{k}</span>
+          <span style={{fontFamily:MONO,fontSize:11,color:GOLD_HI}}>{v}</span>
+        </div>
+      ))}
+      <div style={{flex:1}}/>
+      <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:GOLD,
+        textTransform:'uppercase',padding:'0 16px',borderRight:`1px solid ${RULE}`,height:'100%',
+        display:'flex',alignItems:'center'}}>M{module}</div>
+      <button onClick={onHide} title="UI verbergen" style={{
+        height:'100%',padding:'0 12px',background:'none',border:'none',
+        fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase',
+        borderRight:`1px solid ${RULE}`,
+      }}>{hidden?'UI tonen':'UI verbergen'}</button>
+      <button onClick={onFullscreen} title="Volledig scherm" style={{
+        height:'100%',padding:'0 12px',background:'none',border:'none',
+        fontFamily:SANS,fontSize:6,letterSpacing:'2px',color:T3,textTransform:'uppercase',
+      }}>⤢ Scherm</button>
+    </div>
+  );
+}
+
+// ── Layer control ────────────────────────────────────────────────────────────
+function LayerControl({ layer, idx, onChange }) {
+  const accent = ['#C9A87C','#7A9B6A','#7A7A9B'][idx];
+  return (
+    <div style={{
+      borderBottom:`1px solid rgba(201,168,124,0.15)`,paddingBottom:16,marginBottom:16,
+      opacity: layer.on ? 1 : 0.35, transition:'opacity 150ms',
+      background: layer.on ? 'rgba(201,168,124,0.04)' : 'transparent',
+      padding:'10px 8px 16px', borderRadius:2,
+    }}>
+      <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+        <button onClick={()=>onChange({...layer,on:!layer.on})} style={{
+          width:18,height:18,borderRadius:'50%',flexShrink:0,
+          background: layer.on ? accent : 'transparent',
+          border:`1px solid ${layer.on ? accent : RULE}`,
+          cursor:'pointer',transition:'all 150ms',
+        }}/>
+        <span style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',color:accent,
+          textTransform:'uppercase',flex:1}}>Laag {idx+1}</span>
+      </div>
+
+      <div style={{marginBottom:8}}>
+        <select value={layer.skuId} onChange={e=>{
+          const sku = SKU_DB.find(s=>s.id===e.target.value)||null;
+          onChange({...layer,skuId:e.target.value,sku});
+        }} style={{
+          width:'100%',background:'rgba(13,12,11,0.8)',border:`1px solid rgba(201,168,124,0.25)`,
+          color:CREAM,padding:'7px 10px',fontFamily:MONO,fontSize:10,
+          outline:'none',backdropFilter:'blur(4px)',
+        }}>
+          <option value="">— SKU kiezen —</option>
+          {SKU_DB.map(s=><option key={s.id} value={s.id}>{s.id} · {s.name}</option>)}
+        </select>
+      </div>
+
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <span style={{fontFamily:SANS,fontSize:5,letterSpacing:'2px',color:T3,
+            textTransform:'uppercase',width:52,flexShrink:0,color:CREAM,opacity:0.85}}>Opaciteit</span>
+          <input type="range" min={0} max={100} value={layer.opacity}
+            onChange={e=>onChange({...layer,opacity:+e.target.value})}
+            style={{flex:1,accentColor:accent}}/>
+          <span style={{fontFamily:MONO,fontSize:9,color:accent,width:28,
+            textAlign:'right'}}>{layer.opacity}%</span>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <span style={{fontFamily:SANS,fontSize:5,letterSpacing:'2px',color:T3,
+            textTransform:'uppercase',width:52,flexShrink:0,color:CREAM,opacity:0.85}}>Δf Hz</span>
+          <input type="range" min={-200} max={200} value={layer.df}
+            onChange={e=>onChange({...layer,df:+e.target.value})}
+            style={{flex:1,accentColor:accent}}/>
+          <span style={{fontFamily:MONO,fontSize:9,color:accent,width:28,
+            textAlign:'right'}}>{layer.df>0?'+':''}{layer.df}</span>
+        </div>
+      </div>
+
+      {layer.sku && (
+        <div style={{marginTop:8,padding:'6px 8px',background:'rgba(255,255,255,0.02)',
+          border:`1px solid ${RULE}`,display:'flex',justifyContent:'space-between'}}>
+          <span style={{fontFamily:MONO,fontSize:9,color:T3}}>{layer.sku.mat} · {layer.sku.thick}mm</span>
+          <span style={{fontFamily:MONO,fontSize:9,color:accent}}>RI {layer.sku.ri}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── M1 Composer ──────────────────────────────────────────────────────────────
+function M1Composer({ layers, setLayers, canvasRef, onExport }) {
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:0,height:'100%',overflowY:'auto',
+      background:'rgba(9,8,6,0.75)',backdropFilter:'blur(16px) saturate(1.2)',
+      borderLeft:'1px solid rgba(201,168,124,0.15)'}}>
+      <div style={{padding:'16px 16px 8px'}}>
+        <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:GOLD_HI,
+          textTransform:'uppercase',marginBottom:12,opacity:1}}>M1 — Composer</div>
+        {layers.map((layer,i) => (
+          <LayerControl key={i} layer={layer} idx={i}
+            onChange={updated => setLayers(prev => prev.map((l,j)=>j===i?updated:l))}/>
+        ))}
+      </div>
+      <div style={{padding:'8px 16px',borderTop:`1px solid rgba(201,168,124,0.2)`,marginTop:'auto',
+        background:'rgba(9,8,6,0.5)',backdropFilter:'blur(8px)'}}>
+        <button onClick={onExport} style={{
+          width:'100%',padding:'12px',fontFamily:SANS,fontSize:7,letterSpacing:'3px',
+          textTransform:'uppercase',background:GOLD_HI,color:BG,border:'none',
+          cursor:'pointer',fontWeight:700,
+        }}>PNG exporteren ↓</button>
+        <div style={{fontFamily:MONO,fontSize:8,color:T3,marginTop:6,textAlign:'center',opacity:0.8}}>
+          1400 × 1000px · glassgrasie watermark
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── M2 Advisor ───────────────────────────────────────────────────────────────
+const EXAMPLE_PROMPTS = [
+  'Meditatie ruimte, warm licht van boven, rustige sfeer, kleine groep',
+  'Hotel lobby Rotterdam, hoog plafond, internationaal publiek, dag en nacht',
+  'Kantoor vergaderruimte, neutraal, concentratie, 10 personen',
+  'Galerie expositieruimte, modern, wit, kunstlicht',
+];
+
+function M2Advisor({ onRecommendation, layers, setLayers }) {
+  const [desc, setDesc] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [results, setResults] = React.useState(null);
+  const [error, setError] = React.useState(null);
+
+  const analyze = async () => {
+    if (!desc.trim()) return;
+    setLoading(true); setError(null);
+    try {
+      const skuList = SKU_DB.map(s =>
+        `${s.id}: ${s.name} | mat:${s.mat} | ri:${s.ri} | freq:${s.baseFreq}Hz | synergy:${s.synergy} | harmony:${s.harmony} | strain:${s.strain}`
+      ).join('\n');
+
+      const prompt = `Je bent de Glass⏧Grasie® Cymatics Advisor. Analyseer deze projectomschrijving en rangschik de 15 glasSKUs op perceptuele fit.
+
+Projectomschrijving: "${desc}"
+
+SKU Database:
+${skuList}
+
+Geef de top 3 aanbevelingen terug als JSON (geen uitleg erbuiten):
+{
+  "title": "poëtische naam voor de compositie (max 5 woorden, Nederlands)",
+  "reasoning": "1 zin waarom deze combinatie past (Nederlands)",
+  "matches": [
+    {"rank": 1, "skuId": "GG-XXX", "title": "poëtische naam", "synergyIndex": 0-150, "harmonyScore": 0-100, "strain": "Low/Medium/High", "freqRange": "calm/balanced/energetic", "why": "1 zin"},
+    {"rank": 2, ...},
+    {"rank": 3, ...}
+  ]
+}`;
+
+      const text = await window.claude.complete(prompt);
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('Geen geldig JSON antwoord');
+      const data = JSON.parse(jsonMatch[0]);
+      setResults(data);
+      if (onRecommendation) onRecommendation(data);
+    } catch(e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const applyToLayers = (matches) => {
+    const newLayers = matches.slice(0,3).map((m,i) => {
+      const sku = SKU_DB.find(s=>s.id===m.skuId);
+      return { skuId: m.skuId, sku, opacity: [90,70,50][i], df:0, on:true };
+    });
+    setLayers(newLayers);
+  };
+
+  const strainColor = s => s==='Low' ? '#5A9A6A' : s==='High' ? '#9A5A5A' : GOLD;
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:0,height:'100%',overflowY:'auto'}}>
+      <div style={{padding:'16px',borderBottom:`1px solid ${RULE}`}}>
+        <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:GOLD,
+          textTransform:'uppercase',marginBottom:12}}>M2 — AI Advisor</div>
+
+        <textarea value={desc} onChange={e=>setDesc(e.target.value)}
+          placeholder="Beschrijf uw project: ruimte, sfeer, lichtrichting, gebruik..."
+          rows={4} style={{
+            width:'100%',background:BG3,border:`1px solid ${RULE}`,
+            color:CREAM,padding:'10px',fontFamily:SERIF,fontSize:14,
+            lineHeight:1.6,outline:'none',marginBottom:10,
+          }}/>
+
+        <div style={{display:'flex',flexWrap:'wrap',gap:4,marginBottom:12}}>
+          {EXAMPLE_PROMPTS.map((p,i)=>(
+            <button key={i} onClick={()=>setDesc(p)} style={{
+              fontFamily:SANS,fontSize:5,letterSpacing:'1.5px',textTransform:'uppercase',
+              padding:'4px 8px',background:'transparent',
+              border:`1px solid ${RULE}`,color:T3,cursor:'pointer',
+            }}>Voorbeeld {i+1}</button>
+          ))}
+        </div>
+
+        <button onClick={analyze} disabled={loading || !desc.trim()} style={{
+          width:'100%',padding:'10px',fontFamily:SANS,fontSize:7,letterSpacing:'3px',
+          textTransform:'uppercase',
+          background: loading ? BG3 : GOLD,
+          color: loading ? T4 : BG,
+          border:`1px solid ${loading ? RULE : GOLD}`,
+          display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+        }}>
+          {loading && <div style={{width:10,height:10,border:`1px solid ${GOLD}`,
+            borderTopColor:'transparent',borderRadius:'50%',animation:'spin 0.7s linear infinite'}}/>}
+          {loading ? 'Analyseren...' : 'AI analyse starten →'}
+        </button>
+        {error && <div style={{fontFamily:MONO,fontSize:9,color:'#9A5A5A',marginTop:8}}>{error}</div>}
+      </div>
+
+      {results && (
+        <div style={{padding:'14px 16px',animation:'fadeIn 300ms ease'}}>
+          <div style={{fontFamily:SERIF,fontStyle:'italic',fontSize:16,color:GOLD_HI,
+            marginBottom:4,lineHeight:1.3}}>"{results.title}"</div>
+          <div style={{fontFamily:SERIF,fontSize:12,color:T3,fontStyle:'italic',
+            marginBottom:14,lineHeight:1.6}}>{results.reasoning}</div>
+
+          {results.matches?.map((m,i)=>{
+            const sku = SKU_DB.find(s=>s.id===m.skuId);
+            const rankColors = [GOLD_HI,'#7A9B6A','#7A7A9B'];
+            return (
+              <div key={i} style={{
+                marginBottom:8,padding:'12px',
+                border:`1px solid ${i===0?`${GOLD_HI}44`:RULE}`,
+                background:i===0?'rgba(201,168,124,0.04)':BG2,
+                cursor:'pointer',
+              }} onClick={()=>{
+                const newL = [...layers];
+                if(sku){ newL[i]={skuId:m.skuId,sku,opacity:[90,70,50][i],df:0,on:true}; }
+                setLayers(newL);
+              }}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <span style={{fontFamily:SANS,fontSize:7,letterSpacing:'2px',
+                      color:rankColors[i],textTransform:'uppercase'}}>#{m.rank}</span>
+                    <span style={{fontFamily:SERIF,fontStyle:'italic',fontSize:14,color:CREAM}}>{m.title}</span>
+                  </div>
+                  <span style={{fontFamily:SANS,fontSize:5,letterSpacing:'1px',
+                    padding:'2px 6px',border:`1px solid ${strainColor(m.strain)}44`,
+                    color:strainColor(m.strain),textTransform:'uppercase'}}>{m.strain}</span>
+                </div>
+                <div style={{fontFamily:MONO,fontSize:9,color:T3,marginBottom:6}}>{m.skuId} · {sku?.name}</div>
+                <div style={{display:'flex',gap:12,marginBottom:6}}>
+                  <span style={{fontFamily:SANS,fontSize:5,color:T3,letterSpacing:'1px'}}>SYN <span style={{color:rankColors[i]}}>{m.synergyIndex}</span></span>
+                  <span style={{fontFamily:SANS,fontSize:5,color:T3,letterSpacing:'1px'}}>HAR <span style={{color:rankColors[i]}}>{m.harmonyScore}</span></span>
+                  <span style={{fontFamily:SANS,fontSize:5,color:T3,letterSpacing:'1px',textTransform:'uppercase'}}>{m.freqRange}</span>
+                </div>
+                <div style={{fontFamily:SERIF,fontSize:11,color:T3,fontStyle:'italic',lineHeight:1.6}}>{m.why}</div>
+              </div>
+            );
+          })}
+
+          <button onClick={()=>applyToLayers(results.matches||[])} style={{
+            width:'100%',marginTop:8,padding:'9px',fontFamily:SANS,fontSize:6,
+            letterSpacing:'3px',textTransform:'uppercase',
+            background:'transparent',border:`1px solid ${GOLD}44`,color:GOLD,
+          }}>Alle 3 laden in M1 →</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── M3 Immersie ───────────────────────────────────────────────────────────────
+function M3Immersie({ layers }) {
+  const canvasRef = React.useRef(null);
+  const rafRef    = React.useRef(null);
+  const tRef      = React.useRef(0);
+  const mouseRef  = React.useRef({x:0.5,y:0.5});
+  const audioRef  = React.useRef(null);
+  const analyserRef = React.useRef(null);
+  const [mode, setMode]   = React.useState('3d');
+  const [freq, setFreq]   = React.useState(440);
+  const [mic, setMic]     = React.useState(false);
+  const [micLive, setMicLive] = React.useState(false);
+  const [displayFreq, setDisplayFreq] = React.useState(440);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      tRef.current += 0.014;
+      const t = tRef.current;
+
+      // Detect mic frequency
+      let liveFreq = freq;
+      if (analyserRef.current && micLive) {
+        const buf = new Float32Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getFloatTimeDomainData(buf);
+        // simple zero-crossing pitch detection
+        let crosses = 0, lastPos = buf[0] >= 0;
+        for (let i=1;i<buf.length;i++){
+          const pos = buf[i] >= 0;
+          if (pos !== lastPos) { crosses++; lastPos = pos; }
+        }
+        const detectedFreq = (crosses / 2) * (analyserRef.current.context.sampleRate / buf.length);
+        if (detectedFreq > 80 && detectedFreq < 1500) {
+          liveFreq = Math.round(detectedFreq);
+          setDisplayFreq(liveFreq);
+        }
+      } else {
+        setDisplayFreq(freq);
+      }
+
+      ctx.fillStyle = '#090806';
+      ctx.fillRect(0, 0, W, H);
+
+      if (mode === 'flat') {
+        // Flat cymatics pattern with live freq
+        const img = ctx.createImageData(W, H);
+        const d = img.data;
+        const m = liveFreq / 80;
+        const n = 3.5 + Math.sin(t*0.1) * 0.5;
+        for (let px=0;px<W;px++) for (let py=0;py<H;py++) {
+          const x = (px/W-0.5)*2, y = (py/H-0.5)*2;
+          const val = Math.abs(Math.cos(m*Math.PI*x)*Math.cos(n*Math.PI*y)-Math.cos(n*Math.PI*x)*Math.cos(m*Math.PI*y+t*0.3));
+          const thresh = 0.08;
+          const bright = val < thresh ? Math.pow(1-val/thresh,2.5) : 0;
+          const idx = (py*W+px)*4;
+          d[idx]   = Math.round(bright * 201);
+          d[idx+1] = Math.round(bright * 168);
+          d[idx+2] = Math.round(bright * 124);
+          d[idx+3] = Math.round(bright * 230);
+        }
+        ctx.putImageData(img, 0, 0);
+      } else {
+        // 3D refraction mode
+        const cx = W/2, cy = H/2;
+        const mx = mouseRef.current.x, my = mouseRef.current.y;
+        const tiltX = (mx - 0.5) * 0.6;
+        const tiltY = (my - 0.5) * 0.4;
+
+        // Glass panel in perspective
+        const pw = W * 0.55, ph = H * 0.5;
+        const panelPts = [
+          [-pw/2 + tiltX*60, -ph/2 + tiltY*40],
+          [ pw/2 + tiltX*60, -ph/2 - tiltX*30 + tiltY*40],
+          [ pw/2 - tiltX*60,  ph/2 - tiltY*40],
+          [-pw/2 - tiltX*60,  ph/2 + tiltX*30 - tiltY*40],
+        ].map(([x,y]) => [x+cx, y+cy]);
+
+        // Draw glass panel
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(...panelPts[0]);
+        panelPts.slice(1).forEach(p=>ctx.lineTo(...p));
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(200,195,185,0.06)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(201,168,124,0.35)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Glass thickness edge (top)
+        ctx.beginPath();
+        ctx.moveTo(...panelPts[0]);
+        ctx.lineTo(panelPts[0][0]+4,panelPts[0][1]-8);
+        ctx.lineTo(panelPts[1][0]+4,panelPts[1][1]-8);
+        ctx.lineTo(...panelPts[1]);
+        ctx.fillStyle = 'rgba(220,215,205,0.12)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(201,168,124,0.5)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+        ctx.restore();
+
+        // Light rays with Snell's law
+        const n1 = 1.0, n2 = 1.52;
+        const numRays = 7;
+        for (let r=0; r<numRays; r++) {
+          const rx = panelPts[0][0] + (panelPts[1][0]-panelPts[0][0]) * (r/(numRays-1));
+          const ry = panelPts[0][1] + (panelPts[1][1]-panelPts[0][1]) * (r/(numRays-1));
+          const incidentAngle = 0.4 + tiltX * 0.3 + tiltY * 0.2;
+          const refractedAngle = Math.asin(Math.min(1, n1/n2 * Math.sin(incidentAngle)));
+
+          // Incident ray (above glass)
+          const rayLen = 120;
+          ctx.save();
+          ctx.globalAlpha = 0.18 + 0.06 * Math.sin(t + r);
+          ctx.strokeStyle = '#C9A87C';
+          ctx.lineWidth = 0.8;
+          ctx.setLineDash([4,6]);
+          ctx.beginPath();
+          ctx.moveTo(rx - Math.sin(incidentAngle)*rayLen, ry - Math.cos(incidentAngle)*rayLen);
+          ctx.lineTo(rx, ry);
+          ctx.stroke();
+
+          // Refracted ray (below glass)
+          ctx.globalAlpha = 0.22 + 0.06 * Math.sin(t + r + 1);
+          ctx.strokeStyle = '#7A9B6A';
+          ctx.setLineDash([3,5]);
+          ctx.beginPath();
+          ctx.moveTo(rx, ry);
+          ctx.lineTo(rx + Math.sin(refractedAngle)*rayLen*1.4, ry + Math.cos(refractedAngle)*rayLen*1.4);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Cymatics overlay on panel face
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(...panelPts[0]);
+        panelPts.slice(1).forEach(p=>ctx.lineTo(...p));
+        ctx.closePath();
+        ctx.clip();
+        const m = liveFreq / 80, n = 3.2 + Math.sin(t*0.08);
+        for (let i=0; i<8; i++) {
+          const theta = (i/8)*Math.PI*2 + t*0.1;
+          const cx2 = cx + Math.cos(theta)*pw*0.25;
+          const cy2 = cy + Math.sin(theta)*ph*0.2;
+          const val = Math.abs(Math.cos(m*0.3)*Math.cos(n*0.3));
+          const r2 = (60+val*40) * (0.5+0.5*Math.sin(t*0.4+i));
+          const grad = ctx.createRadialGradient(cx2,cy2,0,cx2,cy2,r2);
+          grad.addColorStop(0,`rgba(201,168,124,${0.08+val*0.06})`);
+          grad.addColorStop(1,'transparent');
+          ctx.fillStyle=grad;
+          ctx.beginPath();ctx.arc(cx2,cy2,r2,0,Math.PI*2);ctx.fill();
+        }
+        ctx.restore();
+
+        // Angle labels
+        ctx.font = `10px ${MONO}`;
+        ctx.fillStyle = `rgba(201,168,124,0.5)`;
+        ctx.fillText(`θᵢ = ${(0.4+tiltX*0.3).toFixed(2)}`, cx-80, cy-ph/2-20);
+        ctx.fillText(`θᵣ = ${(Math.asin(Math.min(1,(0.4+tiltX*0.3)/1.52))).toFixed(2)}`, cx+20, cy+ph/2+30);
+        ctx.fillStyle=`rgba(90,154,106,0.5)`;
+        ctx.fillText(`n₂/n₁ = 1.52`, cx-30, cy+ph/2+48);
+      }
+
+      // Freq label
+      ctx.font = `bold 11px ${MONO}`;
+      ctx.fillStyle = `rgba(201,168,124,0.5)`;
+      ctx.fillText(`${liveFreq} Hz`, 14, H-14);
+      if (micLive) {
+        ctx.fillStyle = `rgba(90,154,106,0.9)`;
+        ctx.fillText('● MIC LIVE', 14, 20);
+      }
+
+      rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [mode, freq, micLive, layers]);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const onMove = e => {
+      const r = canvas.getBoundingClientRect();
+      mouseRef.current = { x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height };
+    };
+    canvas.addEventListener('mousemove', onMove);
+    return () => canvas.removeEventListener('mousemove', onMove);
+  }, []);
+
+  const toggleMic = async () => {
+    if (micLive) {
+      audioRef.current?.stream?.getTracks().forEach(t=>t.stop());
+      analyserRef.current = null;
+      setMicLive(false);
+    } else {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        const ctx2 = new AudioContext();
+        const src = ctx2.createMediaStreamSource(stream);
+        const analyser = ctx2.createAnalyser();
+        analyser.fftSize = 2048;
+        src.connect(analyser);
+        analyserRef.current = analyser;
+        audioRef.current = { stream };
+        setMicLive(true);
+      } catch(e) {
+        alert('Microfoontoegang geweigerd of niet beschikbaar (vereist HTTPS)');
+      }
+    }
+  };
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:0,height:'100%',overflowY:'auto'}}>
+      <div style={{padding:'16px',borderBottom:`1px solid ${RULE}`}}>
+        <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:GOLD,
+          textTransform:'uppercase',marginBottom:12}}>M3 — Immersie</div>
+
+        {/* Mode toggle */}
+        <div style={{display:'flex',gap:1,background:RULE,marginBottom:14}}>
+          {[['3d','3D Refractie'],['flat','Vlak Cymatics']].map(([m,l])=>(
+            <button key={m} onClick={()=>setMode(m)} style={{
+              flex:1,padding:'8px 6px',fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+              textTransform:'uppercase',border:'none',cursor:'pointer',
+              background:mode===m?`rgba(139,115,85,0.2)`:BG2,
+              color:mode===m?GOLD_HI:T4,transition:'all 150ms',
+            }}>{l}</button>
+          ))}
+        </div>
+
+        {/* Freq slider */}
+        <div style={{marginBottom:14}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+            <span style={{fontFamily:SANS,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>Frequentie</span>
+            <span style={{fontFamily:MONO,fontSize:10,color:GOLD_HI}}>{displayFreq} Hz</span>
+          </div>
+          <input type="range" min={200} max={1400} step={5} value={freq}
+            onChange={e=>setFreq(+e.target.value)} style={{width:'100%',accentColor:GOLD_HI}}
+            disabled={micLive}/>
+          <div style={{display:'flex',justifyContent:'space-between',marginTop:4}}>
+            <span style={{fontFamily:MONO,fontSize:8,color:T3}}>200</span>
+            <span style={{fontFamily:MONO,fontSize:8,color:T3}}>1400 Hz</span>
+          </div>
+        </div>
+
+        {/* Mic */}
+        <button onClick={toggleMic} style={{
+          width:'100%',padding:'9px',fontFamily:SANS,fontSize:7,letterSpacing:'3px',
+          textTransform:'uppercase',border:`1px solid ${micLive?'#5A9A6A':RULE}`,
+          background:micLive?'rgba(90,154,106,0.1)':BG3,
+          color:micLive?'#5A9A6A':T3,cursor:'pointer',
+          display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+        }}>
+          {micLive && <span style={{display:'inline-block',width:6,height:6,borderRadius:'50%',
+            background:'#5A9A6A',animation:'pulse 1.5s infinite'}}/>}
+          {micLive ? 'Microfoon stoppen' : 'Microfoon activeren'}
+        </button>
+        <div style={{fontFamily:SERIF,fontSize:11,color:T3,fontStyle:'italic',
+          marginTop:6,lineHeight:1.6,textAlign:'center'}}>
+          Hum, zing of klap — patroon reageert live
+        </div>
+      </div>
+
+      {mode==='3d' && (
+        <div style={{padding:'14px 16px',borderTop:`1px solid ${RULE}`}}>
+          <div style={{fontFamily:SANS,fontSize:6,letterSpacing:'3px',color:GOLD,
+            textTransform:'uppercase',marginBottom:10}}>Snell's Wet</div>
+          <div style={{display:'flex',flexDirection:'column',gap:1,background:RULE}}>
+            {[['n₁ (lucht)','1.000'],['n₂ (float glas)','1.52'],['Formule','n₁ sin(θᵢ) = n₂ sin(θᵣ)']].map(([k,v])=>(
+              <div key={k} style={{background:BG2,padding:'8px 12px',
+                display:'flex',justifyContent:'space-between'}}>
+                <span style={{fontFamily:SANS,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{k}</span>
+                <span style={{fontFamily:MONO,fontSize:9,color:T2}}>{v}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{fontFamily:SERIF,fontSize:11,color:T3,fontStyle:'italic',
+            marginTop:8,lineHeight:1.6}}>Beweeg de muis over het canvas om het glazen paneel te kantelen.</div>
+        </div>
+      )}
+      <canvas ref={canvasRef} style={{display:'none'}}/>
+    </div>
+  );
+}
+
+// ── Canvas renderer (M1 + M4 shared) ────────────────────────────────────────
+function CymaticsCanvas({ layers, module, m3CanvasRef, setM3Ref }) {
+  const canvasRef = React.useRef(null);
+  const rafRef    = React.useRef(null);
+  const mouseRef  = React.useRef({x:0.5,y:0.5});
+  const tRef      = React.useRef(0);
+  const [m3Mode, setM3Mode] = React.useState('3d');
+  const [m3Freq, setM3Freq] = React.useState(440);
+  const [micLive, setMicLive] = React.useState(false);
+  const analyserRef = React.useRef(null);
+  const audioSrcRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (setM3Ref) setM3Ref({canvasRef, setM3Mode, setM3Freq, analyserRef, micLive});
+  }, [micLive]);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const resize = () => {
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    const draw = () => {
+      tRef.current += 0.013;
+      const W = canvas.width, H = canvas.height;
+
+      if (module === 1 || module === 2) {
+        renderChladni(ctx, W, H, layers, tRef.current);
+      } else if (module === 3) {
+        // M3 rendering inline
+        const t = tRef.current;
+        ctx.fillStyle = BG;
+        ctx.fillRect(0,0,W,H);
+        let liveFreq = m3Freq;
+        if (analyserRef.current && micLive) {
+          const buf = new Float32Array(analyserRef.current.frequencyBinCount);
+          analyserRef.current.getFloatTimeDomainData(buf);
+          let crosses=0,last=buf[0]>=0;
+          for(let i=1;i<buf.length;i++){const p=buf[i]>=0;if(p!==last){crosses++;last=p;}}
+          const d=crosses/2*(analyserRef.current.context.sampleRate/buf.length);
+          if(d>80&&d<1500)liveFreq=Math.round(d);
+        }
+        if (m3Mode==='flat') {
+          const img=ctx.createImageData(W,H);const d=img.data;
+          const m=liveFreq/80,n=3.5;
+          for(let px=0;px<W;px++)for(let py=0;py<H;py++){
+            const x=(px/W-0.5)*2,y=(py/H-0.5)*2;
+            const val=Math.abs(Math.cos(m*Math.PI*x)*Math.cos(n*Math.PI*y)-Math.cos(n*Math.PI*x)*Math.cos(m*Math.PI*y+t*0.3));
+            const bright=val<0.08?Math.pow(1-val/0.08,2.5):0;
+            const i=(py*W+px)*4;
+            d[i]=Math.round(bright*201);d[i+1]=Math.round(bright*168);d[i+2]=Math.round(bright*124);d[i+3]=Math.round(bright*230);
+          }
+          ctx.putImageData(img,0,0);
+        } else {
+          // 3D refraction
+          const cx=W/2,cy=H/2,mx=mouseRef.current.x,my=mouseRef.current.y;
+          const tX=(mx-0.5)*0.6,tY=(my-0.5)*0.4;
+          const pw=W*0.55,ph=H*0.5;
+          const pts=[[-pw/2+tX*60,-ph/2+tY*40],[pw/2+tX*60,-ph/2-tX*30+tY*40],[pw/2-tX*60,ph/2-tY*40],[-pw/2-tX*60,ph/2+tX*30-tY*40]].map(([x,y])=>[x+cx,y+cy]);
+          ctx.save();ctx.beginPath();ctx.moveTo(...pts[0]);pts.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();
+          ctx.fillStyle='rgba(200,195,185,0.05)';ctx.fill();ctx.strokeStyle='rgba(201,168,124,0.3)';ctx.lineWidth=1;ctx.stroke();
+          // Top edge
+          ctx.beginPath();ctx.moveTo(...pts[0]);ctx.lineTo(pts[0][0]+4,pts[0][1]-8);ctx.lineTo(pts[1][0]+4,pts[1][1]-8);ctx.lineTo(...pts[1]);
+          ctx.fillStyle='rgba(220,215,205,0.1)';ctx.fill();ctx.strokeStyle='rgba(201,168,124,0.4)';ctx.lineWidth=0.5;ctx.stroke();ctx.restore();
+          const nr=8;
+          for(let r=0;r<nr;r++){
+            const rx=pts[0][0]+(pts[1][0]-pts[0][0])*(r/(nr-1));
+            const ry=pts[0][1]+(pts[1][1]-pts[0][1])*(r/(nr-1));
+            const ia=0.4+tX*0.3;const ra=Math.asin(Math.min(1,ia/1.52));const rl=100;
+            ctx.save();ctx.globalAlpha=0.16+0.05*Math.sin(t+r);ctx.strokeStyle='#C9A87C';ctx.lineWidth=0.7;ctx.setLineDash([4,6]);
+            ctx.beginPath();ctx.moveTo(rx-Math.sin(ia)*rl,ry-Math.cos(ia)*rl);ctx.lineTo(rx,ry);ctx.stroke();
+            ctx.globalAlpha=0.2+0.05*Math.sin(t+r+1);ctx.strokeStyle='#7A9B6A';ctx.setLineDash([3,5]);
+            ctx.beginPath();ctx.moveTo(rx,ry);ctx.lineTo(rx+Math.sin(ra)*rl*1.4,ry+Math.cos(ra)*rl*1.4);ctx.stroke();ctx.restore();
+          }
+          const m=liveFreq/80,n=3.2;
+          ctx.save();ctx.beginPath();ctx.moveTo(...pts[0]);pts.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.clip();
+          for(let i=0;i<8;i++){
+            const theta=(i/8)*Math.PI*2+t*0.1;
+            const bcx=cx+Math.cos(theta)*pw*0.25,bcy=cy+Math.sin(theta)*ph*0.2;
+            const val=Math.abs(Math.cos(m*0.3)*Math.cos(n*0.3));
+            const r2=(50+val*30)*(0.5+0.5*Math.sin(t*0.4+i));
+            const grad=ctx.createRadialGradient(bcx,bcy,0,bcx,bcy,r2);
+            grad.addColorStop(0,`rgba(201,168,124,${0.07+val*0.05})`);grad.addColorStop(1,'transparent');
+            ctx.fillStyle=grad;ctx.beginPath();ctx.arc(bcx,bcy,r2,0,Math.PI*2);ctx.fill();
+          }
+          ctx.restore();
+          ctx.font=`10px ${MONO}`;ctx.fillStyle='rgba(201,168,124,0.45)';
+          ctx.fillText(`θᵢ=${(0.4+tX*0.3).toFixed(2)} θᵣ=${Math.asin(Math.min(1,(0.4+tX*0.3)/1.52)).toFixed(2)}`,14,H-14);
+        }
+        // Freq label
+        ctx.font=`bold 11px ${MONO}`;ctx.fillStyle='rgba(201,168,124,0.5)';
+        ctx.fillText(`${liveFreq} Hz`,W-70,H-14);
+        if(micLive){ctx.fillStyle='rgba(90,154,106,0.9)';ctx.fillText('● MIC LIVE',14,20);}
+      }
+      rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(rafRef.current); ro.disconnect(); };
+  }, [module, layers, m3Mode, m3Freq, micLive]);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const onMove = e => {
+      const r=canvas.getBoundingClientRect();
+      mouseRef.current={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};
+    };
+    canvas.addEventListener('mousemove', onMove);
+    return () => canvas.removeEventListener('mousemove', onMove);
+  }, []);
+
+  return <canvas ref={canvasRef} style={{width:'100%',height:'100%',display:'block'}}/>;
+}
+
+// ── M4 App ────────────────────────────────────────────────────────────────────
+function App() {
+  const [module, setModule]   = React.useState(1);
+  const [hidden, setHidden]   = React.useState(false);
+  const [layers, setLayers]   = React.useState([
+    { skuId:'GG-010', sku:SKU_DB.find(s=>s.id==='GG-010'), opacity:90, df:0, on:true },
+    { skuId:'', sku:null, opacity:60, df:0, on:false },
+    { skuId:'', sku:null, opacity:40, df:0, on:false },
+  ]);
+  const canvasRef = React.useRef(null);
+  const metrics   = computeMetrics(layers);
+
+  const doFullscreen = () => {
+    const el = document.documentElement;
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    else el.requestFullscreen?.();
+  };
+
+  const doExport = () => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `glassgrasie-cymatics-${Date.now()}.png`;
+    a.click();
+  };
+
+  React.useEffect(() => {
+    const onKey = e => {
+      if (e.key==='h') setHidden(h=>!h);
+      if (e.key==='f') doFullscreen();
+      if (e.key==='1') setModule(1);
+      if (e.key==='2') setModule(2);
+      if (e.key==='3') setModule(3);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',width:'100%',height:'100%',background:BG,overflow:'hidden'}}>
+      {/* HUD */}
+      {!hidden && (
+        <HUD metrics={metrics} module={module}
+          onFullscreen={doFullscreen}
+          onHide={()=>setHidden(h=>!h)}
+          hidden={hidden}/>
+      )}
+      {hidden && (
+        <button onClick={()=>setHidden(false)} style={{
+          position:'fixed',top:8,right:8,zIndex:100,
+          background:'rgba(9,8,6,0.7)',border:`1px solid ${RULE}`,
+          color:T3,fontFamily:SANS,fontSize:6,letterSpacing:'2px',
+          padding:'6px 12px',textTransform:'uppercase',
+        }}>UI tonen</button>
+      )}
+
+      {/* Module tabs */}
+      {!hidden && (
+        <div style={{display:'flex',gap:0,background:BG2,borderBottom:`1px solid ${RULE}`,flexShrink:0}}>
+          {[[1,'M1 Composer'],[2,'M2 Advisor'],[3,'M3 Immersie']].map(([m,l])=>(
+            <button key={m} onClick={()=>setModule(m)} style={{
+              padding:'10px 24px',fontFamily:SANS,fontSize:7,letterSpacing:'3px',
+              textTransform:'uppercase',border:'none',cursor:'pointer',
+              background:module===m?`rgba(139,115,85,0.12)`:BG2,
+              color:module===m?GOLD_HI:T4,
+              borderBottom:module===m?`2px solid ${GOLD_HI}`:'2px solid transparent',
+              transition:'all 150ms', borderRight:`1px solid ${RULE}`,
+            }}>{l}</button>
+          ))}
+          <div style={{flex:1}}/>
+          <button onClick={doExport} style={{
+            padding:'10px 20px',fontFamily:SANS,fontSize:7,letterSpacing:'3px',
+            textTransform:'uppercase',border:'none',background:'transparent',
+            color:T3,borderLeft:`1px solid ${RULE}`,cursor:'pointer',
+          }}>PNG exporteren ↓</button>
+        </div>
+      )}
+
+      {/* Main layout */}
+      <div style={{flex:1,display:'flex',minHeight:0,overflow:'hidden'}}>
+        {/* Canvas */}
+        <div style={{flex:1,position:'relative',minWidth:0}}>
+          <CymaticsCanvas layers={layers} module={module}/>
+        </div>
+
+        {/* Side panel */}
+        {!hidden && (
+          <div style={{
+            width:260,flexShrink:0,background:BG2,
+            borderLeft:`1px solid ${RULE}`,
+            display:'flex',flexDirection:'column',
+            overflowY:'auto',
+          }}>
+            {module===1 && <M1Composer layers={layers} setLayers={setLayers} canvasRef={canvasRef} onExport={doExport}/>}
+            {module===2 && <M2Advisor onRecommendation={null} layers={layers} setLayers={setLayers}/>}
+            {module===3 && <M3Immersie layers={layers}/>}
+          </div>
+        )}
+      </div>
+
+      {/* Keyboard hint */}
+      {!hidden && (
+        <div style={{borderTop:`1px solid ${RULE}`,padding:'5px 16px',
+          display:'flex',gap:20,background:BG3,flexShrink:0}}>
+          {[['H','UI verbergen'],['F','Volledig scherm'],['1/2/3','Module']].map(([k,v])=>(
+            <div key={k} style={{display:'flex',gap:5,alignItems:'center'}}>
+              <span style={{fontFamily:MONO,fontSize:8,color:GOLD,
+                background:'rgba(139,115,85,0.1)',padding:'1px 6px',
+                border:`1px solid ${RULE}`}}>{k}</span>
+              <span style={{fontFamily:SANS,fontSize:5,letterSpacing:'2px',color:T3,textTransform:'uppercase'}}>{v}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
