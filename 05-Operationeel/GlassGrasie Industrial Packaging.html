@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass⏧Grasie® — Industrial Packaging</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body, #root { width:100%; height:100%; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel">
+
+const S = "'Syncopate',sans-serif";
+const M = "'JetBrains Mono',ui-monospace,monospace";
+const R = "'Cormorant Garamond',Georgia,serif";
+
+// Industrial palette
+const INK    = '#0A0908';   // matte black box
+const INK2   = '#141210';
+const INK3   = '#1C1A18';
+const YELLOW = '#F5C800';
+const YELL2  = '#E6B800';
+const WHITE  = '#F2EFE8';
+const GREY   = '#C8C4BC';
+const LGREY  = '#E8E4DC';
+const DGREY  = '#3A3830';
+const RED    = '#D42B2B';
+const GOLD   = '#C9A87C';
+
+// ── Shared graphic elements ──────────────────────────────────────────────────
+
+// Hazard stripe bar
+const HazardBar = ({ h=18, direction='h', color=YELLOW, bg=INK, w='100%' }) => {
+  const stripeW = h * 1.2;
+  return (
+    <div style={{
+      width: w, height: h, flexShrink:0,
+      backgroundImage: `repeating-linear-gradient(${direction==='h'?'-45deg':'45deg'}, ${color} 0px, ${color} ${stripeW/2}px, ${bg} ${stripeW/2}px, ${bg} ${stripeW}px)`,
+      flexShrink: 0,
+    }}/>
+  );
+};
+
+// Warning triangle
+const WarnTriangle = ({ size=40, color=YELLOW }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" style={{flexShrink:0}}>
+    <polygon points="20,3 38,36 2,36" fill={color} stroke={INK} strokeWidth="1.5"/>
+    <text x="20" y="31" textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="18" fill={INK}>!</text>
+  </svg>
+);
+
+// Barcode
+const Barcode = ({ value='GG-2025-0042', w=120, h=40 }) => {
+  const bars = Array.from({length:52},(_,i)=>(i*37+17)%13<6);
+  const bw = w/52;
+  return (
+    <svg width={w} height={h+14} viewBox={`0 0 ${w} ${h+14}`}>
+      <rect width={w} height={h+14} fill={WHITE}/>
+      {bars.map((on,i)=>on&&<rect key={i} x={i*bw} y={2} width={bw-0.4} height={h} fill={INK}/>)}
+      <text x={w/2} y={h+13} textAnchor="middle" fontFamily={M} fontSize="7" fill={INK}>{value}</text>
+    </svg>
+  );
+};
+
+// Handling icon — fragile
+const IconFragile = ({ size=36 }) => (
+  <svg width={size} height={size} viewBox="0 0 36 36">
+    <rect width={36} height={36} fill={INK}/>
+    <text x="18" y="14" textAnchor="middle" fontFamily={M} fontSize="16" fill={WHITE}>🥃</text>
+    <text x="18" y="30" textAnchor="middle" fontFamily={M} fontSize="6" fill={GREY} letterSpacing="1">FRAGILE</text>
+  </svg>
+);
+
+// Handling icon — arrows up
+const IconUp = ({ size=36 }) => (
+  <svg width={size} height={size} viewBox="0 0 36 36">
+    <rect width={36} height={36} fill={INK}/>
+    <path d="M10 26 L10 14 L7 17 M10 14 L13 17" stroke={WHITE} strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <path d="M26 26 L26 14 L23 17 M26 14 L29 17" stroke={WHITE} strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <text x="18" y="30" textAnchor="middle" fontFamily={M} fontSize="5" fill={GREY} letterSpacing="1">THIS SIDE UP</text>
+  </svg>
+);
+
+// Handling icon — keep dry
+const IconDry = ({ size=36 }) => (
+  <svg width={size} height={size} viewBox="0 0 36 36">
+    <rect width={36} height={36} fill={INK}/>
+    <path d="M12 20 L16 16 M20 20 L24 16" stroke={WHITE} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    <path d="M18 8 L18 24" stroke={YELLOW} strokeWidth="1.5"/>
+    <line x1="8" y1="8" x2="28" y2="8" stroke={GREY} strokeWidth="1" strokeDasharray="2 2"/>
+    <text x="18" y="31" textAnchor="middle" fontFamily={M} fontSize="5" fill={GREY} letterSpacing="1">KEEP DRY</text>
+  </svg>
+);
+
+// Spec label row
+const SpecRow = ({ label, value, highlight=false, mono=true }) => (
+  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',
+    padding:'5px 8px',background:highlight?`${YELLOW}18`:INK2,
+    borderBottom:`1px solid ${INK3}`}}>
+    <span style={{fontFamily:M,fontSize:8,color:GREY,letterSpacing:'0.5px',textTransform:'uppercase'}}>{label}</span>
+    <span style={{fontFamily:M,fontSize:highlight?10:9,color:highlight?YELLOW:WHITE,fontWeight:highlight?'700':'400'}}>{value}</span>
+  </div>
+);
+
+// ── BOX FACE: FRONT ──────────────────────────────────────────────────────────
+const BoxFront = () => (
+  <div style={{width:'100%',height:'100%',background:INK,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column'}}>
+
+    {/* Top hazard bar */}
+    <HazardBar h={20}/>
+
+    {/* Main header panel */}
+    <div style={{background:INK,padding:'12px 16px 10px',borderBottom:`2px solid ${YELLOW}`}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
+        <div>
+          <div style={{fontFamily:S,fontWeight:700,fontSize:22,letterSpacing:'4px',color:WHITE,lineHeight:1}}>
+            GLASS<span style={{color:YELLOW}}>⏧</span>GRASIE
+            <sup style={{fontSize:10,color:YELLOW,verticalAlign:'super',letterSpacing:0}}>®</sup>
+          </div>
+          <div style={{fontFamily:M,fontSize:9,color:DGREY,letterSpacing:'3px',marginTop:4}}>ROTTERDAM, NL · EST. 2025</div>
+        </div>
+        <WarnTriangle size={44} color={YELLOW}/>
+      </div>
+    </div>
+
+    {/* BIG WARNING PANEL */}
+    <div style={{background:YELLOW,padding:'8px 16px',display:'flex',alignItems:'center',gap:12}}>
+      <div style={{fontFamily:M,fontWeight:700,fontSize:26,color:INK,letterSpacing:'2px',lineHeight:1}}>
+        ⚠ GLAS · GLASS
+      </div>
+    </div>
+
+    {/* CAUTION band */}
+    <div style={{background:INK2,padding:'6px 16px',borderBottom:`1px solid ${INK3}`,display:'flex',gap:16,alignItems:'center'}}>
+      <div style={{fontFamily:M,fontWeight:700,fontSize:11,color:YELLOW,letterSpacing:'3px'}}>VOORZICHTIG</div>
+      <div style={{width:1,height:16,background:DGREY}}/>
+      <div style={{fontFamily:M,fontWeight:700,fontSize:11,color:YELLOW,letterSpacing:'3px'}}>CAUTION</div>
+      <div style={{width:1,height:16,background:DGREY}}/>
+      <div style={{fontFamily:M,fontWeight:700,fontSize:11,color:YELLOW,letterSpacing:'3px'}}>HANDLE WITH CARE</div>
+    </div>
+
+    {/* Content area: left specs + right icons */}
+    <div style={{flex:1,display:'grid',gridTemplateColumns:'1fr auto',gap:0}}>
+
+      {/* Left: product info */}
+      <div style={{padding:'12px 16px',display:'flex',flexDirection:'column',gap:1,borderRight:`1px solid ${INK3}`}}>
+        <div style={{fontFamily:R,fontStyle:'italic',fontWeight:300,fontSize:20,color:WHITE,marginBottom:8,lineHeight:1.2}}>
+          Fragment Tie Bar<br/>
+          <span style={{fontSize:14,color:GREY}}>Forest Floor · Run VD-2025-0138</span>
+        </div>
+
+        <SpecRow label="Serienummer" value="GG-2025-0042" highlight/>
+        <SpecRow label="Materiaal" value="Bedrukt restglas 3mm"/>
+        <SpecRow label="Bron" value="Van Dijken Glas"/>
+        <SpecRow label="Kwaliteit" value="A — Gecertificeerd"/>
+        <SpecRow label="CO₂ offset" value="0.087 kg"/>
+        <SpecRow label="Blockchain" value="XRP Ledger · On-chain ✓" highlight/>
+
+        <div style={{marginTop:8}}>
+          <Barcode value="GG-2025-0042" w={140} h={36}/>
+        </div>
+      </div>
+
+      {/* Right: icons + QR */}
+      <div style={{width:72,display:'flex',flexDirection:'column',alignItems:'center',padding:'8px 0',gap:6,background:INK2}}>
+        <IconUp size={52}/>
+        <IconFragile size={52}/>
+        <IconDry size={52}/>
+        {/* Mini QR */}
+        <div style={{width:48,height:48,background:WHITE,padding:4,display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'0.5px',marginTop:4}}>
+          {Array.from({length:49},(_,i)=>{
+            const r=Math.floor(i/7),c=i%7;
+            const corner=(r<2&&c<2)||(r<2&&c>4)||(r>4&&c<2);
+            return <div key={i} style={{background:corner||((i*31+7)%7>3)?INK:WHITE}}/>;
+          })}
+        </div>
+        <div style={{fontFamily:M,fontSize:5,color:DGREY,letterSpacing:'0.5px',textAlign:'center',padding:'0 4px'}}>SCAN<br/>CERT</div>
+      </div>
+    </div>
+
+    {/* Protection note */}
+    <div style={{padding:'6px 16px',background:INK3,borderTop:`1px solid ${INK2}`,display:'flex',gap:8,alignItems:'center'}}>
+      <WarnTriangle size={16} color={YELLOW}/>
+      <span style={{fontFamily:M,fontSize:8,color:DGREY,letterSpacing:'1px'}}>NFT CERTIFICAAT VAN HERKOMST INBEGREPEN — glassgrasie.nl/cert/GG-2025-0042</span>
+    </div>
+
+    {/* Bottom hazard */}
+    <HazardBar h={18}/>
+  </div>
+);
+
+// ── BOX FACE: SIDE ──────────────────────────────────────────────────────────
+const BoxSide = () => (
+  <div style={{width:'100%',height:'100%',background:INK,display:'flex',flexDirection:'column'}}>
+    <HazardBar h={16}/>
+    <div style={{flex:1,padding:'10px 12px',display:'flex',flexDirection:'column',gap:8}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:`1px solid ${INK3}`,paddingBottom:8}}>
+        <div style={{fontFamily:S,fontWeight:700,fontSize:10,letterSpacing:'3px',color:WHITE}}>
+          G<span style={{color:YELLOW}}>⏧</span>G
+        </div>
+        <WarnTriangle size={28} color={YELLOW}/>
+      </div>
+      <SpecRow label="Batch" value="VD-2025-0138"/>
+      <SpecRow label="Dim" value="120 × 80 × 40mm"/>
+      <SpecRow label="Gewicht" value="0.41 kg (netto)"/>
+      <SpecRow label="Temp" value="+5°C – +40°C"/>
+      <div style={{flex:1,display:'flex',flexDirection:'column',gap:4,marginTop:4}}>
+        <div style={{fontFamily:M,fontSize:7,color:DGREY,letterSpacing:'1px',textTransform:'uppercase',marginBottom:2}}>Handling</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:4}}>
+          <IconUp size={40}/>
+          <IconFragile size={40}/>
+        </div>
+      </div>
+      <Barcode value="VD-2025-0138" w={100} h={28}/>
+    </div>
+    <HazardBar h={16}/>
+  </div>
+);
+
+// ── BOX FACE: TOP LID ───────────────────────────────────────────────────────
+const BoxTop = () => (
+  <div style={{width:'100%',height:'100%',background:INK,position:'relative',overflow:'hidden',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16,padding:'20px'}}>
+    <HazardBar h={14} w='100%'/>
+    {/* center content */}
+    <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12,padding:'0 20px'}}>
+      <div style={{fontFamily:S,fontWeight:700,fontSize:28,letterSpacing:'6px',color:WHITE,textAlign:'center',lineHeight:1.1}}>
+        GLASS<br/><span style={{color:YELLOW,fontSize:36}}>⏧</span><br/>GRASIE<sup style={{fontSize:12,color:YELLOW,verticalAlign:'super',letterSpacing:0}}>®</sup>
+      </div>
+      <div style={{display:'flex',flexDirection:'column',gap:1,width:'100%',maxWidth:220}}>
+        <SpecRow label="Inhoud" value="1× sieraad · 1× cert"/>
+        <SpecRow label="Fragile" value="⚠ GLAS" highlight/>
+        <SpecRow label="Run" value="VD-2025-0138"/>
+      </div>
+      <div style={{display:'flex',gap:12,marginTop:4}}>
+        <WarnTriangle size={32} color={YELLOW}/>
+        <WarnTriangle size={32} color={YELLOW}/>
+        <WarnTriangle size={32} color={YELLOW}/>
+      </div>
+    </div>
+    <HazardBar h={14} w='100%'/>
+  </div>
+);
+
+// ── BOX FACE: BACK ──────────────────────────────────────────────────────────
+const BoxBack = () => (
+  <div style={{width:'100%',height:'100%',background:INK,display:'flex',flexDirection:'column'}}>
+    <HazardBar h={20}/>
+    <div style={{padding:'12px 16px',display:'flex',flexDirection:'column',gap:10,flex:1}}>
+      <div style={{fontFamily:M,fontWeight:700,fontSize:11,color:YELLOW,letterSpacing:'3px',borderBottom:`1px solid ${INK3}`,paddingBottom:8}}>
+        ▲ INHOUD / CONTENTS
+      </div>
+      <div style={{fontFamily:R,fontStyle:'italic',fontSize:15,color:WHITE,lineHeight:1.7}}>
+        1× Fragment Tie Bar — Forest Floor<br/>
+        1× Certificaat van Herkomst (papier)<br/>
+        1× NFT Certificaat (digitaal, email)<br/>
+        1× Informatieboekje
+      </div>
+      <div style={{marginTop:4,padding:'10px',background:YELLOW,display:'flex',gap:10,alignItems:'flex-start'}}>
+        <WarnTriangle size={32} color={INK}/>
+        <div>
+          <div style={{fontFamily:M,fontWeight:700,fontSize:10,color:INK,letterSpacing:'2px',marginBottom:4}}>GLASS OBJECT — BREEKBAAR</div>
+          <div style={{fontFamily:M,fontSize:8,color:INK,lineHeight:1.7}}>
+            Dit pakket bevat glas van 3mm dikte.<br/>
+            Niet gooien · Niet neerleggen · Rechtop bewaren.
+          </div>
+        </div>
+      </div>
+      <div style={{marginTop:'auto'}}>
+        {[['Besteld via','glassgrasie.nl'],['Klantenservice','hallo@glassgrasie.nl'],['Retour','30 dagen · zie website'],['Blockchain','glassgrasie.nl/cert/GG-2025-0042']].map(([k,v])=>(
+          <SpecRow key={k} label={k} value={v}/>
+        ))}
+      </div>
+      <div style={{marginTop:8,display:'flex',gap:8,alignItems:'center'}}>
+        <Barcode value="GG-2025-0042" w={120} h={32}/>
+        <div style={{flex:1}}>
+          <div style={{fontFamily:M,fontSize:7,color:DGREY,letterSpacing:'1px',lineHeight:1.9}}>
+            KVK: 0000000<br/>
+            BTW: NL000000B01<br/>
+            Rotterdam, NL
+          </div>
+        </div>
+      </div>
+    </div>
+    <HazardBar h={18}/>
+  </div>
+);
+
+// ── 3D BOX VISUALIZATION (isometric-style) ──────────────────────────────────
+const Box3D = () => {
+  // Isometric projection dimensions
+  const W=300, H=200, D=100;
+  // Perspective approximation using SVG transforms
+  return (
+    <div style={{width:'100%',height:'100%',background:'#1a1818',display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
+      {/* Shadow */}
+      <div style={{position:'absolute',bottom:'14%',left:'50%',transform:'translateX(-50%)',
+        width:360,height:24,background:'rgba(0,0,0,0.5)',filter:'blur(12px)',borderRadius:'50%'}}/>
+      <svg width={520} height={420} viewBox="0 0 520 420" style={{overflow:'visible'}}>
+        <defs>
+          {/* Front face gradient */}
+          <linearGradient id="frontGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#181614"/>
+            <stop offset="100%" stopColor="#0A0908"/>
+          </linearGradient>
+          {/* Top face gradient */}
+          <linearGradient id="topGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#282420"/>
+            <stop offset="100%" stopColor="#1A1816"/>
+          </linearGradient>
+          {/* Right face gradient */}
+          <linearGradient id="rightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#111010"/>
+            <stop offset="100%" stopColor="#0A0908"/>
+          </linearGradient>
+        </defs>
+
+        {/* ── RIGHT FACE ── */}
+        <polygon points="370,100 520,160 520,340 370,280" fill="url(#rightGrad)" stroke="#333" strokeWidth="1"/>
+        {/* Right hazard bars */}
+        {[100,118,318,300].slice(0,2).map(y=>(
+          <polygon key={y} points={`370,${y} 520,${y+42} 520,${y+60} 370,${y+18}`}
+            fill={YELLOW} opacity="0.85"/>
+        ))}
+        {/* Right labels */}
+        <text x={445} y={200} textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="11" fill={YELLOW}
+          transform="rotate(27,445,200)" letterSpacing="2">G⏧G · GLASS</text>
+        <text x={445} y={230} textAnchor="middle" fontFamily={M} fontSize="8" fill={DGREY}
+          transform="rotate(27,445,230)" letterSpacing="1">BREEKBAAR · FRAGILE</text>
+        {/* Right warning triangle */}
+        <g transform="translate(430,250) rotate(27)">
+          <polygon points="0,-14 12,8 -12,8" fill={YELLOW} stroke="#0A0908" strokeWidth="1"/>
+          <text x="0" y="6" textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="10" fill={INK}>!</text>
+        </g>
+
+        {/* ── TOP FACE ── */}
+        <polygon points="20,100 370,100 520,160 170,160" fill="url(#topGrad)" stroke="#333" strokeWidth="1"/>
+        {/* Top hazard stripes */}
+        <clipPath id="topClip"><polygon points="20,100 370,100 520,160 170,160"/></clipPath>
+        <g clipPath="url(#topClip)">
+          {Array.from({length:20},(_,i)=>(
+            <line key={i} x1={20+i*28} y1={95} x2={20+i*28-30} y2={168}
+              stroke={YELLOW} strokeWidth="12" opacity="0.12"/>
+          ))}
+        </g>
+        {/* Top text */}
+        <text x={270} y={136} textAnchor="middle" fontFamily={S} fontWeight="700" fontSize="13"
+          fill={WHITE} letterSpacing="4" transform="skewX(-10)">Glass⏧Grasie</text>
+        <text x={270} y={150} textAnchor="middle" fontFamily={M} fontSize="8"
+          fill={YELLOW} letterSpacing="2" transform="skewX(-10)">⚠ GLAS · FRAGILE ⚠</text>
+
+        {/* ── FRONT FACE ── */}
+        <polygon points="20,100 370,100 370,280 20,280" fill="url(#frontGrad)" stroke="#333" strokeWidth="1"/>
+
+        {/* Front: top hazard bar */}
+        <polygon points="20,100 370,100 370,120 20,120" fill={YELLOW} opacity="0.9"/>
+        <text x={195} y={114} textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="10" fill={INK} letterSpacing="3">▲▲ VOORZICHTIG · CAUTION · HANDLE WITH CARE ▲▲</text>
+
+        {/* Front: main branding */}
+        <text x={195} y={150} textAnchor="middle" fontFamily={S} fontWeight="700" fontSize="28" fill={WHITE} letterSpacing="4">GLASS</text>
+        <text x={195} y={178} textAnchor="middle" fontFamily={S} fontWeight="700" fontSize="40" fill={YELLOW} letterSpacing="2">⏧</text>
+        <text x={195} y={208} textAnchor="middle" fontFamily={S} fontWeight="700" fontSize="28" fill={WHITE} letterSpacing="4">GRASIE®</text>
+
+        {/* Front: left spec panel */}
+        <rect x={20} y={214} width={165} height={52} fill={INK2} stroke={INK3} strokeWidth="0.5"/>
+        <text x={28} y={226} fontFamily={M} fontSize="7" fill={YELLOW} letterSpacing="1">BATCH: VD-2025-0138</text>
+        <text x={28} y={237} fontFamily={M} fontSize="7" fill={GREY} letterSpacing="1">SERIE: GG-2025-0042</text>
+        <text x={28} y={248} fontFamily={M} fontSize="7" fill={GREY} letterSpacing="1">MAT: RESTGLAS 3MM</text>
+        <text x={28} y={259} fontFamily={M} fontSize="7" fill={GREY} letterSpacing="1">ROTTERDAM · NL</text>
+
+        {/* Front: right warning panel */}
+        <rect x={200} y={214} width={170} height={52} fill={YELLOW} stroke={YELL2} strokeWidth="0.5"/>
+        <text x={285} y={230} textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="11" fill={INK} letterSpacing="2">⚠ GLAS OBJECT</text>
+        <text x={285} y={244} textAnchor="middle" fontFamily={M} fontSize="8" fill={INK} letterSpacing="1">BREEKBAAR · FRAGILE</text>
+        <text x={285} y={256} textAnchor="middle" fontFamily={M} fontSize="7" fill={INK2} letterSpacing="0.5">Niet gooien · Do not drop</text>
+
+        {/* Front: bottom hazard */}
+        <polygon points="20,268 370,268 370,280 20,280" fill={YELLOW} opacity="0.85"/>
+        <text x={195} y={276.5} textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="7" fill={INK} letterSpacing="2">glassgrasie.nl/cert/GG-2025-0042</text>
+
+        {/* Edge highlights */}
+        <line x1={20} y1={100} x2={20} y2={280} stroke="#2a2826" strokeWidth="2"/>
+        <line x1={370} y1={100} x2={370} y2={280} stroke="#333" strokeWidth="1.5"/>
+        <line x1={20} y1={100} x2={370} y2={100} stroke="#333" strokeWidth="1.5"/>
+      </svg>
+    </div>
+  );
+};
+
+// ── INDUSTRIAL DIELINE ──────────────────────────────────────────────────────
+const IndustrialDieline = () => {
+  const sc=1.4;
+  const W=120, H=80, D=40, G=18;
+  const CUT='#FF3B30', FOLD='#2196F3';
+  const TW=(D+W+D+W+G)*sc, TH=(D+H+D)*sc;
+  const p=n=>n*sc;
+
+  return (
+    <div style={{width:'100%',height:'100%',background:'#1a1818',overflow:'auto',padding:16}}>
+      <div style={{fontFamily:M,fontSize:8,color:GREY,letterSpacing:'2px',textTransform:'uppercase',marginBottom:12}}>
+        Dieline — 120×80×40mm · Industrial Black Box · Schaal 1:1.4
+      </div>
+
+      {/* Legend */}
+      <div style={{display:'flex',gap:20,marginBottom:14,flexWrap:'wrap'}}>
+        {[[CUT,'Snijlijn'],[FOLD,'Vouwlijn'],['#444','Bedrukgebied']].map(([c,l])=>(
+          <div key={l} style={{display:'flex',alignItems:'center',gap:6}}>
+            <div style={{width:20,height:2,background:c}}/>
+            <span style={{fontFamily:M,fontSize:8,color:GREY}}>{l}</span>
+          </div>
+        ))}
+      </div>
+
+      <svg width={TW+60} height={TH+60} viewBox={`-30 -30 ${TW+60} ${TH+60}`}>
+        {/* ── Face fills ── */}
+        {/* Left flap */}
+        <rect x={0} y={p(D)} width={p(D)} height={p(H)} fill="#141210"/>
+        {/* Front face */}
+        <rect x={p(D)} y={p(D)} width={p(W)} height={p(H)} fill="#0A0908"/>
+        {/* Right flap */}
+        <rect x={p(D+W)} y={p(D)} width={p(D)} height={p(H)} fill="#141210"/>
+        {/* Back face */}
+        <rect x={p(D+W+D)} y={p(D)} width={p(W)} height={p(H)} fill="#111010"/>
+        {/* Glue */}
+        <rect x={p(D+W+D+W)} y={p(D)} width={p(G)} height={p(H)} fill="#1a1208" opacity="0.7"/>
+        {/* Top flaps */}
+        <rect x={p(D)} y={0} width={p(W)} height={p(D)} fill="#181614"/>
+        <rect x={p(D+W+D)} y={0} width={p(W)} height={p(D)} fill="#181614"/>
+        {/* Bottom flaps */}
+        <rect x={p(D)} y={p(D+H)} width={p(W)} height={p(D)} fill="#181614"/>
+        <rect x={p(D+W+D)} y={p(D+H)} width={p(W)} height={p(D)} fill="#181614"/>
+
+        {/* ── Front face design ── */}
+        {/* Hazard stripes top */}
+        {Array.from({length:20},(_,i)=>(
+          <rect key={i} x={p(D)+i*10} y={p(D)} width={5} height={p(H)} fill={YELLOW} opacity="0.04"/>
+        ))}
+        <rect x={p(D)} y={p(D)} width={p(W)} height={p(H)*0.18} fill={YELLOW} opacity="0.85"/>
+        <text x={p(D+W/2)} y={p(D)+13} textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="9" fill={INK} letterSpacing="2">⚠ GLAS · CAUTION · FRAGILE ⚠</text>
+
+        <text x={p(D+W/2)} y={p(D)+40} textAnchor="middle" fontFamily={S} fontWeight="700" fontSize="14" fill={WHITE} letterSpacing="3">Glass⏧Grasie</text>
+        <text x={p(D+W/2)} y={p(D)+54} textAnchor="middle" fontFamily={M} fontSize="7" fill={YELLOW} letterSpacing="1">BATCH: VD-2025-0138 · GG-2025-0042</text>
+
+        {/* Bottom hazard strip on front */}
+        <rect x={p(D)} y={p(D+H)-p(H)*0.15} width={p(W)} height={p(H)*0.15} fill={YELLOW} opacity="0.85"/>
+        <text x={p(D+W/2)} y={p(D+H)-5} textAnchor="middle" fontFamily={M} fontSize="7" fill={INK} letterSpacing="1">glassgrasie.nl</text>
+
+        {/* ── Back face design ── */}
+        <text x={p(D+W+D+W/2)} y={p(D)+18} textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="9" fill={YELLOW} letterSpacing="2">▲ INHOUD / CONTENTS</text>
+        {['1× Fragment sieraad','1× Certificaat (papier)','1× NFT certificaat'].map((t,i)=>(
+          <text key={i} x={p(D+W+D)+8} y={p(D)+32+i*12} fontFamily={M} fontSize="7" fill={GREY} letterSpacing="0.5">— {t}</text>
+        ))}
+        {/* Warning panel on back */}
+        <rect x={p(D+W+D)+8} y={p(D)+72} width={p(W)-16} height={26} fill={YELLOW}/>
+        <text x={p(D+W+D+W/2)} y={p(D)+82} textAnchor="middle" fontFamily={M} fontWeight="700" fontSize="8" fill={INK} letterSpacing="1">⚠ BREEKBAAR · FRAGILE GLASS</text>
+        <text x={p(D+W+D+W/2)} y={p(D)+93} textAnchor="middle" fontFamily={M} fontSize="6.5" fill={INK}>Niet gooien · Rechtop bewaren</text>
+
+        {/* ── Fold lines ── */}
+        {[p(D),p(D+W),p(D+W+D),p(D+W+D+W)].map(x=>(
+          <line key={x} x1={x} y1={-10} x2={x} y2={TH+10} stroke={FOLD} strokeWidth="0.8" strokeDasharray="4 3"/>
+        ))}
+        <line x1={-10} y1={p(D)} x2={TW+10} y2={p(D)} stroke={FOLD} strokeWidth="0.8" strokeDasharray="4 3"/>
+        <line x1={-10} y1={p(D+H)} x2={TW+10} y2={p(D+H)} stroke={FOLD} strokeWidth="0.8" strokeDasharray="4 3"/>
+
+        {/* ── Cut lines ── */}
+        <rect x={p(D)} y={0} width={p(W)} height={p(D)} stroke={CUT} strokeWidth="1" fill="none"/>
+        <rect x={p(D+W+D)} y={0} width={p(W)} height={p(D)} stroke={CUT} strokeWidth="1" fill="none"/>
+        <rect x={p(D)} y={p(D+H)} width={p(W)} height={p(D)} stroke={CUT} strokeWidth="1" fill="none"/>
+        <rect x={p(D+W+D)} y={p(D+H)} width={p(W)} height={p(D)} stroke={CUT} strokeWidth="1" fill="none"/>
+        <rect x={0} y={p(D)} width={p(D)} height={p(H)} stroke={CUT} strokeWidth="1" fill="none"/>
+        <rect x={p(D+W)} y={p(D)} width={p(D)} height={p(H)} stroke={CUT} strokeWidth="1" fill="none"/>
+        <rect x={p(D+W+D+W)} y={p(D)} width={p(G)} height={p(H)} stroke={CUT} strokeWidth="1" fill="none" strokeDasharray="3 2" opacity="0.7"/>
+
+        {/* ── Dim labels ── */}
+        {[[p(D),p(D+W),p(-20),`${W}mm`],[p(D+W+D),p(D+W+D+W),p(-20),`${W}mm`],[0,p(D),p(-20),`${D}mm`],[p(D+W),p(D+W+D),p(-20),`${D}mm`]].map(([x1,x2,y,l],i)=>(
+          <g key={i}>
+            <line x1={x1} y1={y+4} x2={x2} y2={y+4} stroke="#555" strokeWidth="0.5"/>
+            <text x={(x1+x2)/2} y={y-2} textAnchor="middle" fontFamily={M} fontSize="7" fill="#777">{l}</text>
+          </g>
+        ))}
+      </svg>
+
+      {/* Print specs */}
+      <div style={{marginTop:14,display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:1,background:'#333',maxWidth:600}}>
+        {[['Materiaal','Golfkarton B-flute, 300gsm'],['Kleur','PMS Black 6C (mat laminaat)'],['Accent','PMS 109 C (geel) + wit'],['Hazard stripes','1×0 zeefdruk (UV)'],['Afwerking','Mat laminaat buitenzijde'],['Stempelsnijden','Tussenvorm uitsnede + rillen']].map(([k,v])=>(
+          <React.Fragment key={k}>
+            <div style={{background:'#1a1818',padding:'6px 10px',fontFamily:M,fontSize:8,color:'#666'}}>{k}</div>
+            <div style={{background:'#111',padding:'6px 10px',fontFamily:M,fontSize:8,color:GREY,gridColumn:'span 1'}}>{v}</div>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ── Label / Sticker ──────────────────────────────────────────────────────────
+const WarningLabel = () => (
+  <div style={{width:'100%',height:'100%',background:'#1a1818',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
+    <div style={{width:240,border:`2px solid ${YELLOW}`}}>
+      <HazardBar h={14}/>
+      <div style={{background:INK,padding:'10px 14px'}}>
+        <div style={{display:'flex',gap:10,alignItems:'center',marginBottom:8}}>
+          <WarnTriangle size={36} color={YELLOW}/>
+          <div>
+            <div style={{fontFamily:M,fontWeight:700,fontSize:14,color:YELLOW,letterSpacing:'2px'}}>⚠ GLAS</div>
+            <div style={{fontFamily:M,fontSize:9,color:WHITE,letterSpacing:'1px'}}>FRAGILE GLASS OBJECT</div>
+          </div>
+        </div>
+        <div style={{fontFamily:M,fontSize:8,color:GREY,lineHeight:1.9}}>
+          Niet gooien · Do not drop<br/>
+          Rechtop bewaren · Store upright<br/>
+          Niet nat maken · Keep dry
+        </div>
+        <div style={{marginTop:8,display:'flex',gap:6}}>
+          <IconUp size={32}/><IconFragile size={32}/><IconDry size={32}/>
+        </div>
+        <div style={{marginTop:8,borderTop:`1px solid ${INK3}`,paddingTop:6}}>
+          <Barcode value="GG-2025-0042" w={180} h={28}/>
+        </div>
+      </div>
+      <HazardBar h={14}/>
+    </div>
+  </div>
+);
+
+// ── Shipping label ────────────────────────────────────────────────────────────
+const ShippingLabel = () => (
+  <div style={{width:'100%',height:'100%',background:'#1a1818',display:'flex',alignItems:'center',justifyContent:'center',padding:12}}>
+    <div style={{width:280,background:WHITE,border:'2px solid #333'}}>
+      <div style={{background:INK,padding:'8px 12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div style={{fontFamily:S,fontWeight:700,fontSize:10,letterSpacing:'3px',color:WHITE}}>GLASS<span style={{color:YELLOW}}>⏧</span>GRASIE<sup style={{fontSize:'0.45em',color:YELLOW,verticalAlign:'super'}}>®</sup></div>
+        <WarnTriangle size={24} color={YELLOW}/>
+      </div>
+      <div style={{padding:'8px 12px'}}>
+        <div style={{fontFamily:M,fontSize:7,color:'#666',textTransform:'uppercase',marginBottom:4}}>Afzender</div>
+        <div style={{fontFamily:M,fontSize:10,color:'#222',lineHeight:1.8}}>
+          Glass⏧Grasie®<br/>
+          Orteliusplein 4<br/>
+          3014 RN Rotterdam, NL
+        </div>
+        <div style={{height:1,background:'#ddd',margin:'8px 0'}}/>
+        <div style={{fontFamily:M,fontSize:7,color:'#666',textTransform:'uppercase',marginBottom:4}}>Ontvanger</div>
+        <div style={{fontFamily:M,fontSize:10,color:'#222',lineHeight:1.8}}>
+          [Naam ontvanger]<br/>
+          [Straat + huisnummer]<br/>
+          [Postcode + Stad, Land]
+        </div>
+        <div style={{height:1,background:'#ddd',margin:'8px 0'}}/>
+        <div style={{display:'flex',gap:12,alignItems:'center'}}>
+          <Barcode value="GG-ORD-2026-001" w={140} h={32}/>
+          <div>
+            <div style={{fontFamily:M,fontSize:7,color:'#666'}}>TRACK</div>
+            <div style={{fontFamily:M,fontSize:8,color:'#222'}}>GG-001</div>
+          </div>
+        </div>
+        <div style={{background:YELLOW,padding:'4px 8px',marginTop:6,display:'flex',gap:6,alignItems:'center'}}>
+          <WarnTriangle size={16} color={INK}/>
+          <span style={{fontFamily:M,fontWeight:700,fontSize:8,color:INK,letterSpacing:'1px'}}>FRAGILE GLAS — BREEKBAAR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="3d" title="3D Visualisatie" subtitle="Industrial black box — isometrisch aanzicht">
+        <DCArtboard id="box3d" label="Isometrisch — Geassembleerd" width={560} height={460}>
+          <Box3D/>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="faces" title="Doosbedrukking — Vlakken" subtitle="Voorzijde · Achterzijde · Zijkant · Bovenkant">
+        <DCArtboard id="front" label="Voorzijde — 120×80mm" width={320} height={320}>
+          <BoxFront/>
+        </DCArtboard>
+        <DCArtboard id="back" label="Achterzijde — 120×80mm" width={320} height={320}>
+          <BoxBack/>
+        </DCArtboard>
+        <DCArtboard id="side" label="Zijkant — 40×80mm" width={180} height={320}>
+          <BoxSide/>
+        </DCArtboard>
+        <DCArtboard id="top" label="Bovenkant — 120×40mm" width={320} height={180}>
+          <BoxTop/>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="dieline" title="Dieline + Snijvorm" subtitle="Schaal 1:1.4 · snijlijnen (rood) · vouwlijnen (blauw)">
+        <DCArtboard id="die" label="Industriële doosdieline" width={660} height={480}>
+          <IndustrialDieline/>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="labels" title="Labels & Stickers" subtitle="Waarschuwingslabel · Verzendlabel">
+        <DCArtboard id="warn-label" label="Warning Label — 90×60mm" width={280} height={220}>
+          <WarningLabel/>
+        </DCArtboard>
+        <DCArtboard id="ship-label" label="Verzendlabel — 100×150mm" width={320} height={300}>
+          <ShippingLabel/>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
